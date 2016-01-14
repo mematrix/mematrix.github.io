@@ -1,0 +1,564 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>开发笔记 | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="在开发过程中的一些笔记心得，包括一些技巧方法和记录。不定期整理更新。
+
+最近更新时间：2015年11月16日">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开发笔记">
+<meta property="og:url" content="http://3meng.github.io/2015/07/31/development-notes/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="在开发过程中的一些笔记心得，包括一些技巧方法和记录。不定期整理更新。
+
+最近更新时间：2015年11月16日">
+<meta property="og:updated_time" content="2015-11-16T15:49:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开发笔记">
+<meta name="twitter:description" content="在开发过程中的一些笔记心得，包括一些技巧方法和记录。不定期整理更新。
+
+最近更新时间：2015年11月16日">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/31/development-notes/" title="开发笔记" itemprop="url">开发笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-31T13:30:47.000Z" itemprop="datePublished"> 发表于 2015-07-31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u521D_u59CB_u5316"><span class="toc-number">1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VisualStateManager_u7528_u6CD5_u7EC6_u8282"><span class="toc-number">2.</span> <span class="toc-text">VisualStateManager用法细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UIElement-Transitions"><span class="toc-number">3.</span> <span class="toc-text">UIElement.Transitions</span></a></li></ol>
+		
+		</div>
+		
+		<p>在开发过程中的一些笔记心得，包括一些技巧方法和记录。不定期整理更新。</p>
+<blockquote>
+<p>最近更新时间：<code>2015年11月16日</code></p>
+</blockquote>
+<a id="more"></a>
+<ul>
+<li>2015年7月31日，初始化。</li>
+<li>2015年11月12日，<code>VisualStateManager</code>使用细节。</li>
+<li>2015年11月16日，<code>UIElement.Transitions</code>使用注意。</li>
+</ul>
+<h2 id="u521D_u59CB_u5316"><a href="#u521D_u59CB_u5316" class="headerlink" title="初始化"></a>初始化</h2><p>文章原文件建立很早了，但是期间由于各种各样的问题（包括自身和外界的），一直到今天（2015年11月12日）才继续，不仅仅是继续这篇文章，也是继续博客。期间因为更换了电脑硬盘，重装了一次系统，所以很多程序都没有安装，这也是一直拖到今天的原因之一，其它的，不一一细表。</p>
+<h2 id="VisualStateManager_u7528_u6CD5_u7EC6_u8282"><a href="#VisualStateManager_u7528_u6CD5_u7EC6_u8282" class="headerlink" title="VisualStateManager用法细节"></a>VisualStateManager用法细节</h2><blockquote>
+<p>2015年11月12日</p>
+</blockquote>
+<p>今天开始尝试<code>Universal Windows Platform (UWP)</code>应用程序开发，首先当然是找到Windows 10中针对响应式程序设计所新增的内容，从网上搜索，发现一片都是提<code>RelativePanel</code>控件和<code>AdaptiveTrigger</code>的，于是就从这两个开始入门了。</p>
+<p>但是在测试过程中，发现设定的<code>AdaptiveTrigger</code>并没有起作用，到MSDN中搜索发现了下面的一句话：</p>
+<blockquote>
+<p>When you use <code>StateTriggers</code>, <strong>ensure</strong> that the <code>VisualStateGroup</code> is declared under the first child of the root in order for the triggers to take effect automatically.</p>
+</blockquote>
+<p>看来问题出在这里了，使用了<code>StateTriggers</code>属性之后，必须确保<code>VisualStateGroup</code>是在根节点的第一个子节点下声明的，而在这里，根节点为<code>Page</code>元素，默认是有一个<code>Grid</code>类型的布局子元素，也就是我们需要在这个<code>Grid</code>元素下面声明我们的状态组对象，而这里我直接写到了根节点（<code>Page</code>）下了，所以会没有被触发。</p>
+<p>当修改之后，可以很直观的在VS的XAML设计器中看到状态的变化，这一点很赞，不用再去编译运行来查看效果了。</p>
+<p>而这里的提示，也可以作为一条“潜规则”了，回想一下，以前自定义控件样式/模版的时候，也都是把控件的视觉状态组声明到元素<code>ControlTemplate</code>的子节点下，虽然那时候并没有使用<code>StateTriggers</code>，（因为没有），但是这个习惯却可以保持下去，免得出现不必要的bug。</p>
+<blockquote>
+<p>顺便提一句，有关UWP的内容，最好尽量选择查看英文MSDN页面，因为目前好像中文版还没有更新，仍然是老旧的内容说明。比如，你可以对比一下上面的<code>Visual State</code>类的两种语言说明：<a href="https://msdn.microsoft.com/zh-cn/library/windows/apps/windows.ui.xaml.visualstate.aspx" title="Visual State类中文页面" target="_blank" rel="external">Visual State 类</a> &amp; <a href="https://msdn.microsoft.com/en-us/library/windows/apps/windows.ui.xaml.visualstate.aspx" title="Visual State class" target="_blank" rel="external">Visual State class</a>，可以很明显的发现中文页面内容仍然是以前的WinRT说明。</p>
+</blockquote>
+<h2 id="UIElement-Transitions"><a href="#UIElement-Transitions" class="headerlink" title="UIElement.Transitions"></a>UIElement.Transitions</h2><p><code>Transitions</code>是<code>UIElement</code>类型的一个属性，所以所有的UWP控件都有这个属性，它控制了控件在展示时候的一些变换。但是在使用XAML样式为这个属性赋值的时候，却有些细节需要注意。</p>
+<p><code>Transitions</code>属性是一个集合类型，而通常在XAML中，对于集合类型，我们可以采用集合类型的隐式赋值方式，也就是省略集合类型的声明，而直接写集合中的元素。但是对于<code>Transitions</code>属性来说，我们却必须显式的声明一个<code>TransitionCollection</code>对象作为其子元素，如果直接利用隐式集合语法赋值的话，将会在运行时产生一个<code>System.AccessViolationException</code>异常：</p>
+<blockquote>
+<p><code>System.AccessViolationException</code>类型的未经处理的异常在 <strong>YourApp.exe</strong> 中发生</p>
+<p>其他信息：Attempted to read or write protected memory. This is often an indication that other memory is corrupt.</p>
+</blockquote>
+<p>上面的异常将会在页面对象构造时候发送，从异常抛出位置可以看出是在<code>this.InitializeComponent()</code>方法中，但是这个异常并没有更多的详细信息，因此只能推测是XAML分析构造过程中出现了异常，而经过验证最近的改动，最终确定就是由于在给<code>Transitions</code>赋值时采用了隐式集合写法导致的：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;UIElement&gt;  </span><br><span class="line">    &lt;UIElement.Transitions&gt;</span><br><span class="line">        oneOrMoreTransitions</span><br><span class="line">    &lt;/UIElement.Transitions&gt;</span><br><span class="line">&lt;/UIElement&gt;</span><br></pre></td></tr></table></figure></p>
+<p>而将声明改成如下形式，程序就可以正常运行了：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;UIElement&gt;</span><br><span class="line">    &lt;UIElement.Transitions&gt;</span><br><span class="line">        &lt;TransitionCollection&gt;</span><br><span class="line">            oneOrMoreTransitions</span><br><span class="line">        &lt;/TransitionCollection&gt;</span><br><span class="line">    &lt;/UIElement.Transitions&gt;</span><br><span class="line">&lt;/UIElement&gt;</span><br></pre></td></tr></table></figure></p>
+<p>而其实仔细想来，对于<code>Transitions</code>属性来说，确实是必须采用下面的显式赋值方式，因为所谓的隐式集合语法，其实只是XAML分析器帮我们做了一些事情，分析器会自动调用集合属性的<code>Add</code>方法（大部分情况下都是）来添加我们在集合中声明的元素。而这里就需要注意，分析器是不会主动去为集合属性赋值的，而通常也是不需要的，因为一般集合属性是只读的，也就是说当我们使用这个集合属性的时候，属性所有者会确保这个集合属性已经初始化了。而我们再去查看<code>Transitions</code>的声明：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> TransitionCollection Transitions &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>验证可以知道默认情况下这个属性值为<code>null</code>，因此如果我们采用隐式集合语法，将会引发<code>NullReferenceException</code>类型的异常，因此我们需要显示的声明一个<code>TransitionCollection</code>对象，将其赋值给<code>Transitions</code>属性。而为什么实际抛出的异常不是空引用异常呢？从抛出的异常描述来看，异常是一直等到向属性写入内容的时候产生的，也就类似与在C/C++中对一个空指针进行操作，这个时候的异常就是由操作系统产生的了，因为指针所指的内存区域是不可以被应用程序操作的；因此我们可以猜测微软对XAML分析器有一个非常底层的实现（为了效率），因此除了少数操作，大部分XAML异常将会更类似于C/C++中的异常提示。</p>
+<p>最后，其实在MSDN上的<a href="https://msdn.microsoft.com/zh-cn/library/windows/apps/windows.ui.xaml.uielement.transitions.aspx" target="_blank" rel="external">UIElement.Transitions Property</a>页面也有对此的备注提示：</p>
+<blockquote>
+<p><strong>重要事项</strong> 使用<code>TransitionCollection</code>值的所有属性的 XAML 语法出现异常，所以你必须将一个显式<code>TransitionCollection</code>对象元素声明为值，然后为要使用的每个过渡动画提供对象元素作为<code>TransitionCollection</code>的子元素。对于大多数其他 XAML 集合属性，你可以省略集合对象元素，因为它可以是隐式的，但是使用<code>TransitionCollection</code>的属性不支持隐式集合用法。</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/笔记/">笔记</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Transitions/">Transitions</a><a href="/tags/VisualStateManager/">VisualStateManager</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2015/07/31/development-notes/" data-title="开发笔记 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/11/14/dev-issue/" title="开发问题记录">
+  <strong>上一篇：</strong><br/>
+  <span>
+  开发问题记录</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/07/21/New-Language-Features-in-CSharp6/"  title="C# 6 新特性">
+ <strong>下一篇：</strong><br/> 
+ <span>C# 6 新特性
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/07/31/development-notes/" data-title="开发笔记" data-url="http://3meng.github.io/2015/07/31/development-notes/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u521D_u59CB_u5316"><span class="toc-number">1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VisualStateManager_u7528_u6CD5_u7EC6_u8282"><span class="toc-number">2.</span> <span class="toc-text">VisualStateManager用法细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UIElement-Transitions"><span class="toc-number">3.</span> <span class="toc-text">UIElement.Transitions</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+</html>

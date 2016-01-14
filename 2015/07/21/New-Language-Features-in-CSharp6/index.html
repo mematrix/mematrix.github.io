@@ -1,0 +1,655 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>C# 6 新特性 | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="微软新一代开发工具Visual Studio 2015正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为.Net开发中的主力开发语言C#，也已经走到了C# 6。
+那么作为C#开发语言的最新版本，微软又给它添加或改进了哪些特性呢？
+C# 6的新特性是和微软的 .Net 开源编译器Roslyn紧密相连的，在其 GitHub 页面中，也给出了C# 6新特性：New Language">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C# 6 新特性">
+<meta property="og:url" content="http://3meng.github.io/2015/07/21/New-Language-Features-in-CSharp6/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="微软新一代开发工具Visual Studio 2015正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为.Net开发中的主力开发语言C#，也已经走到了C# 6。
+那么作为C#开发语言的最新版本，微软又给它添加或改进了哪些特性呢？
+C# 6的新特性是和微软的 .Net 开源编译器Roslyn紧密相连的，在其 GitHub 页面中，也给出了C# 6新特性：New Language">
+<meta property="og:updated_time" content="2015-07-21T14:58:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C# 6 新特性">
+<meta name="twitter:description" content="微软新一代开发工具Visual Studio 2015正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为.Net开发中的主力开发语言C#，也已经走到了C# 6。
+那么作为C#开发语言的最新版本，微软又给它添加或改进了哪些特性呢？
+C# 6的新特性是和微软的 .Net 开源编译器Roslyn紧密相连的，在其 GitHub 页面中，也给出了C# 6新特性：New Language">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/21/New-Language-Features-in-CSharp6/" title="C# 6 新特性" itemprop="url">C# 6 新特性</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-21T06:52:31.000Z" itemprop="datePublished"> 发表于 2015-07-21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u81EA_u52A8_u5C5E_u6027_u589E_u5F3A"><span class="toc-number">1.</span> <span class="toc-text">自动属性增强</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u81EA_u52A8_u5C5E_u6027_u521D_u59CB_u503C_u8868_u8FBE_u5F0F"><span class="toc-number">1.1.</span> <span class="toc-text">自动属性初始值表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u53EA_u8BFB_u81EA_u52A8_u5C5E_u6027"><span class="toc-number">1.2.</span> <span class="toc-text">只读自动属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6210_u5458_u8868_u8FBE_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">成员表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u65B9_u6CD5_u8868_u8FBE_u5F0F"><span class="toc-number">2.1.</span> <span class="toc-text">方法表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u5C5E_u6027_u8868_u8FBE_u5F0F"><span class="toc-number">2.2.</span> <span class="toc-text">属性表达式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using_static"><span class="toc-number">3.</span> <span class="toc-text">Using static</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u6269_u5C55_u65B9_u6CD5"><span class="toc-number">3.1.</span> <span class="toc-text">扩展方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Null_u6761_u4EF6_u8FD0_u7B97_u7B26"><span class="toc-number">4.</span> <span class="toc-text">Null条件运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B57_u7B26_u4E32_u63D2_u503C"><span class="toc-number">5.</span> <span class="toc-text">字符串插值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nameof_u8868_u8FBE_u5F0F"><span class="toc-number">6.</span> <span class="toc-text">nameof表达式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7D22_u5F15_u5668_u5BF9_u8C61_u521D_u59CB_u5316"><span class="toc-number">7.</span> <span class="toc-text">索引器对象初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F02_u5E38_u8FC7_u6EE4_u5668"><span class="toc-number">8.</span> <span class="toc-text">异常过滤器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5728catch_u548Cfinally_u5757_u4E2D_u4F7F_u7528await"><span class="toc-number">9.</span> <span class="toc-text">在catch和finally块中使用await</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u96C6_u5408_u521D_u59CB_u5316_u5668_u6269_u5C55_u65B9_u6CD5"><span class="toc-number">10.</span> <span class="toc-text">集合初始化器扩展方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6539_u8FDB_u7684_u91CD_u8F7D_u89E3_u6790"><span class="toc-number">11.</span> <span class="toc-text">改进的重载解析</span></a></li></ol>
+		
+		</div>
+		
+		<p>微软新一代开发工具<code>Visual Studio 2015</code>正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为<code>.Net</code>开发中的主力开发语言<code>C#</code>，也已经走到了<code>C# 6</code>。</p>
+<p>那么作为<code>C#</code>开发语言的最新版本，微软又给它添加或改进了哪些特性呢？</p>
+<p><code>C# 6</code>的新特性是和微软的 .Net 开源编译器<a href="https://github.com/dotnet/roslyn" target="_blank" rel="external">Roslyn</a>紧密相连的，在其 GitHub 页面中，也给出了<code>C# 6</code>新特性：<a href="https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6" target="_blank" rel="external">New Language Features in C# 6</a>。下面内容一部分为简单的翻译，以及在查看时的一些理解和疑问，由于目前我还没发下载最新版 Win10 和 VS 2015，因此有些地方暂时还没发验证猜想。等待后续更新。</p>
+<p>下面先列出<code>C# 6</code>中的新特性：</p>
+<ul>
+<li>自动属性初始值表达式<blockquote>
+<p><code>public int X { get; set; } = x;</code></p>
+</blockquote>
+</li>
+<li>只读自动属性<blockquote>
+<p><code>public int Y { get; } = y;</code></p>
+</blockquote>
+</li>
+<li><p>静态导入<code>using static</code></p>
+<blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">using</span> <span class="keyword">static</span> System.Console;</span><br><span class="line">&gt; ...</span><br><span class="line">&gt; Write(<span class="number">4</span>);</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>索引器对象初始化</p>
+<blockquote>
+<p><code>new JObject { [&quot;x&quot;] = 3 }</code></p>
+</blockquote>
+</li>
+<li>在<code>catch</code>和<code>finally</code>块中使用<code>await</code><blockquote>
+<p><code>try { ... } catch { await ... } finally { await ... }</code></p>
+</blockquote>
+</li>
+<li>异常筛选器<blockquote>
+<p><code>catch(Exception e) when (e.Count &gt; 5) { ... }</code></p>
+</blockquote>
+</li>
+<li>函数/属性表达式<blockquote>
+<p><code>public double Dist =&gt; Sqrt(X * X + Y * Y);</code></p>
+</blockquote>
+</li>
+<li>Null条件运算符<blockquote>
+<p><code>customer?.Orders?[5]</code></p>
+</blockquote>
+</li>
+<li>字符串插值<blockquote>
+<p><code>$&quot;{p.Name} is {p.Age} years old.&quot;</code></p>
+</blockquote>
+</li>
+<li><code>nameof</code>运算符<blockquote>
+<p><code>string s = nameof(Console.Write);</code></p>
+</blockquote>
+</li>
+<li>其它改进<blockquote>
+<ul>
+<li>#pragma</li>
+<li>集合初始化支持扩展方法<code>Add</code></li>
+<li>重载方法解析改进</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="u81EA_u52A8_u5C5E_u6027_u589E_u5F3A"><a href="#u81EA_u52A8_u5C5E_u6027_u589E_u5F3A" class="headerlink" title="自动属性增强"></a>自动属性增强</h2><h3 id="u81EA_u52A8_u5C5E_u6027_u521D_u59CB_u503C_u8868_u8FBE_u5F0F"><a href="#u81EA_u52A8_u5C5E_u6027_u521D_u59CB_u503C_u8868_u8FBE_u5F0F" class="headerlink" title="自动属性初始值表达式"></a>自动属性初始值表达式</h3><p>现在可以为自动属性添加一个初始值表达式了，如下：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Customer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> First &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; = <span class="string">"Jane"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Last &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; = <span class="string">"Doe"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们知道所谓自动属性，其实是属性的一种快速写法，编译器为我们做了额外的工作，包括为自动属性生成对应的字段以及添加读写方法。这里的自动熟悉初始值，会被直接赋值给属性对应的字段，而不经过自动属性的<code>setter</code>索引器，就如同直接给字段赋初始值一样。因此，如果我们在应用中使用了某些<code>AOP</code>框架，并且为属性添加了<code>NotifyPropertyChanged</code>或类似特性，当属性被初始化的时候，我们并不能得到通知。</p>
+<blockquote>
+<p>和字段的初始化一样，自动属性初始化表达式中不能引用<code>this</code>，因为在类被初始化之前它们就已经被执行了。</p>
+</blockquote>
+<h3 id="u53EA_u8BFB_u81EA_u52A8_u5C5E_u6027"><a href="#u53EA_u8BFB_u81EA_u52A8_u5C5E_u6027" class="headerlink" title="只读自动属性"></a>只读自动属性</h3><p>现在我们可以声明一个只读自动熟悉了，同时使用上面的自动熟悉初始化表达式设置初始值。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Customer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> First &#123; <span class="keyword">get</span>; &#125; = <span class="string">"Jane"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Last &#123; <span class="keyword">get</span>; &#125; = <span class="string">"Doe"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>只读自动属性对应的字段被隐式的声明为<code>readonly</code>。因此，一个只读属性还可以在其声明类型的构造函数中赋值，实质上也还是直接对属性所对应的字段赋值。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Customer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name &#123; <span class="keyword">get</span>; &#125;;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Customer</span>(<span class="params"><span class="keyword">string</span> first, <span class="keyword">string</span> last</span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        Name = first + <span class="string">" "</span> + last;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这使得我们可以更简洁的表述类型，但是它同时也消除了语言中可变类型与不可变类型之间的区别：自动属性是一种简写，只有当我们愿意让我们的类可变并且属性适合使用默认值初始化的时候才使用。现在，使用只读属性，可变与不可变之间区别不再。</p>
+</blockquote>
+<h2 id="u6210_u5458_u8868_u8FBE_u5F0F"><a href="#u6210_u5458_u8868_u8FBE_u5F0F" class="headerlink" title="成员表达式"></a>成员表达式</h2><p>Lambda表达式可以被定义为一个表达式主体以及传统函数那样由一个块包含的函数体。现在这种特性也可以用来定义类型成员了。</p>
+<h3 id="u65B9_u6CD5_u8868_u8FBE_u5F0F"><a href="#u65B9_u6CD5_u8868_u8FBE_u5F0F" class="headerlink" title="方法表达式"></a>方法表达式</h3><p>方法、用户自定义运算符以及转换操作现在可以通过使用“Lambda箭头”给定一个表达主体来定义了。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Point <span class="title">Move</span>(<span class="params"><span class="keyword">int</span> dx, <span class="keyword">int</span> dy</span>) </span>=&gt; <span class="keyword">new</span> Point(x + dx, y + dy); </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Complex <span class="keyword">operator</span> +(Complex a, Complex b) =&gt; a.Add(b);</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">implicit</span> <span class="keyword">operator</span> <span class="title">string</span>(<span class="params">Person p</span>) </span>=&gt; p.First + <span class="string">" "</span> + p.Last;</span><br></pre></td></tr></table></figure></p>
+<p>就如同方法语句块中只有一个返回表达式一样。</p>
+<p>对于无返回值的方法、包括返回<code>Task</code>类型的方法、这种语法仍然适用，但是箭头后面必须是一个声明表达式：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Print</span>(<span class="params"></span>) </span>=&gt; Console.WriteLine(First + <span class="string">" "</span> + Last);</span><br></pre></td></tr></table></figure></p>
+<h3 id="u5C5E_u6027_u8868_u8FBE_u5F0F"><a href="#u5C5E_u6027_u8868_u8FBE_u5F0F" class="headerlink" title="属性表达式"></a>属性表达式</h3><p>属性和索引器可以有读方法（<code>get</code>）以及写方法（<code>set</code>）。上述的表达式写法可以被用到只读属性和索引器中：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">string</span> Name =&gt; First + <span class="string">" "</span> + Last;</span><br><span class="line"><span class="keyword">public</span> Customer <span class="keyword">this</span>[<span class="keyword">long</span> id] =&gt; store.LookupCustomer(id);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>注意这里并没有<code>get</code>关键字，使用这种语法时它是隐式声明的。</p>
+</blockquote>
+<h2 id="Using_static"><a href="#Using_static" class="headerlink" title="Using static"></a>Using static</h2><p>这个特性使我们可以声明静态方法所在命名空间，然后再代码中可以直接使用静态方法而不用添加其所在命名空间前缀。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> <span class="keyword">static</span> System.Console;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">static</span> System.Math;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">static</span> System.DayOfWeek;</span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        WriteLine(Sqrt(<span class="number">3</span>*<span class="number">3</span> + <span class="number">4</span>*<span class="number">4</span>)); </span><br><span class="line">        WriteLine(Friday - Monday); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当我们需要使用特定域中的一组函数时很有用，<code>System.Math</code>只是一个常见的例子。同时，它还允许直接指定枚举类型个人命名，比如<code>System.DayOfWeek</code>。</p>
+<h3 id="u6269_u5C55_u65B9_u6CD5"><a href="#u6269_u5C55_u65B9_u6CD5" class="headerlink" title="扩展方法"></a>扩展方法</h3><p>扩展方法是静态方法，但是被当作实例方法来使用。通过使用<code>using static</code>而不是引入命名空间，使得一个类型的扩展方法可被真正做为“扩展”方法。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> <span class="keyword">static</span> System.Linq.Enumerable; <span class="comment">// The type, not the namespace</span></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> range = Range(<span class="number">5</span>, <span class="number">17</span>);                <span class="comment">// Ok: not extension</span></span><br><span class="line">        <span class="keyword">var</span> odd = Where(range, i =&gt; i % <span class="number">2</span> == <span class="number">1</span>); <span class="comment">// Error, not in scope</span></span><br><span class="line">        <span class="keyword">var</span> even = range.Where(i =&gt; i % <span class="number">2</span> == <span class="number">0</span>); <span class="comment">// Ok</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Null_u6761_u4EF6_u8FD0_u7B97_u7B26"><a href="#Null_u6761_u4EF6_u8FD0_u7B97_u7B26" class="headerlink" title="Null条件运算符"></a>Null条件运算符</h2><p>在我们的代码中通常要进行一堆的 null 检查，现在<code>C# 6</code>引入了新的运算符，只有当运算符作用者不为<code>null</code>时才能访问其成员和元素，否则表达式返回<code>null</code>。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>? length = customers?.Length; <span class="comment">// null if customers is null</span></span><br><span class="line">Customer first = customers?[<span class="number">0</span>];  <span class="comment">// null if customers is null</span></span><br></pre></td></tr></table></figure></p>
+<p>Null条件运算符可以和空合并运算符 <code>??</code> 联合使用：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> length = customers?.Length ?? <span class="number">0</span>; <span class="comment">// 0 if customers is null</span></span><br></pre></td></tr></table></figure></p>
+<p>Null条件运算符只有在检查到成员非空时才会执行后面紧跟的成员访问、元素访问和方法调用。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>? first = customers?[<span class="number">0</span>].Orders.Count();</span><br></pre></td></tr></table></figure></p>
+<p>上面这个例子本质上等价于：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>? first = (customers != <span class="keyword">null</span>) ? customers[<span class="number">0</span>].Orders.Count() : <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure></p>
+<p>除了<code>customers</code>被计算一次之外，除非<code>customers</code>非空，否则跟在 <code>?</code> 后面的成员访问和方法调用将不会被执行。</p>
+<p>当然，Null条件运算符可以被连续调用，每次调用都会进行<code>null</code>检查。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>? first = customers?[<span class="number">0</span>].Orders?.Count();</span><br></pre></td></tr></table></figure></p>
+<p>注意一个方法调用不可以直接跟在 <code>?</code> 运算符之后，因为这会导致太多的语法歧义。</p>
+<blockquote>
+<p>等待测试。这里在 <code>?</code> 运算符后面直接跟的方法是指当前类型中的方法还是 <code>?</code> 前面的变量所拥有的实例方法？看前面的示例，是可以直接调用变量的实力方法的（<code>...Orders?.Count();</code>），如果是说当前类型的方法，那么歧义是因为与三目运算符 <code>?:</code> 冲突吗？</p>
+</blockquote>
+<p>然而，我们可以调用委托中的<code>Invoke</code>方法：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (predicate?.Invoke(e) ?? <span class="keyword">false</span>) &#123; … &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种使用方法应该在事件触发的时候很常用：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PropertyChanged?.Invoke(<span class="keyword">this</span>, args);</span><br></pre></td></tr></table></figure></p>
+<p>这是一种简单并且<code>线程安全</code>的方式去在触发事件之前做 null 检查。说它是<code>线程安全</code>的，是因为这个方式只执行 <code>?</code> 左边表达式一次，并且将其保存在一个临时变量中。</p>
+<blockquote>
+<p>说明：这里保存在临时变量中的是那个<code>PropertyChanged</code>实例。</p>
+<p>也就是说，上面的事件触发代码等价于：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> handler = PropertyChanged;</span><br><span class="line"><span class="keyword">if</span> (handler != <span class="keyword">null</span>)</span><br><span class="line">&#123;</span><br><span class="line">    handler.Invoke(<span class="keyword">this</span>, args);</span><br><span class="line">&#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+<p>而这里，需要说明在<code>.Net</code>中使用<code>C#</code>进行事件的订阅和取消时，其实返回的<code>Handler</code>是一个新的对象，所以对于上面的代码来说，当我们通过临时变量<code>handler</code>引用<code>PropertyChanged</code>实例之后，即使又有线程对这个事件进行了取消订阅操作导致事件变为<code>null</code>，也不会影响这个临时变量的值，因此不会导致接下来的调用出现异常。</p>
+<p>因此，通过 <code>?</code> 方式触发事件是<code>线程安全</code>的（这个也应该是编译器特别优化的吧）。而在使用<code>C# 6</code>之前的语言编程时，如果要触发一个事件，我们也应该像上面那样通过一个临时变量引用事件实例，然后再判断触发，这样才能保证事件的线程安全。</p>
+</blockquote>
+<h2 id="u5B57_u7B26_u4E32_u63D2_u503C"><a href="#u5B57_u7B26_u4E32_u63D2_u503C" class="headerlink" title="字符串插值"></a>字符串插值</h2><p><code>string.Format</code>和它的同类被我们经常使用，但是它们的用法有一点笨拙且容易出错。特别是占位符<code>{0}</code>等，它们必须与参数分别提供：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = String.Format(<span class="string">"&#123;0&#125; is &#123;1&#125; year&#123;&#123;s&#125;&#125; old"</span>, p.Name, p.Age);</span><br></pre></td></tr></table></figure></p>
+<p>字符串插值允许我们通过“洞”来直接把表达式插入到正确的位置：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = $<span class="string">"&#123;p.Name&#125; is &#123;p.Age&#125; year&#123;&#123;s&#125;&#125; old"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>和<code>string.Format</code>一样，我们可以定义一些可选的对齐及格式方式：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = $<span class="string">"&#123;p.Name,20&#125; is &#123;p.Age:D3&#125; year&#123;&#123;s&#125;&#125; old"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>“洞”的内容可以是任意表达式，甚至是其它字符串：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = $<span class="string">"&#123;p.Name&#125; is &#123;p.Age&#125; year&#123;(p.Age == 1 ? "</span><span class="string">" : "</span>s<span class="string">")&#125; old"</span>;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>注意条件表达式被括号括起来了，所以 <code>: &quot;s&quot;</code> 并不会和格式说明符混淆。</p>
+</blockquote>
+<h2 id="nameof_u8868_u8FBE_u5F0F"><a href="#nameof_u8868_u8FBE_u5F0F" class="headerlink" title="nameof表达式"></a>nameof表达式</h2><p>有时候我们会需要提供一些这样的字符串，字符串内容是某些程序元素的名称。比如当我们抛出一个<code>ArgumentNullException</code>异常的时候，我们希望可以给出出错的参数名称；而当我们激活一个<code>PropertyChanged</code>事件的时候，我们需要给出变化的属性的名称；等等。</p>
+<p>使用一个硬编码的字符串很简单，但是很容易出错。我们可能一不小心出现拼写错误，又或者当进行代码重构时这个字符串就会过期。<code>nameof</code>表达式本质上是一个字符串，由编译器检查你所给的参数并赋值，Visual Studio 知道它所引用的内容，所以导航和重构都能正确工作。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">if</span> x == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(x));</span><br></pre></td></tr></table></figure></p>
+<p>你可以在<code>nameof</code>表达式传递更复杂的由点分割的参数，但这只是告诉编译器该看哪里：只有最后的标识符将被使用：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WriteLine(nameof(person.Address.ZipCode)); <span class="comment">// prints "ZipCode"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="u7D22_u5F15_u5668_u5BF9_u8C61_u521D_u59CB_u5316"><a href="#u7D22_u5F15_u5668_u5BF9_u8C61_u521D_u59CB_u5316" class="headerlink" title="索引器对象初始化"></a>索引器对象初始化</h2><p>对象和集合初始化可用于声明性的初始化对象字段和属性、或者给一组集合元素初始化，但是字典对象或者带索引器的对象初始化时却不甚优雅。现在我们可以通过新的对象初始化语法来给索引器指定的键设置初值，如下所示：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numbers = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">int</span>, <span class="keyword">string</span>&gt; </span><br><span class="line">&#123;</span><br><span class="line">    [<span class="number">7</span>] = <span class="string">"seven"</span>,</span><br><span class="line">    [<span class="number">9</span>] = <span class="string">"nine"</span>,</span><br><span class="line">    [<span class="number">13</span>] = <span class="string">"thirteen"</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="u5F02_u5E38_u8FC7_u6EE4_u5668"><a href="#u5F02_u5E38_u8FC7_u6EE4_u5668" class="headerlink" title="异常过滤器"></a>异常过滤器</h2><p><code>VB</code>中存在，<code>F#</code>中也存在，现在<code>C#</code>中也有了。它长的大概像这样：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123; … &#125;</span><br><span class="line"><span class="keyword">catch</span> (MyException e) <span class="keyword">when</span> (myfilter(e))</span><br><span class="line">&#123;</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果括号表达式中的结果为<code>true</code>，那么将运行<code>catch</code>块，否则异常将被继续向上抛出。</p>
+<p>异常过滤器比捕捉然后重新抛出异常的方式更好，因为异常过滤器不会破坏堆栈内容。如果一个异常最后会导致堆栈被清空，使用过滤器方式你可以看到异常的原始来源，而不是它最后被重新抛出的地方。</p>
+<p>异常过滤器有一些被普遍认可的“滥用”，比如日志记录，而这会导致一些副作用。它们可以检查而不拦截异常，这样，这些过滤器通常会给出一个<code>false</code>返回值，这会产生一些副作用，比如异常块总是不被执行：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">Log</span>(<span class="params">Exception e</span>) </span>&#123; <span class="comment">/* log it */</span> ; <span class="keyword">return</span> <span class="keyword">false</span>; &#125;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">try</span> &#123; … &#125; <span class="keyword">catch</span> (Exception e) <span class="keyword">when</span> (Log(e)) &#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>不知道异常过滤器函数签名是不是被固定了，如果仅仅要求函数有一个bool返回值（以及一个<code>Exception</code>参数和其它可选参数），那么对于异常过滤器函数，我们可以通过传入更多的参数来决定返回值是<code>true</code>或者<code>false</code>，以此来控制异常处理块是否执行。</p>
+</blockquote>
+<h2 id="u5728catch_u548Cfinally_u5757_u4E2D_u4F7F_u7528await"><a href="#u5728catch_u548Cfinally_u5757_u4E2D_u4F7F_u7528await" class="headerlink" title="在catch和finally块中使用await"></a>在catch和finally块中使用await</h2><p>下面是微软原文的幽默：</p>
+<blockquote>
+<p><code>C# 5</code>中我们不允许在catch块和finally块中出现<code>await</code>关键字，因为我们设法让自己相信那是不可能实现的。但是现在我们弄懂了，显然这并不是不可能的。</p>
+</blockquote>
+<p>这实际上是一个很值得注意的限制，使得人们不得不用其它“丑陋的”解决方式。现在这个限制不在了：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Resource res = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span></span><br><span class="line">&#123;</span><br><span class="line">    res = <span class="keyword">await</span> Resource.OpenAsync(…);       <span class="comment">// You could do this.</span></span><br><span class="line">    …</span><br><span class="line">&#125; </span><br><span class="line"><span class="keyword">catch</span>(ResourceException e)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">await</span> Resource.LogAsync(res, e);         <span class="comment">// Now you can do this …</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (res != <span class="keyword">null</span>) <span class="keyword">await</span> res.CloseAsync(); <span class="comment">// … and this.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这个实现是相当复杂的，但是你不用去担心。这是这个语言中异步的重点。</p>
+</blockquote>
+<h2 id="u96C6_u5408_u521D_u59CB_u5316_u5668_u6269_u5C55_u65B9_u6CD5"><a href="#u96C6_u5408_u521D_u59CB_u5316_u5668_u6269_u5C55_u65B9_u6CD5" class="headerlink" title="集合初始化器扩展方法"></a>集合初始化器扩展方法</h2><blockquote>
+<p>当我们在<code>C#</code>中首次实现集合初始化器的时候，<code>Add</code>方法不能作为扩展方法调用。<code>VB</code>从一开始就有了，但是看起来我们似乎忘了在<code>C#</code>中加入。现在这个问题解决了：集合初始化代码中可以很愉快的使用一个叫做<code>Add</code>的扩展方法。这不是一个大的特性，但是它偶尔很有用，而结果证明在新的编译器中实现它相当于删除一个阻止它的检查。</p>
+</blockquote>
+<h2 id="u6539_u8FDB_u7684_u91CD_u8F7D_u89E3_u6790"><a href="#u6539_u8FDB_u7684_u91CD_u8F7D_u89E3_u6790" class="headerlink" title="改进的重载解析"></a>改进的重载解析</h2><blockquote>
+<p>在重载解析上有很多小的改进，这可能会使得很多事情会按照你所期望的方式工作。所有的改进都和“betterness”有关，所谓“betterness”，是编译器决定对于指定参数两个重载方法哪一个更合适的方法。</p>
+<p>当在可空值类型重载方法之间选择时，你可能会注意到这点；另一点是在函数组（相对于Lambdas）中重载期望的委托。细节不值得在这里多说，只是想让你知道！</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C#</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2015/07/21/New-Language-Features-in-CSharp6/" data-title="C# 6 新特性 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/07/31/development-notes/" title="开发笔记">
+  <strong>上一篇：</strong><br/>
+  <span>
+  开发笔记</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/07/16/SQLite-and-inheritance-mapping/"  title="SQLite与“继承映射”">
+ <strong>下一篇：</strong><br/> 
+ <span>SQLite与“继承映射”
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/07/21/New-Language-Features-in-CSharp6/" data-title="C# 6 新特性" data-url="http://3meng.github.io/2015/07/21/New-Language-Features-in-CSharp6/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u81EA_u52A8_u5C5E_u6027_u589E_u5F3A"><span class="toc-number">1.</span> <span class="toc-text">自动属性增强</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u81EA_u52A8_u5C5E_u6027_u521D_u59CB_u503C_u8868_u8FBE_u5F0F"><span class="toc-number">1.1.</span> <span class="toc-text">自动属性初始值表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u53EA_u8BFB_u81EA_u52A8_u5C5E_u6027"><span class="toc-number">1.2.</span> <span class="toc-text">只读自动属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6210_u5458_u8868_u8FBE_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">成员表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u65B9_u6CD5_u8868_u8FBE_u5F0F"><span class="toc-number">2.1.</span> <span class="toc-text">方法表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u5C5E_u6027_u8868_u8FBE_u5F0F"><span class="toc-number">2.2.</span> <span class="toc-text">属性表达式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using_static"><span class="toc-number">3.</span> <span class="toc-text">Using static</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u6269_u5C55_u65B9_u6CD5"><span class="toc-number">3.1.</span> <span class="toc-text">扩展方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Null_u6761_u4EF6_u8FD0_u7B97_u7B26"><span class="toc-number">4.</span> <span class="toc-text">Null条件运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B57_u7B26_u4E32_u63D2_u503C"><span class="toc-number">5.</span> <span class="toc-text">字符串插值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nameof_u8868_u8FBE_u5F0F"><span class="toc-number">6.</span> <span class="toc-text">nameof表达式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7D22_u5F15_u5668_u5BF9_u8C61_u521D_u59CB_u5316"><span class="toc-number">7.</span> <span class="toc-text">索引器对象初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F02_u5E38_u8FC7_u6EE4_u5668"><span class="toc-number">8.</span> <span class="toc-text">异常过滤器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5728catch_u548Cfinally_u5757_u4E2D_u4F7F_u7528await"><span class="toc-number">9.</span> <span class="toc-text">在catch和finally块中使用await</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u96C6_u5408_u521D_u59CB_u5316_u5668_u6269_u5C55_u65B9_u6CD5"><span class="toc-number">10.</span> <span class="toc-text">集合初始化器扩展方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6539_u8FDB_u7684_u91CD_u8F7D_u89E3_u6790"><span class="toc-number">11.</span> <span class="toc-text">改进的重载解析</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+</html>

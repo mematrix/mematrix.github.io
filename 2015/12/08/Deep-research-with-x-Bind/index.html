@@ -1,0 +1,592 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>深入探究 {x:Bind} | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="今天无意间谈到了UWP应用中为数据绑定新引入的一个XAML标记：{x:Bind}，对于这个新的标记的作用和原理，网上的一般说法都是：
+
+相比较传统的{Binding}方式，{x:Bind｝的效率更高，因为{x:Bind}的数据绑定发生编译期间，绑定工作在编译时期就已经完成了，所以我们在使用{x:Bind}的时候，需要一个明确的数据类型（按：这也符合强类型语言的特点）。
+
+这些也都基本说的过去，相对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入探究 {x:Bind}">
+<meta property="og:url" content="http://3meng.github.io/2015/12/08/Deep-research-with-x-Bind/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="今天无意间谈到了UWP应用中为数据绑定新引入的一个XAML标记：{x:Bind}，对于这个新的标记的作用和原理，网上的一般说法都是：
+
+相比较传统的{Binding}方式，{x:Bind｝的效率更高，因为{x:Bind}的数据绑定发生编译期间，绑定工作在编译时期就已经完成了，所以我们在使用{x:Bind}的时候，需要一个明确的数据类型（按：这也符合强类型语言的特点）。
+
+这些也都基本说的过去，相对">
+<meta property="og:updated_time" content="2015-12-08T16:08:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入探究 {x:Bind}">
+<meta name="twitter:description" content="今天无意间谈到了UWP应用中为数据绑定新引入的一个XAML标记：{x:Bind}，对于这个新的标记的作用和原理，网上的一般说法都是：
+
+相比较传统的{Binding}方式，{x:Bind｝的效率更高，因为{x:Bind}的数据绑定发生编译期间，绑定工作在编译时期就已经完成了，所以我们在使用{x:Bind}的时候，需要一个明确的数据类型（按：这也符合强类型语言的特点）。
+
+这些也都基本说的过去，相对">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/08/Deep-research-with-x-Bind/" title="深入探究 {x:Bind}" itemprop="url">深入探究 {x:Bind}</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-08T09:16:17.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u7F18_u8D77"><span class="toc-number">1.</span> <span class="toc-text">缘起</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6D4B_u8BD5"><span class="toc-number">2.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OneTime_u7ED1_u5B9A"><span class="toc-number">2.1.</span> <span class="toc-text">OneTime绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OneWay__26amp_3B_TwoWay_u7ED1_u5B9A"><span class="toc-number">2.2.</span> <span class="toc-text">OneWay & TwoWay绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TwoWay_u7ED1_u5B9A_u4E2D_u4ECE_u76EE_u6807_u5230_u6E90"><span class="toc-number">2.3.</span> <span class="toc-text">TwoWay绑定中从目标到源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#INotifyPropertyChanged"><span class="toc-number">2.4.</span> <span class="toc-text">INotifyPropertyChanged</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6DF1_u5165"><span class="toc-number">3.</span> <span class="toc-text">深入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-g-i-cs"><span class="toc-number">3.1.</span> <span class="toc-text">MainPage.g.i.cs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-g-cs"><span class="toc-number">3.2.</span> <span class="toc-text">MainPage.g.cs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-xaml"><span class="toc-number">3.3.</span> <span class="toc-text">MainPage.xaml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u989D_u5916_u7684"><span class="toc-number">3.4.</span> <span class="toc-text">额外的</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6700_u540E"><span class="toc-number">4.</span> <span class="toc-text">最后</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u8BED"><span class="toc-number">5.</span> <span class="toc-text">结语</span></a></li></ol>
+		
+		</div>
+		
+		<p>今天无意间谈到了<code>UWP</code>应用中为数据绑定新引入的一个<code>XAML</code>标记：<code>{x:Bind}</code>，对于这个新的标记的作用和原理，网上的一般说法都是：</p>
+<blockquote>
+<p>相比较传统的<code>{Binding}</code>方式，<code>{x:Bind｝</code>的效率更高，因为<code>{x:Bind}</code>的数据绑定发生编译期间，绑定工作在编译时期就已经完成了，所以我们在使用<code>{x:Bind}</code>的时候，需要一个明确的数据类型（按：这也符合强类型语言的特点）。</p>
+</blockquote>
+<p>这些也都基本说的过去，相对于传统的<code>{Binding}</code>方式，这种类型严格的绑定行为，最起码也可以减少对象装箱和拆箱行为的性能损耗，而至于其它的由于强类型带来的可以优化的地方，就要看编译器的行为了。</p>
+<p>但是基本上也就到此为止了，大部分关于<code>{x:Bind}</code>的说明文章，接下来就是将示例，陈述简单的用法，不说讲解一下<code>{x:Bind}</code>的实现方式，就连深入一点的用法，比如双向绑定等都没有提到多少。</p>
+<blockquote>
+<p>这里别说那些示例中写了个<code>Mode=TwoWay</code>就是双向绑定了，如果双向绑定这么简单，那在传统的<code>{Binding}</code>方式中又为什么要弄个<code>INotifyPropertyChanged</code>接口，还要弄个叫依赖属性的东西出来？</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="u7F18_u8D77"><a href="#u7F18_u8D77" class="headerlink" title="缘起"></a>缘起</h2><p>所以今天突然提起了这个新的绑定方式，一时间就突然发现认识的还是太少了，仅仅只是从网上看到了一点关于它的一点概述而已，一旦深入讨论下去，才发现很多东西都没有关注过，也许是我搜索的少了吧，没看到有谁深入的说明这个新加入的标记，即使是MSDN上也是说明了一下用法以及与<code>{Binding}</code>的对比而已。</p>
+<p>多的也不多说了，既然找不到，那还不如自己去测试探索一翻。</p>
+<p>先把网上总结的一些<code>{x:Bind}</code>特点罗列一下：</p>
+<ul>
+<li>强类型，因此某些时候你需要使用XAML中的方式强制类型转换。</li>
+<li>上下文是<code>Page</code>或者<code>UserControl</code>。</li>
+<li>默认的绑定模式是<strong>OneTime</strong>。</li>
+<li>在数据模版中使用时，需要指定<code>{x:DataType}</code>。</li>
+<li>支持绑定事件到方法。</li>
+</ul>
+<p>而关于<code>{x:Bind}</code>的更多详细说明，可以参考MSDN文档：<a href="https://msdn.microsoft.com/zh-cn/library/windows/apps/mt204783.aspx" title="{x:Bind} 标记扩展" target="_blank" rel="external">{x:Bind} 标记扩展</a>。关于<code>{x:Bind}</code>和<code>{Binding}</code>标记使用方法和功能的对比，也可以参考MSDN的说明：<a href="https://msdn.microsoft.com/zh-cn/library/windows/apps/mt210946.aspx#_x_bind_____binding______" title="{x:Bind} 和 {Binding} 功能比较" target="_blank" rel="external">{x:Bind} 和 {Binding} 功能比较</a>。</p>
+<h2 id="u6D4B_u8BD5"><a href="#u6D4B_u8BD5" class="headerlink" title="测试"></a>测试</h2><p>新建一个UWP项目，然后开始测试了。因为只是看看<code>{x:Bind}</code>的工作方式，因此程序有些设计细节就不用过多关注了……</p>
+<h3 id="OneTime_u7ED1_u5B9A"><a href="#OneTime_u7ED1_u5B9A" class="headerlink" title="OneTime绑定"></a>OneTime绑定</h3><p>这是<code>{x:Bind}</code>的默认绑定模式，也基本是比较常用的模式了，这种情况没什么好测试的了，正常的写法都能跑起来，而且也可以想像得到编译器会怎么处理：直接在页面构造的某个时期赋值一次罢了。这里需要注意的所有事项也就是<code>{x:Bind}</code>的基本用法注意事项了。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ** .cs **</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">string</span> Title &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; = <span class="string">"Title"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ** .xaml **</span></span><br><span class="line">&lt;TextBlock Text=<span class="string">"&#123;x:Bind Title&#125;"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="OneWay__26amp_3B_TwoWay_u7ED1_u5B9A"><a href="#OneWay__26amp_3B_TwoWay_u7ED1_u5B9A" class="headerlink" title="OneWay &amp; TwoWay绑定"></a>OneWay &amp; TwoWay绑定</h3><p>这两个之所以放到一起，是因为我没有测试过<strong>OneWay</strong>模式，而是直接观察<strong>TwoWay</strong>模式下的绑定情况的。</p>
+<p>下面是测试用的XAML主要代码：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;Grid Background=&#34;&#123;ThemeResource ApplicationPageBackgroundThemeBrush&#125;&#34;&#62;&#10;    &#60;TextBlock&#10;        Text=&#34;&#123;x:Bind Time, Mode=TwoWay&#125;&#34;&#10;        HorizontalAlignment=&#34;Right&#34;&#10;        VerticalAlignment=&#34;Top&#34;&#10;        Height=&#34;100&#34;/&#62;&#10;    &#60;TextBox&#10;        Text=&#34;&#123;x:Bind Time, Mode=TwoWay&#125;&#34;&#10;        Margin=&#34;0,100,0,0&#34;&#10;        VerticalAlignment=&#34;Top&#34;/&#62;&#10;    &#60;Button&#10;        VerticalAlignment=&#34;Bottom&#34;&#10;        Content=&#34;Update Time&#34;&#10;        Click=&#34;ButtonBase_OnClick&#34;/&#62;&#10;&#60;/Grid&#62;</span><br></pre></td></tr></table></figure></p>
+<p>其中中间那个<code>TextBox</code>是测试过程中加入的，是因为<strong>TwoWay</strong>模式的<code>TextBlock</code>不好测试，没有文本框方便。</p>
+<p>C#主要代码如下：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">sealed</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainPage</span> : <span class="title">Page</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Time &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainPage</span>(<span class="params"></span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.InitializeComponent();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ButtonBase_OnClick</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.Time = DateTime.Now.ToString(<span class="string">"D"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个相对于默认用法来说，其实也就是简单的给<code>{x:Bind}</code>加了一句说明：<code>Mode=TwoWay</code>，这也是网上大部分示例的做法。</p>
+<p>在第一次测试中，忽略那个<code>TextBox</code>控件，我们使用按钮更改<code>Time</code>的值，看看界面的变化。而测试结果也在意料之中，不管你怎么点击那个按钮，界面都不会有任何的变化，<code>Time</code>的值根本不能传到控件属性上，这很好解释，这个<code>Time</code>就是一个很简单的自动属性而已，深入一点也就是两个普通的对象方法而已，根本没有地方把属性值传出去，甚至外界也根本不知道这个值已经变化了。</p>
+<h3 id="TwoWay_u7ED1_u5B9A_u4E2D_u4ECE_u76EE_u6807_u5230_u6E90"><a href="#TwoWay_u7ED1_u5B9A_u4E2D_u4ECE_u76EE_u6807_u5230_u6E90" class="headerlink" title="TwoWay绑定中从目标到源"></a>TwoWay绑定中从目标到源</h3><p>继续上面那个测试，不同的是这次使用<code>TextBox</code>控件。</p>
+<p>给<code>Time</code>属性的<em>set</em>访问器添加断点，然后开始在<code>TextBox</code>中输入一些内容，然后让文本框失去焦点，这时候可以看到断点命中了，当运行完毕之后，<code>Time</code>的值也被设置成为了文本框中输入的内容。当然这个时候<code>TextBlock</code>的内容仍然没有任何变化，原因和上面的一样，这时候的<code>Time</code>只是个普通属性。</p>
+<p>但是无论如何，这里可以说明<code>{x:Bind}</code>是具有一般绑定的行为的，那么目前我们就剩下一个问题了，为什么从绑定源到绑定目标的路径不通？也就是绑定源的变化无法反馈给绑定目标？</p>
+<h3 id="INotifyPropertyChanged"><a href="#INotifyPropertyChanged" class="headerlink" title="INotifyPropertyChanged"></a>INotifyPropertyChanged</h3><p>既然<code>{x:Bind}</code>和<code>{Binding}</code>如此类似，那么可不可以借鉴在<code>{Binding}</code>方式中使用的一些方式呢？比如<code>INotifyPropertyChanged</code>。上面提到无法报告绑定源的变化，而在传统的绑定中，出了使用依赖属性之外，我们还可以使用<code>INotifyPropertyChanged</code>接口，而在<code>{x:Bind}</code>方式中呢，是不是也可以试试这种方式，将属性的变化通知出去。</p>
+<p>那么对C#代码稍微改变一下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public sealed partial class MainPage : Page, INotifyPropertyChanged</span><br><span class="line">&#123;</span><br><span class="line">    public event PropertyChangedEventHandler PropertyChanged;</span><br><span class="line"></span><br><span class="line">    private string _time;</span><br><span class="line"></span><br><span class="line">    public string Time</span><br><span class="line">    &#123;</span><br><span class="line">        get &#123; return _time; &#125;</span><br><span class="line">        set</span><br><span class="line">        &#123;</span><br><span class="line">            if (value != _time)</span><br><span class="line">            &#123;</span><br><span class="line">                _time = value;</span><br><span class="line">                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Time"));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后在运行测试一下，结果很出人意外。</p>
+<p>无论是更改文本框的内容，还是点击按钮主动更新<code>Time</code>的值，都没有任何反应，也就是说，绑定仍然没有起作用，准确来说，是绑定仍然无法完成从绑定源到绑定目标的更新。</p>
+<p>这也就是说，传统的方式无法适用于<code>{x:Bind}</code>了。因此需要看看编译器对这个标记扩展做了哪些工作了，而在VS的智能提示中，输入<code>this.</code>之后也可以看到一个新的<code>Page</code>类的字段：<code>Bindings</code>，也许和这种新的编译时绑定有关。</p>
+<h2 id="u6DF1_u5165"><a href="#u6DF1_u5165" class="headerlink" title="深入"></a>深入</h2><p>既然要看看编译器究竟对XAML文档中的<code>{x:Bind}</code>做了什么，第一个想法当然是看看编译后生成的代码了，于是找到<strong>obj</strong>目录下临时文件，找到所有的以<em>MainPage</em>开头的文件，然后打开看看其中的内容。而很幸运，在这里找到了答案，具体来说，实在下面三个文件中：</p>
+<ul>
+<li>MainPage.g.i.cs</li>
+<li>MainPage.g.cs</li>
+<li>MainPage.xaml</li>
+</ul>
+<h3 id="MainPage-g-i-cs"><a href="#MainPage-g-i-cs" class="headerlink" title="MainPage.g.i.cs"></a>MainPage.g.i.cs</h3><p>下面是这个文件中的主要内容：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">partial class MainPage : global::Windows.UI.Xaml.Controls.Page</span><br><span class="line">&#123;</span><br><span class="line">    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Windows.UI.Xaml.Build.Tasks"," 14.0.0.0")]</span><br><span class="line">    private bool _contentLoaded;</span><br><span class="line"></span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// InitializeComponent()</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Windows.UI.Xaml.Build.Tasks"," 14.0.0.0")]</span><br><span class="line">    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]</span><br><span class="line">    public void InitializeComponent()</span><br><span class="line">    &#123;</span><br><span class="line">        // ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    private interface IMainPage_Bindings</span><br><span class="line">    &#123;</span><br><span class="line">        void Initialize();</span><br><span class="line">        void Update();</span><br><span class="line">        void StopTracking();</span><br><span class="line">    &#125;</span><br><span class="line">#pragma warning disable 0169</span><br><span class="line">    private IMainPage_Bindings Bindings;</span><br><span class="line">#pragma warning restore 0169</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到这里声明了一个私有接口和对应的字段。在这个接口中定义了三个操作方法，而在看完后面两个文件内容之后，就可以知道每个方法的作用了。而这个接口，也是整个绑定环节中的一个重要部分。</p>
+<h3 id="MainPage-g-cs"><a href="#MainPage-g-cs" class="headerlink" title="MainPage.g.cs"></a>MainPage.g.cs</h3><p>这个文件内容有点多，也是绑定实现的主要部分。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br></pre></td><td class="code"><pre><span class="line">partial class MainPage : </span><br><span class="line">    global::Windows.UI.Xaml.Controls.Page, </span><br><span class="line">    global::Windows.UI.Xaml.Markup.IComponentConnector,</span><br><span class="line">    global::Windows.UI.Xaml.Markup.IComponentConnector2</span><br><span class="line">&#123;</span><br><span class="line">    internal class XamlBindingSetters</span><br><span class="line">    &#123;</span><br><span class="line">        public static void Set_Windows_UI_Xaml_Controls_TextBlock_Text(global::Windows.UI.Xaml.Controls.TextBlock obj, global::System.String value, string targetNullValue)</span><br><span class="line">        &#123;</span><br><span class="line">            if (value == null &amp;&amp; targetNullValue != null)</span><br><span class="line">            &#123;</span><br><span class="line">                value = targetNullValue;</span><br><span class="line">            &#125;</span><br><span class="line">            obj.Text = value ?? global::System.String.Empty;</span><br><span class="line">        &#125;</span><br><span class="line">        public static void Set_Windows_UI_Xaml_Controls_TextBox_Text(global::Windows.UI.Xaml.Controls.TextBox obj, global::System.String value, string targetNullValue)</span><br><span class="line">        &#123;</span><br><span class="line">            if (value == null &amp;&amp; targetNullValue != null)</span><br><span class="line">            &#123;</span><br><span class="line">                value = targetNullValue;</span><br><span class="line">            &#125;</span><br><span class="line">            obj.Text = value ?? global::System.String.Empty;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    private class MainPage_obj1_Bindings :</span><br><span class="line">        global::Windows.UI.Xaml.Markup.IComponentConnector,</span><br><span class="line">        IMainPage_Bindings</span><br><span class="line">    &#123;</span><br><span class="line">        private global::TestApp1.MainPage dataRoot;</span><br><span class="line">        private bool initialized = false;</span><br><span class="line">        private const int NOT_PHASED = (1 &lt;&lt; 31);</span><br><span class="line">        private const int DATA_CHANGED = (1 &lt;&lt; 30);</span><br><span class="line"></span><br><span class="line">        // Fields for each control that has bindings.</span><br><span class="line">        private global::Windows.UI.Xaml.Controls.TextBlock obj2;</span><br><span class="line">        private global::Windows.UI.Xaml.Controls.TextBox obj3;</span><br><span class="line"></span><br><span class="line">        private MainPage_obj1_BindingsTracking bindingsTracking;</span><br><span class="line"></span><br><span class="line">        public MainPage_obj1_Bindings()</span><br><span class="line">        &#123;</span><br><span class="line">            this.bindingsTracking = new MainPage_obj1_BindingsTracking(this);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // IComponentConnector</span><br><span class="line"></span><br><span class="line">        public void Connect(int connectionId, global::System.Object target)</span><br><span class="line">        &#123;</span><br><span class="line">            switch(connectionId)</span><br><span class="line">            &#123;</span><br><span class="line">                case 2:</span><br><span class="line">                    this.obj2 = (global::Windows.UI.Xaml.Controls.TextBlock)target;</span><br><span class="line">                    (this.obj2).RegisterPropertyChangedCallback(global::Windows.UI.Xaml.Controls.TextBlock.TextProperty,</span><br><span class="line">                        (global::Windows.UI.Xaml.DependencyObject sender, global::Windows.UI.Xaml.DependencyProperty prop) =&gt;</span><br><span class="line">                        &#123;</span><br><span class="line">                            if (this.initialized)</span><br><span class="line">                            &#123;</span><br><span class="line">                                // Update Two Way binding</span><br><span class="line">                                this.dataRoot.Time = (this.obj2).Text;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;);</span><br><span class="line">                    break;</span><br><span class="line">                case 3:</span><br><span class="line">                    this.obj3 = (global::Windows.UI.Xaml.Controls.TextBox)target;</span><br><span class="line">                    (this.obj3).LostFocus += (global::System.Object sender, global::Windows.UI.Xaml.RoutedEventArgs e) =&gt;</span><br><span class="line">                        &#123;</span><br><span class="line">                            if (this.initialized)</span><br><span class="line">                            &#123;</span><br><span class="line">                                // Update Two Way binding</span><br><span class="line">                                this.dataRoot.Time = (this.obj3).Text;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;;</span><br><span class="line">                    break;</span><br><span class="line">                default:</span><br><span class="line">                    break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // IMainPage_Bindings</span><br><span class="line"></span><br><span class="line">        public void Initialize()</span><br><span class="line">        &#123;</span><br><span class="line">            if (!this.initialized)</span><br><span class="line">            &#123;</span><br><span class="line">                this.Update();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        public void Update()</span><br><span class="line">        &#123;</span><br><span class="line">            this.Update_(this.dataRoot, NOT_PHASED);</span><br><span class="line">            this.initialized = true;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public void StopTracking()</span><br><span class="line">        &#123;</span><br><span class="line">            this.bindingsTracking.ReleaseAllListeners();</span><br><span class="line">            this.initialized = false;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // MainPage_obj1_Bindings</span><br><span class="line"></span><br><span class="line">        public void SetDataRoot(global::TestApp1.MainPage newDataRoot)</span><br><span class="line">        &#123;</span><br><span class="line">            this.bindingsTracking.ReleaseAllListeners();</span><br><span class="line">            this.dataRoot = newDataRoot;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public void Loading(global::Windows.UI.Xaml.FrameworkElement src, object data)</span><br><span class="line">        &#123;</span><br><span class="line">            this.Initialize();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // Update methods for each path node used in binding steps.</span><br><span class="line">        private void Update_(global::TestApp1.MainPage obj, int phase)</span><br><span class="line">        &#123;</span><br><span class="line">            if (obj != null)</span><br><span class="line">            &#123;</span><br><span class="line">                if ((phase &amp; (NOT_PHASED | DATA_CHANGED | (1 &lt;&lt; 0))) != 0)</span><br><span class="line">                &#123;</span><br><span class="line">                    this.Update_Time(obj.Time, phase);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        private void Update_Time(global::System.String obj, int phase)</span><br><span class="line">        &#123;</span><br><span class="line">            if((phase &amp; ((1 &lt;&lt; 0) | NOT_PHASED | DATA_CHANGED)) != 0)</span><br><span class="line">            &#123;</span><br><span class="line">                XamlBindingSetters.Set_Windows_UI_Xaml_Controls_TextBlock_Text(this.obj2, obj, null);</span><br><span class="line">                XamlBindingSetters.Set_Windows_UI_Xaml_Controls_TextBox_Text(this.obj3, obj, null);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        private class MainPage_obj1_BindingsTracking</span><br><span class="line">        &#123;</span><br><span class="line">            global::System.WeakReference&lt;MainPage_obj1_Bindings&gt; WeakRefToBindingObj; </span><br><span class="line"></span><br><span class="line">            public MainPage_obj1_BindingsTracking(MainPage_obj1_Bindings obj)</span><br><span class="line">            &#123;</span><br><span class="line">                WeakRefToBindingObj = new global::System.WeakReference&lt;MainPage_obj1_Bindings&gt;(obj);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public void ReleaseAllListeners()</span><br><span class="line">            &#123;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// Connect()</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Windows.UI.Xaml.Build.Tasks"," 14.0.0.0")]</span><br><span class="line">    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]</span><br><span class="line">    public void Connect(int connectionId, object target)</span><br><span class="line">    &#123;</span><br><span class="line">        switch(connectionId)</span><br><span class="line">        &#123;</span><br><span class="line">        case 4:</span><br><span class="line">            &#123;</span><br><span class="line">                global::Windows.UI.Xaml.Controls.Button element4 = (global::Windows.UI.Xaml.Controls.Button)(target);</span><br><span class="line">                #line 23 "..\..\..\MainPage.xaml"</span><br><span class="line">                ((global::Windows.UI.Xaml.Controls.Button)element4).Click += this.ButtonBase_OnClick;</span><br><span class="line">                #line default</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line">        default:</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        this._contentLoaded = true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Windows.UI.Xaml.Build.Tasks"," 14.0.0.0")]</span><br><span class="line">    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]</span><br><span class="line">    public global::Windows.UI.Xaml.Markup.IComponentConnector GetBindingConnector(int connectionId, object target)</span><br><span class="line">    &#123;</span><br><span class="line">        global::Windows.UI.Xaml.Markup.IComponentConnector returnValue = null;</span><br><span class="line">        switch(connectionId)</span><br><span class="line">        &#123;</span><br><span class="line">        case 1:</span><br><span class="line">            &#123;</span><br><span class="line">                global::Windows.UI.Xaml.Controls.Page element1 = (global::Windows.UI.Xaml.Controls.Page)target;</span><br><span class="line">                MainPage_obj1_Bindings bindings = new MainPage_obj1_Bindings();</span><br><span class="line">                returnValue = bindings;</span><br><span class="line">                bindings.SetDataRoot(this);</span><br><span class="line">                this.Bindings = bindings;</span><br><span class="line">                element1.Loading += bindings.Loading;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        return returnValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>不过具体内容也很好理解，抛开几个属于<code>MainPage</code>类的方法先不管，在这里定义了几个内部类：<code>XamlBindingSetters</code>、<code>MainPage_obj1_Bindings</code>，其中<code>MainPage_obj1_Bindings</code>类实现了前面定义的那个接口，同时还定义了一个内部类<code>MainPage_obj1_BindingsTracking</code>作为所谓跟踪的一个实现，具体在这里我们不管它的作用。</p>
+<p>首先看第一个类<code>XamlBindingSetters</code>，这个类中定义的方法很明显是给控件属性赋值使用的，而且是专门真对声明了<code>{x:Bind}</code>标记的控件和属性。</p>
+<p>然后是主要的类<code>MainPage_obj1_Bindings</code>了，这个实现了所谓绑定接口的类中，我们重点关注接口声明的三个方法。而对于另外有个相对比较长的方法<code>Connect</code>，可以看出来就是实现从绑定目标到绑定源的更新了，这里就不分析了，很简单的代码。</p>
+<p>对于接口中三个方法的实现中，可以抛去<code>StopTracking()</code>方法不管，这个方法和上面所说的<code>MainPage_obj1_BindingsTracking</code>类有关，也许是我的例子过于简单，在这个类中看不出来有什么特殊的工作要做，除了保持了一个弱引用。</p>
+<p>而剩下的两个方法，最后的调用都指向了一个名叫<code>Update_</code>的私有方法，在这个方法里面有调用了一个针对具体属性的<code>Update_Time</code>方法，而从这里，我们就可以看到对<code>XamlBindingSetters</code>类的调用了，而这个类是为了设置控件的绑定属性的值的。那么很显然，<strong>在</strong><code>{x:Bind}</code><strong>方式的绑定中，从绑定源到绑定目标的更新是由上述内部接口中定义的</strong><code>Update</code><strong>方法来完成的</strong>。</p>
+<p>具体为什么跳跃这么远，又扯到了上一个文件中定义的接口，我们可以上面最后一个方法的内容：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MainPage_obj1_Bindings bindings = <span class="keyword">new</span> MainPage_obj1_Bindings();</span><br><span class="line"><span class="keyword">this</span>.Bindings = bindings;</span><br></pre></td></tr></table></figure></p>
+<p>因此，具体来说，是<strong>使用私有字段</strong><code>Bindings</code><strong>来完成更新的</strong>。</p>
+<p>到这里已经基本结束了，也许关于那些<code>switch</code>分支中的数字感到有些莫名其妙，那么可以再看看最后一个文件。</p>
+<h3 id="MainPage-xaml"><a href="#MainPage-xaml" class="headerlink" title="MainPage.xaml"></a>MainPage.xaml</h3><p>内容很少，可以很容易看出那些奇怪的数字来源：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#60;Page x:ConnectionId=&#39;1&#39;&#10;    x:Class=&#34;TestApp1.MainPage&#34;&#10;    xmlns=&#34;http://schemas.microsoft.com/winfx/2006/xaml/presentation&#34;&#10;    xmlns:x=&#34;http://schemas.microsoft.com/winfx/2006/xaml&#34;&#10;    xmlns:local=&#34;using:TestApp1&#34;&#10;    xmlns:d=&#34;http://schemas.microsoft.com/expression/blend/2008&#34;&#10;    xmlns:mc=&#34;http://schemas.openxmlformats.org/markup-compatibility/2006&#34;&#10;    mc:Ignorable=&#34;d&#34;&#62;&#10;&#10;    &#60;Grid Background=&#34;&#123;ThemeResource ApplicationPageBackgroundThemeBrush&#125;&#34;&#62;&#10;        &#60;TextBlock x:ConnectionId=&#39;2&#39;&#10;                                             &#10;            HorizontalAlignment=&#34;Right&#34;&#10;            VerticalAlignment=&#34;Top&#34;&#10;            Height=&#34;100&#34;/&#62;&#10;        &#60;TextBox x:ConnectionId=&#39;3&#39;&#10;                                             &#10;            Margin=&#34;0,100,0,0&#34;&#10;            VerticalAlignment=&#34;Top&#34;/&#62;&#10;        &#60;Button x:ConnectionId=&#39;4&#39;&#10;            VerticalAlignment=&#34;Bottom&#34;&#10;            Content=&#34;Update Time&#34;&#10;                                      /&#62;&#10;    &#60;/Grid&#62;&#10;&#60;/Page&#62;</span><br></pre></td></tr></table></figure></p>
+<p>所谓留空的地方也不是我故意弄得，使本来就如此，对比一下，可以发现留空的位置就是我们使用了绑定或者声明事件的位置。</p>
+<h3 id="u989D_u5916_u7684"><a href="#u989D_u5916_u7684" class="headerlink" title="额外的"></a>额外的</h3><p>其实关于上面三个文件，特别是第二个里面，有些地方我们不用深究，最起码对于这个简单的例子不用，比如那些奇怪的数字和常量定义，还有那条件判断等。除非你打算在深入研究这个框架，不过那时候也不应该看这些代码了。</p>
+<p>而对于上面这些具体代码，具体的方法，我们也不用过分深究究竟是什么时候被调用的，我们只需要知道当你在XAML中使用了<code>{x:Bind}</code>的时候，<code>Bindings</code>字段就处于可用的情况了，至于那些<code>Initialize</code>、<code>Initialize</code>、<code>GetBindingConnector</code>方法是什么时候调用的，可以不用管了。而如果不放心，你可以像我下面调用的那样使用。</p>
+<h2 id="u6700_u540E"><a href="#u6700_u540E" class="headerlink" title="最后"></a>最后</h2><p>最后就留下测试之后的正确工作的代码吧，改动也不大，就是换了一个通知方式而已。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">sealed</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainPage</span> : <span class="title">Page</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">string</span> _time;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Time</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _time; &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">value</span> != _time)</span><br><span class="line">            &#123;</span><br><span class="line">                _time = <span class="keyword">value</span>;</span><br><span class="line">                <span class="keyword">this</span>.Bindings?.Update();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainPage</span>(<span class="params"></span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.InitializeComponent();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ButtonBase_OnClick</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.Time = DateTime.Now.ToString(<span class="string">"D"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>重点就是属性的<em>set</em>访问器中的对<code>Bindings.Update()</code>方法的调用了。</p>
+<h2 id="u7ED3_u8BED"><a href="#u7ED3_u8BED" class="headerlink" title="结语"></a>结语</h2><p>关于<code>{x:Bind}</code>目前就告一段落吧，其实还有很多细节可以去深究，比如针对依赖属性的行为。如果你多去试试，未尝不能和<code>{Binding}</code>一样玩出各种花样来。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/UWP/">UWP</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Binding/">Binding</a><a href="/tags/XAML/">XAML</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2015/12/08/Deep-research-with-x-Bind/" data-title="深入探究 {x:Bind} | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/" title="将Hexo从Windows迁移到OS X">
+  <strong>上一篇：</strong><br/>
+  <span>
+  将Hexo从Windows迁移到OS X</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/11/14/dev-issue/"  title="开发问题记录">
+ <strong>下一篇：</strong><br/> 
+ <span>开发问题记录
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/12/08/Deep-research-with-x-Bind/" data-title="深入探究 {x:Bind}" data-url="http://3meng.github.io/2015/12/08/Deep-research-with-x-Bind/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u7F18_u8D77"><span class="toc-number">1.</span> <span class="toc-text">缘起</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6D4B_u8BD5"><span class="toc-number">2.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OneTime_u7ED1_u5B9A"><span class="toc-number">2.1.</span> <span class="toc-text">OneTime绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OneWay__26amp_3B_TwoWay_u7ED1_u5B9A"><span class="toc-number">2.2.</span> <span class="toc-text">OneWay & TwoWay绑定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TwoWay_u7ED1_u5B9A_u4E2D_u4ECE_u76EE_u6807_u5230_u6E90"><span class="toc-number">2.3.</span> <span class="toc-text">TwoWay绑定中从目标到源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#INotifyPropertyChanged"><span class="toc-number">2.4.</span> <span class="toc-text">INotifyPropertyChanged</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6DF1_u5165"><span class="toc-number">3.</span> <span class="toc-text">深入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-g-i-cs"><span class="toc-number">3.1.</span> <span class="toc-text">MainPage.g.i.cs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-g-cs"><span class="toc-number">3.2.</span> <span class="toc-text">MainPage.g.cs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MainPage-xaml"><span class="toc-number">3.3.</span> <span class="toc-text">MainPage.xaml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u989D_u5916_u7684"><span class="toc-number">3.4.</span> <span class="toc-text">额外的</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6700_u540E"><span class="toc-number">4.</span> <span class="toc-text">最后</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u8BED"><span class="toc-number">5.</span> <span class="toc-text">结语</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+</html>

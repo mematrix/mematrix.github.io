@@ -1,0 +1,1014 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="blog | C# | .Net | Windows Phone">
+<meta property="og:type" content="website">
+<meta property="og:title" content="一千二百年的清风明月">
+<meta property="og:url" content="http://3meng.github.io/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="blog | C# | .Net | Windows Phone">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一千二百年的清风明月">
+<meta name="twitter:description" content="blog | C# | .Net | Windows Phone">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/" title="将Hexo从Windows迁移到OS X" itemprop="url">将Hexo从Windows迁移到OS X</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-14T09:49:00.000Z" itemprop="datePublished"> 发表于 2016-01-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>几个月之前就想过，在 <strong>OS X</strong> 上配置一下<code>Hexo</code>，方便偶尔更新一下文章什么的，只是这么长时间了一拖再拖，总是在做着各种其它的事情，甚至Mac都很久没打开过了……</p>
+<blockquote>
+<p><strong>题外话：</strong>Mac的设计抛开不说，配合<strong>OS X</strong>用起来体验也不错，重点是续航，这都最少一个多月没开，现在开了，电量还有<em>60%</em>多，所有的App状态都还是之前合盖时候的状态。</p>
+<p>顺便也得说一下，<strong>OS X</strong>上应用是少了一点，但是能用的基本都是布局很精美，也许部分是系统的一贯主题特色，而<strong>Retina</strong>屏幕的显示效果也是相当赞的。当然，用的也不多，出了系统那个<code>Finder</code>是个真尴尬的东西之外，基本其它的都感觉不错，比如现在正在用来编辑此文的<code>MacDown</code>，除了主题差了一点，各种显示效果是真的不错，文本编辑起来也是很舒服。</p>
+</blockquote>
+<p>扯远了，继续上文。最近准备弄弄<code>C++</code>，所以又打开了Mac，当然不是说<strong>Windows</strong>上面做不了开发，毕竟<code>Visual Studio</code>不是吹的，只是这次有点问题，一个依赖的项目在<strong>Windows</strong>上编译有问题，使用<code>MinGW</code>+<code>Clion</code>一直编译不通过，连接失败；然后我想着到<strong>OS X</strong>上试试，结果稍微改了一下<code>CMakeLists.txt</code>文件，就通过编译成功执行了。于是将项目搬到了Mac上面。</p>
+<p>然后昨天又弄了一下，又将<code>Minecraft</code>给弄到<strong>OS X</strong>上面跑了，这下也基本可以单用<strong>OS X</strong>一阵子了，所以才有了标题所说的，想着准备把<code>Hexo</code>也弄过来了。这次也就没再往下拖延了。</p>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hexo/">Hexo</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/01/14/Migrate-hexo-from-Windows-to-OS-X/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/08/Deep-research-with-x-Bind/" title="深入探究 {x:Bind}" itemprop="url">深入探究 {x:Bind}</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-08T09:16:17.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>今天无意间谈到了<code>UWP</code>应用中为数据绑定新引入的一个<code>XAML</code>标记：<code>{x:Bind}</code>，对于这个新的标记的作用和原理，网上的一般说法都是：</p>
+<blockquote>
+<p>相比较传统的<code>{Binding}</code>方式，<code>{x:Bind｝</code>的效率更高，因为<code>{x:Bind}</code>的数据绑定发生编译期间，绑定工作在编译时期就已经完成了，所以我们在使用<code>{x:Bind}</code>的时候，需要一个明确的数据类型（按：这也符合强类型语言的特点）。</p>
+</blockquote>
+<p>这些也都基本说的过去，相对于传统的<code>{Binding}</code>方式，这种类型严格的绑定行为，最起码也可以减少对象装箱和拆箱行为的性能损耗，而至于其它的由于强类型带来的可以优化的地方，就要看编译器的行为了。</p>
+<p>但是基本上也就到此为止了，大部分关于<code>{x:Bind}</code>的说明文章，接下来就是将示例，陈述简单的用法，不说讲解一下<code>{x:Bind}</code>的实现方式，就连深入一点的用法，比如双向绑定等都没有提到多少。</p>
+<blockquote>
+<p>这里别说那些示例中写了个<code>Mode=TwoWay</code>就是双向绑定了，如果双向绑定这么简单，那在传统的<code>{Binding}</code>方式中又为什么要弄个<code>INotifyPropertyChanged</code>接口，还要弄个叫依赖属性的东西出来？</p>
+</blockquote>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/12/08/Deep-research-with-x-Bind/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/UWP/">UWP</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Binding/">Binding</a><a href="/tags/XAML/">XAML</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/12/08/Deep-research-with-x-Bind/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/12/08/Deep-research-with-x-Bind/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/11/14/dev-issue/" title="开发问题记录" itemprop="url">开发问题记录</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-11-14T14:35:25.000Z" itemprop="datePublished"> 发表于 2015-11-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>记录一些开发过程中遇到的问题，或者疑惑的地方，在记录的时候，还没有解决或者找到原因，也许会在以后的时间里去验证和解决。如果知道了原因所在，也会及时更新并记录下来。</p>
+<p>就当是一个历史的记忆，也避免日后在重复同样的问题。</p>
+<blockquote>
+<p>最近更新时间：<code>2015年11月14日</code></p>
+</blockquote>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/11/14/dev-issue/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/笔记/">笔记</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Storyboard/">Storyboard</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/11/14/dev-issue/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/11/14/dev-issue/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/31/development-notes/" title="开发笔记" itemprop="url">开发笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-31T13:30:47.000Z" itemprop="datePublished"> 发表于 2015-07-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在开发过程中的一些笔记心得，包括一些技巧方法和记录。不定期整理更新。</p>
+<blockquote>
+<p>最近更新时间：<code>2015年11月16日</code></p>
+</blockquote>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/07/31/development-notes/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/笔记/">笔记</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Transitions/">Transitions</a><a href="/tags/VisualStateManager/">VisualStateManager</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/07/31/development-notes/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/07/31/development-notes/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/21/New-Language-Features-in-CSharp6/" title="C# 6 新特性" itemprop="url">C# 6 新特性</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-21T06:52:31.000Z" itemprop="datePublished"> 发表于 2015-07-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>微软新一代开发工具<code>Visual Studio 2015</code>正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为<code>.Net</code>开发中的主力开发语言<code>C#</code>，也已经走到了<code>C# 6</code>。</p>
+<p>那么作为<code>C#</code>开发语言的最新版本，微软又给它添加或改进了哪些特性呢？</p>
+<p><code>C# 6</code>的新特性是和微软的 .Net 开源编译器<a href="https://github.com/dotnet/roslyn">Roslyn</a>紧密相连的，在其 GitHub 页面中，也给出了<code>C# 6</code>新特性：<a href="https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6">New Language Features in C# 6</a>。下面内容一部分为简单的翻译，以及在查看时的一些理解和疑问，由于目前我还没发下载最新版 Win10 和 VS 2015，因此有些地方暂时还没发验证猜想。等待后续更新。</p>
+<p>下面先列出<code>C# 6</code>中的新特性：</p>
+<ul>
+<li>自动属性初始值表达式<blockquote>
+<p><code>public int X { get; set; } = x;</code></p>
+</blockquote>
+</li>
+<li>只读自动属性<blockquote>
+<p><code>public int Y { get; } = y;</code></p>
+</blockquote>
+</li>
+<li><p>静态导入<code>using static</code></p>
+<blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">using</span> <span class="keyword">static</span> System.Console;</span><br><span class="line">&gt; ...</span><br><span class="line">&gt; Write(<span class="number">4</span>);</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>索引器对象初始化</p>
+<blockquote>
+<p><code>new JObject { [&quot;x&quot;] = 3 }</code></p>
+</blockquote>
+</li>
+<li>在<code>catch</code>和<code>finally</code>块中使用<code>await</code><blockquote>
+<p><code>try { ... } catch { await ... } finally { await ... }</code></p>
+</blockquote>
+</li>
+<li>异常筛选器<blockquote>
+<p><code>catch(Exception e) when (e.Count &gt; 5) { ... }</code></p>
+</blockquote>
+</li>
+<li>函数/属性表达式<blockquote>
+<p><code>public double Dist =&gt; Sqrt(X * X + Y * Y);</code></p>
+</blockquote>
+</li>
+<li>Null条件运算符<blockquote>
+<p><code>customer?.Orders?[5]</code></p>
+</blockquote>
+</li>
+<li>字符串插值<blockquote>
+<p><code>$&quot;{p.Name} is {p.Age} years old.&quot;</code></p>
+</blockquote>
+</li>
+<li><code>nameof</code>运算符<blockquote>
+<p><code>string s = nameof(Console.Write);</code></p>
+</blockquote>
+</li>
+<li>其它改进<blockquote>
+<ul>
+<li>#pragma</li>
+<li>集合初始化支持扩展方法<code>Add</code></li>
+<li>重载方法解析改进</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/07/21/New-Language-Features-in-CSharp6/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C#</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/07/21/New-Language-Features-in-CSharp6/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/07/21/New-Language-Features-in-CSharp6/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/16/SQLite-and-inheritance-mapping/" title="SQLite与“继承映射”" itemprop="url">SQLite与“继承映射”</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-16T15:02:19.000Z" itemprop="datePublished"> 发表于 2015-07-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="SQLite"><a href="#SQLite" class="headerlink" title="SQLite"></a>SQLite</h2><p>SQLite 的网站 (<a href="http://www.sqlite.org/">sqlite.org</a>) 对SQL进行了如下描述：</p>
+<blockquote>
+<p>SQLite 是一个可实现独立、无服务器、零配置、事务性 SQL 数据库引擎的软件库。</p>
+</blockquote>
+<p>SQLite 完全驻留在客户端进程中，这使之成为一种<strong>嵌入式</strong>数据库。 在使用期间，SQLite 数据库的运行空间是一个存储在客户端文件系统的某一位置中的单个文件，并且安装空间通常也相当小。 </p>
+<p>尽管如此，SQLite 数据库的功能却是极其丰富的，因为它支持大部分<em>SQL-92</em> 规范，只是去除了 RIGHT 和 FULL OUTER JOIN、ALTER TABLE、某一触发器支持、GRANT/REVOKE 以及写入 VIEW 等几项内容（更详细的说明请参见<a href="http://www.sqlite.org/">SQLite 网站</a>）。令人印象深刻的是支持的功能数量，包括事务和各种数据类型。这使 SQLite 十分适合只需<strong>轻型 SQL</strong>的情形。 </p>
+<p>有关更详细的 SQLite 体系结构和用法说明，还可以查看<a href="https://www.microsoft.com/china/msdn/x-platform/developing_17.html">这里</a>。</p>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/07/16/SQLite-and-inheritance-mapping/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/SQLite/">SQLite</a><a href="/tags/继承映射/">继承映射</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/07/16/SQLite-and-inheritance-mapping/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/07/16/SQLite-and-inheritance-mapping/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/11/recovery-data-from-chk-file/" title="从CHK文件中恢复数据" itemprop="url">从CHK文件中恢复数据</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-06-11T15:21:29.000Z" itemprop="datePublished"> 发表于 2015-06-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在使用电脑的过程中，总会遇到各种各样的故障，导致电脑非正常关机，或者由于其它的原因，最终使得磁盘某些文件（夹）存储出现错误。一般表现为文件夹无法访问，或者是在资源管理器中看不到对应文件或文件夹（而实际上这些文件还是可访问），这时候我们就需要想办法将这些数据恢复到正常状态或者从磁盘中删除了，因为虽然你无法通过资源管理器或者一般应用去访问这些数据，但是它们其实还是被存储在磁盘中某一个区域，仍然占据着磁盘空间。<br>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/06/11/recovery-data-from-chk-file/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/CHK文件/">CHK文件</a><a href="/tags/数据恢复/">数据恢复</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/06/11/recovery-data-from-chk-file/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/06/11/recovery-data-from-chk-file/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/10/Windows-Sockets/" title="Windows Sockets：多线程WEB服务器" itemprop="url">Windows Sockets：多线程WEB服务器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-06-09T16:32:10.000Z" itemprop="datePublished"> 发表于 2015-06-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>平时如果一个项目需要网络连接，一般都是直接用如<code>C#</code>、<code>Java</code>等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用<code>C#</code>中的Socket相关类做过一点有关长连接的事情。</p>
+<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Sockets API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
+<h2 id="u5B9E_u9A8C_u8981_u6C42"><a href="#u5B9E_u9A8C_u8981_u6C42" class="headerlink" title="实验要求"></a>实验要求</h2><ol>
+<li>可配置IP地址、监听端口和主目录</li>
+<li>能够在监听端口上进行监听</li>
+<li>支持服务的启动</li>
+<li>支持服务的关闭</li>
+<li>能够响应客户端的请求，并定位相应的html文件</li>
+<li>对每个请求能够创建单独的响应线程</li>
+<li>能够发送可被客户端解析的响应报文</li>
+<li>对于错误的请求能够定位错误的原因并给出相应的响应</li>
+<li>支持多种类型文件的输出</li>
+<li>具备图形GUI界面
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/06/10/Windows-Sockets/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Socket/">Socket</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Windows-Sockets/">Windows Sockets</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/06/10/Windows-Sockets/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/06/10/Windows-Sockets/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/21/hello-world/" title="Hello World" itemprop="url">Hello World</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-20T16:52:19.000Z" itemprop="datePublished"> 发表于 2015-03-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>第一篇博文，不知道该写个什么名字最好，干脆就保持默认的标题<code>Hello World</code>吧，这也算是学计算机软件的一个启蒙标志吧。<br>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/03/21/hello-world/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hexo/">Hexo</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/03/21/hello-world/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/03/21/hello-world/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+  </body>
+ </html>
