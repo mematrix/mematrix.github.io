@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://3meng.github.io/2016/02/08/Algorithm-of-Finding-Maximum-SubArray/</loc>
+    <lastmod>2016-02-08T14:15:26.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://3meng.github.io/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/</loc>
     <lastmod>2016-01-14T14:06:53.000Z</lastmod>
   </url>
