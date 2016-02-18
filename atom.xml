@@ -4,7 +4,7 @@
   <subtitle><![CDATA[历劫由来谁一笑，仙踪尽飞羽衣飘。]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://3meng.github.io/"/>
-  <updated>2016-02-10T13:01:47.000Z</updated>
+  <updated>2016-02-18T15:10:20.000Z</updated>
   <id>http://3meng.github.io/</id>
   
   <author>
@@ -13,6 +13,83 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[非递归遍历二叉树：线性时间&常量额外空间]]></title>
+    <link href="http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/"/>
+    <id>http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/</id>
+    <published>2016-02-17T11:45:09.000Z</published>
+    <updated>2016-02-18T15:10:20.000Z</updated>
+    <content type="html"><![CDATA[<p>今天看到了<strong>《算法导论（第三版）》</strong>第三部分中第十章内容，在<code>10.4节</code>遇到了一个题目，要求在<code>O(n)</code>（即上限渐进时间为线性）时间内非递归遍历二叉树，并且只能使用固定量的额外存储空间。</p>
+<blockquote>
+<p><strong>10.4-5</strong> 给定一个<em>n</em>结点的二叉树，写出一个<code>O(n)</code>时间的非递归过程，将该树每个节点的关键字输出。要求除该树本身的存储空间外只能使用固定量的额外存储空间，且在过程中不得修改该树，即使是暂时的修改也不允许。</p>
+</blockquote>
+<p>部分理解需要联系上下文，比如说关键字是前文定义的一个树的结点通常具有的结构，包括一个关键字<code>key</code>、一个左孩子结点指针<code>leftChild</code>、一个右孩子结点指针<code>rightChild</code>以及一个父结点指针<code>parent</code>，另外带有可选的卫星数据。</p>
+<a id="more"></a>
+<p>在开始之前，给出一些基本的树结点定义，然后可以先看看二叉树常规的遍历方式。</p>
+<h2 id="u5B9A_u4E49"><a href="#u5B9A_u4E49" class="headerlink" title="定义"></a>定义</h2><p>在下面的讨论中，对于树结点的定义都按照这个定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> Node</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> key;</span><br><span class="line">    Node *leftChild;</span><br><span class="line">    Node *rightChild;</span><br><span class="line">    Node *parent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只包括主要的数据，至于可能存在的其它卫星数据之类的与讨论无关，就不包括了。<br>而按照上面的定义也知道，我们将假定二叉树是按照链式结构存储的，因此其迭代器类型可视为一个双向迭代器而非随机迭代器。</p>
+<p>从定义中可以看出，每个结点还有一个指向其父结点的属性，对于根结点，该值为<code>null</code>。并非所有的二叉树结点定义中都需要这个属性，但是为了完成前面题目中的要求，我们这里的讨论中需要它；有这个属性，我们才可以在<code>O(1)</code>时间内从一个结点导航到它的父结点。</p>
+<h2 id="u9012_u5F52_u65B9_u5F0F"><a href="#u9012_u5F52_u65B9_u5F0F" class="headerlink" title="递归方式"></a>递归方式</h2><p>遍历一颗二叉树，我们最容易想到的就是递归方式了。因为二叉树本身的定义也符合递归思想，而其实，一般书籍中对二叉树定义都是采用递归方式的。</p>
+<blockquote>
+<p><strong>二叉树*</strong>T*是定义在有限结点集上的结构，它</p>
+<ul>
+<li>或者不包含任何结点，</li>
+<li>或者包含三个<strong>不相交</strong>的结点集合：一个<strong>根</strong>结点，一颗称为<strong>左子树</strong>的二叉树，以及一颗称为<strong>右子树</strong>的二叉树。</li>
+</ul>
+</blockquote>
+<p>因此我们在遍历的时候，也可以很容易根据定义来。下面给出<strong>二叉树先根递归方式遍历</strong>伪代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">visit</span><span class="params">(<span class="keyword">const</span> Node *node)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">nullptr</span> == node) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; node-&gt;key;</span><br><span class="line">    visit(node-&gt;leftChild);</span><br><span class="line">    visit(node-&gt;rightChild);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先输出根结点的值，然后分别输出其左右子树。当达到叶节点的时候，递归开始回升。</p>
+<h2 id="u975E_u9012_u5F52_26amp_3B_u4E0D_u9650_u5236_u5B58_u50A8_u7A7A_u95F4"><a href="#u975E_u9012_u5F52_26amp_3B_u4E0D_u9650_u5236_u5B58_u50A8_u7A7A_u95F4" class="headerlink" title="非递归&amp;不限制存储空间"></a>非递归&amp;不限制存储空间</h2><p>其实这也就是一般的将递归调用过程优化为迭代过程所使用的方法，一般思路就是我们使用一个栈来存储之前在递归过程中间产生的临时值，然后调整一下调用过程就行。</p>
+<p>这里我们主要就是要将迭代过程中我们经过的根结点按照顺序依次保存起来，然后当到达叶节点的时候开始退栈。下面是<strong>非递归、使用栈作为辅助结构</strong>的二叉树先根遍历伪代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">const</span> Node *node)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">stack</span>&lt;<span class="keyword">const</span> Node*&gt; <span class="built_in">stack</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (node || !<span class="built_in">stack</span>.empty())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> (node)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">stack</span>.push(node);</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; node-&gt;key;</span><br><span class="line">            node = node-&gt;leftChild;</span><br><span class="line">        &#125;</span><br><span class="line">        node = <span class="built_in">stack</span>.top();</span><br><span class="line">        <span class="built_in">stack</span>.pop();</span><br><span class="line">        node = <span class="built_in">stack</span>-&gt;rightChild;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>非递归过程用一个栈结构作为辅助，来存储在递归过程中函数参数中所传递的信息（函数参数通常也是通过栈传递的）。这里的基本过程也就是我们接下来讨论的基础。</p>
+<h2 id="u975E_u9012_u5F52_26amp_3B_u5E38_u91CF_u989D_u5916_u5B58_u50A8_u7A7A_u95F4"><a href="#u975E_u9012_u5F52_26amp_3B_u5E38_u91CF_u989D_u5916_u5B58_u50A8_u7A7A_u95F4" class="headerlink" title="非递归&amp;常量额外存储空间"></a>非递归&amp;常量额外存储空间</h2><p>现在回到正题，按照题目要求，我们只能使用固定量的额外存储空间，因此，栈是不能使用了。但是我们在使用栈作为辅助结构的时候，其实目的是为了方便遍历过程的回退（即从孩子结点回到父结点），因此，这里我们也可以借用这个基本流程，但是需要改变的是回退方法。</p>
+<p>没有了栈，我们就要自己想办法从孩子结点正确的回退到下一个需要被访问的<strong>祖先结点</strong>，按照先根遍历方式的话，我们就需要回退到<strong>下一个具有右孩子结点的祖先结点</strong>了。</p>
+<ul>
+<li>如果我们当前位于一个左子树上，那么回退很简单，只需要不断的往父结点方向搜索直到找到第一个具有右子树的结点或者到达根节点的<code>parent</code>而结束遍历；</li>
+<li>但是如果我们是从右子树遍历过来的，那么就不能简单的采用左子树回退方式了，因为那样会导致死循环（从右子树回退到其父结点，然后发现存在右子树，又遍历这个右子树），这时候我们就需要首先判断当前结点是否为其父结点的右孩子，如果是，就直接回退，一直到父结点为<code>nullptr</code>或者不是右孩子为止，也就是我们回退到了一个左子树路径上，这个时候，我们就可以按照左子树中回退方式，来寻找下一个合适的结点了。</li>
+</ul>
+<p>上面提到的是回退，而向下的过程则很简单了，就是按照先序遍历顺序，对每个节点都沿着其左子树一直遍历到底即可。</p>
+<p>按照上面的分析，可以写出代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(Node *p)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (p)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> (p-&gt;leftChild)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; p-&gt;key;</span><br><span class="line">            p = p-&gt;leftChild;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; p;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (p.rightChild)</span><br><span class="line">        &#123;</span><br><span class="line">            p = p.rightChild;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 到达叶节点，开始回退</span></span><br><span class="line">        <span class="comment">// 回退右子树路径上的结点</span></span><br><span class="line">        <span class="keyword">while</span> (p.parent &amp;&amp; p.parent.rightChild == p)</span><br><span class="line">        &#123;</span><br><span class="line">            p = p.parent;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 回退左子树路径上的结点</span></span><br><span class="line">        p = p.parent;</span><br><span class="line">        <span class="keyword">while</span> (p &amp;&amp; !p.rightChild)</span><br><span class="line">        &#123;</span><br><span class="line">            p = p.parent;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (p) p = p.rightChild;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面过程中除了参数所占用的一个指针空间之外，没有使用其它额外的存储空间。而对过程的分析可以知道，在遍历过程中，我们会对所有的<strong>非叶子结点</strong>访问过两次，一次是向下遍历，一次是回退时候；而对所有的<strong>叶子结点</strong>，我们只需要访问一次，也就是输出它的信息。因此从这个非形式化的分析可以得知，上面代码中循环次数大约为<code>3n/2</code>，所以整个过程的时间复杂度为<code>O(n)</code>。</p>
+<h3 id="u53E6_u4E00_u79CD_u601D_u8DEF"><a href="#u53E6_u4E00_u79CD_u601D_u8DEF" class="headerlink" title="另一种思路"></a>另一种思路</h3><p>在这里再附加上另一种思路，更详细内容（代码）见<a href="http://clrs.skanev.com/10/04/05.html" target="_blank" rel="external">此链接</a>。</p>
+<blockquote>
+<p>对于基本的遍历，我们按照下列规则进行：</p>
+<ul>
+<li>如果我们从父结点出来，那么在访问其左孩子结点；</li>
+<li>如果我们从一个左孩子结点出来，那么接下来访问那个对应的右孩子结点；</li>
+<li>如果我们离开一个右孩子结点，那么接下来就将指针移到其父结点上。</li>
+</ul>
+<p>而为了处理那些少于两个孩子结点的情况，当下列对应条件满足时，我们转移到相应的步骤：</p>
+<ul>
+<li>如果一个结点只有右孩子，那么当访问完这个结点之后，接下来访问其右孩子结点；</li>
+<li>如果一个结点只有左孩子，当我们访问完这个左孩子结点之后，返回其父结点；</li>
+<li>如果一个结点没有孩子，返回其父结点。</li>
+</ul>
+</blockquote>
+<p><strong>注意上面所说父结点、孩子结点均是相对于当前正在被遍历的结点来说的。</strong></p>
+<p>只是在该页面最后附加的C代码好像有点问题，对于那个全局的额外占用的一个数组空间的使用，只有不断写入，却从没调用过那个重置方法。如果去掉那个<code>store(key)</code>的调用，然后在<code>if</code>分支中进行输出（<code>if</code>分支花括号之后，其它语句开始之前），也可以完成遍历。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>今天看到了<strong>《算法导论（第三版）》</strong>第三部分中第十章内容，在<code>10.4节</code>遇到了一个题目，要求在<code>O(n)</code>（即上限渐进时间为线性）时间内非递归遍历二叉树，并且只能使用固定量的额外存储空间。</p>
+<blockquote>
+<p><strong>10.4-5</strong> 给定一个<em>n</em>结点的二叉树，写出一个<code>O(n)</code>时间的非递归过程，将该树每个节点的关键字输出。要求除该树本身的存储空间外只能使用固定量的额外存储空间，且在过程中不得修改该树，即使是暂时的修改也不允许。</p>
+</blockquote>
+<p>部分理解需要联系上下文，比如说关键字是前文定义的一个树的结点通常具有的结构，包括一个关键字<code>key</code>、一个左孩子结点指针<code>leftChild</code>、一个右孩子结点指针<code>rightChild</code>以及一个父结点指针<code>parent</code>，另外带有可选的卫星数据。</p>]]>
+    
+    </summary>
+    
+      <category term="Algorithm" scheme="http://3meng.github.io/tags/Algorithm/"/>
+    
+      <category term="binary tree" scheme="http://3meng.github.io/tags/binary-tree/"/>
+    
+      <category term="Algorithm" scheme="http://3meng.github.io/categories/Algorithm/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[最大子数组查找算法]]></title>

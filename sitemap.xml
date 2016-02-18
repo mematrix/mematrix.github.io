@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/</loc>
+    <lastmod>2016-02-18T15:10:20.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://3meng.github.io/2016/02/08/Algorithm-of-Finding-Maximum-SubArray/</loc>
     <lastmod>2016-02-10T13:01:47.000Z</lastmod>
   </url>
