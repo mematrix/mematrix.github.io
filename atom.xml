@@ -4,7 +4,7 @@
   <subtitle><![CDATA[历劫由来谁一笑，仙踪尽飞羽衣飘。]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://3meng.github.io/"/>
-  <updated>2016-02-18T15:10:20.000Z</updated>
+  <updated>2016-02-18T15:17:01.000Z</updated>
   <id>http://3meng.github.io/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/"/>
     <id>http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/</id>
     <published>2016-02-17T11:45:09.000Z</published>
-    <updated>2016-02-18T15:10:20.000Z</updated>
+    <updated>2016-02-18T15:17:01.000Z</updated>
     <content type="html"><![CDATA[<p>今天看到了<strong>《算法导论（第三版）》</strong>第三部分中第十章内容，在<code>10.4节</code>遇到了一个题目，要求在<code>O(n)</code>（即上限渐进时间为线性）时间内非递归遍历二叉树，并且只能使用固定量的额外存储空间。</p>
 <blockquote>
 <p><strong>10.4-5</strong> 给定一个<em>n</em>结点的二叉树，写出一个<code>O(n)</code>时间的非递归过程，将该树每个节点的关键字输出。要求除该树本身的存储空间外只能使用固定量的额外存储空间，且在过程中不得修改该树，即使是暂时的修改也不允许。</p>
@@ -33,7 +33,7 @@
 <p>从定义中可以看出，每个结点还有一个指向其父结点的属性，对于根结点，该值为<code>null</code>。并非所有的二叉树结点定义中都需要这个属性，但是为了完成前面题目中的要求，我们这里的讨论中需要它；有这个属性，我们才可以在<code>O(1)</code>时间内从一个结点导航到它的父结点。</p>
 <h2 id="u9012_u5F52_u65B9_u5F0F"><a href="#u9012_u5F52_u65B9_u5F0F" class="headerlink" title="递归方式"></a>递归方式</h2><p>遍历一颗二叉树，我们最容易想到的就是递归方式了。因为二叉树本身的定义也符合递归思想，而其实，一般书籍中对二叉树定义都是采用递归方式的。</p>
 <blockquote>
-<p><strong>二叉树*</strong>T*是定义在有限结点集上的结构，它</p>
+<p><strong>二叉树</strong><em>T</em>是定义在有限结点集上的结构，它</p>
 <ul>
 <li>或者不包含任何结点，</li>
 <li>或者包含三个<strong>不相交</strong>的结点集合：一个<strong>根</strong>结点，一颗称为<strong>左子树</strong>的二叉树，以及一颗称为<strong>右子树</strong>的二叉树。</li>
