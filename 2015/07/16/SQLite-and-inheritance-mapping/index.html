@@ -27,7 +27,7 @@ SQLite 是一个可实现独立、无服务器、零配置、事务性 SQL 数�
 
 SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据库。 在使用期间，SQLite 数据库的运行空间是一个存储在客户端文件系统的某一位置中的单个文件，并且安装空间通常也相当小。 
 尽管如此，SQLite 数据库的">
-<meta property="og:updated_time" content="2015-12-08T12:23:10.000Z">
+<meta property="og:updated_time" content="2016-02-22T14:29:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SQLite与“继承映射”">
 <meta name="twitter:description" content="SQLiteSQLite 的网站 (sqlite.org) 对SQL进行了如下描述：
@@ -48,6 +48,12 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
   <body>
@@ -171,15 +177,104 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
 </ul>
 <p>有关<code>继承映射</code>的更多内容，可以自行搜索。</p>
 <h2 id="SQLite_u5904_u7406"><a href="#SQLite_u5904_u7406" class="headerlink" title="SQLite处理"></a>SQLite处理</h2><p>对于<code>.Net</code>平台，有许多的SQLite帮助程序库，可以简化SQLite的操作。这里在<code>Windows Phone 8</code>平台上使用相应的帮助库来测试SQLite数据库。有关如何在<code>Windows Phone 8</code>中使用SQLite数据库，可以查看<code>sqlite-net-wp8</code>的<a href="https://github.com/peterhuene/sqlite-net-wp8" target="_blank" rel="external">说明</a>。</p>
-<h3 id="u521B_u5EFA_u6570_u636E_u5E93_u8868"><a href="#u521B_u5EFA_u6570_u636E_u5E93_u8868" class="headerlink" title="创建数据库表"></a>创建数据库表</h3><p>要创建一个数据库表，我们需要定义相对应的实体类，并且使用对应的特性（<code>Attribute</code>）去修饰相应的类（<code>class</code>）和属性（<code>Property</code>）。如下是一个实体类定义：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[Table(<span class="string">"base_data"</span>)]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BaseData</span></span><br><span class="line">&#123;</span><br><span class="line">    [PrimaryKey, AutoIncrement, Column(<span class="string">"id"</span>)]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> ID &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    [Column(<span class="string">"name"</span>)]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    [Column(<span class="string">"key"</span>), NotNull]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Key &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="u521B_u5EFA_u6570_u636E_u5E93_u8868"><a href="#u521B_u5EFA_u6570_u636E_u5E93_u8868" class="headerlink" title="创建数据库表"></a>创建数据库表</h3><p>要创建一个数据库表，我们需要定义相对应的实体类，并且使用对应的特性（<code>Attribute</code>）去修饰相应的类（<code>class</code>）和属性（<code>Property</code>）。如下是一个实体类定义：</p>
+<pre><code class="csharp">[Table(&quot;base_data&quot;)]
+public class BaseData
+{
+    [PrimaryKey, AutoIncrement, Column(&quot;id&quot;)]
+    public int ID { get; set; }
+
+    [Column(&quot;name&quot;)]
+    public string Name { get; set; }
+
+    [Column(&quot;key&quot;), NotNull]
+    public string Key { get; set; }
+}
+</code></pre>
 <h3 id="u7EE7_u627F_u6620_u5C04_uFF1F"><a href="#u7EE7_u627F_u6620_u5C04_uFF1F" class="headerlink" title="继承映射？"></a>继承映射？</h3><p>对于一个实体类，我们需要使用<code>TableAttribute</code>修饰，并传入表名称。而在查找的时候，同样需要传入要查找的表对应的实体类型，因此，我觉得SQLite-net在对继承映射处理时采用了一种更简单的实现：对于每个具体的实体类都对应一个表，在这张表中会包含有该类所有的（包括基类）具有<code>ColumnAttribute</code>特性的属性，但是SQLite-net并不提供在继承映射中最重要的一个特性：查询父类时同时返回所有符合条件的子类。</p>
 <p>本来SQLite就是一个轻量级的数据库，因此SQLite-net在实现的时候，只是把我们定义的实体类作为一个类似参照的东西，所以对于<code>Table</code>的修饰也没有要求更多的与继承映射有关的字段。不过这样也好，毕竟一般当我们需要使用类似SQLite的数据库时，也不会有太多的要求，而SQLite-net这样的处理，一般并不会影响我们对数据的处理。</p>
-<h3 id="u5206_u6790_-__u6E90_u4EE3_u7801"><a href="#u5206_u6790_-__u6E90_u4EE3_u7801" class="headerlink" title="分析 - 源代码"></a>分析 - 源代码</h3><p>为了验证SQLite-net对具有继承关系的实体类的处理方式，我们可以查看它的源代码。而与SQLite-net对类的处理方式直接相关联的就是那几个<code>Attribute</code>了，从<code>MSDN</code>中可以查到，对于一个<code>Attribute</code>特性，可以使用<code>AttributeUsageAttribute</code>类来指示其使用方法，该类的声明如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 指定另一特性类的用法。无法继承此类。</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public sealed class AttributeUsageAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// 用指定的 &lt;see cref="System.AttributeTargets"/&gt;、</span><br><span class="line">    /// &lt;see cref="System.AttributeUsageAttribute.AllowMultiple"/&gt; 值和 </span><br><span class="line">    /// &lt;see cref="System.AttributeUsageAttribute.Inherited"/&gt; 值列表初始化</span><br><span class="line">    /// System.AttributeUsageAttribute 类的新实例。</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    /// &lt;param name="validOn"&gt; 使用按位 OR 运算符组合的一组值，用于指示哪些程序元素是有效的。&lt;/param&gt;</span><br><span class="line">    public AttributeUsageAttribute(System.AttributeTargets validOn);</span><br><span class="line"></span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// 获取一组值，这组值标识指示的特性可应用到的程序元素。</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    public System.AttributeTargets ValidOn &#123; get; private set; &#125;</span><br><span class="line"></span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// 获取或设置一个布尔值，该值指示能否为一个程序元素指定多个指示特性实例。</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    public bool AllowMultiple &#123; set; get; &#125;</span><br><span class="line"></span><br><span class="line">    /// &lt;summary&gt;</span><br><span class="line">    /// 获取或设置一个布尔值，该值指示指示的特性能否由派生类和重写成员继承。</span><br><span class="line">    /// &lt;/summary&gt;</span><br><span class="line">    public bool Inherited &#123; set; get; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="u5206_u6790_-__u6E90_u4EE3_u7801"><a href="#u5206_u6790_-__u6E90_u4EE3_u7801" class="headerlink" title="分析 - 源代码"></a>分析 - 源代码</h3><p>为了验证SQLite-net对具有继承关系的实体类的处理方式，我们可以查看它的源代码。而与SQLite-net对类的处理方式直接相关联的就是那几个<code>Attribute</code>了，从<code>MSDN</code>中可以查到，对于一个<code>Attribute</code>特性，可以使用<code>AttributeUsageAttribute</code>类来指示其使用方法，该类的声明如下：</p>
+<pre><code class="csharp">/// &lt;summary&gt;
+/// 指定另一特性类的用法。无法继承此类。
+/// &lt;/summary&gt;
+public sealed class AttributeUsageAttribute : System.Attribute
+{
+    /// &lt;summary&gt;
+    /// 用指定的 &lt;see cref=&quot;System.AttributeTargets&quot;/&gt;、
+    /// &lt;see cref=&quot;System.AttributeUsageAttribute.AllowMultiple&quot;/&gt; 值和 
+    /// &lt;see cref=&quot;System.AttributeUsageAttribute.Inherited&quot;/&gt; 值列表初始化
+    /// System.AttributeUsageAttribute 类的新实例。
+    /// &lt;/summary&gt;
+    /// &lt;param name=&quot;validOn&quot;&gt; 使用按位 OR 运算符组合的一组值，用于指示哪些程序元素是有效的。&lt;/param&gt;
+    public AttributeUsageAttribute(System.AttributeTargets validOn);
+
+    /// &lt;summary&gt;
+    /// 获取一组值，这组值标识指示的特性可应用到的程序元素。
+    /// &lt;/summary&gt;
+    public System.AttributeTargets ValidOn { get; private set; }
+
+    /// &lt;summary&gt;
+    /// 获取或设置一个布尔值，该值指示能否为一个程序元素指定多个指示特性实例。
+    /// &lt;/summary&gt;
+    public bool AllowMultiple { set; get; }
+
+    /// &lt;summary&gt;
+    /// 获取或设置一个布尔值，该值指示指示的特性能否由派生类和重写成员继承。
+    /// &lt;/summary&gt;
+    public bool Inherited { set; get; }
+}
+</code></pre>
 <p>我们可以指定一个<code>Attribute</code>的使用范围（使用<code>AttributeTargets</code>枚举，例如类、属性、方法、参数等），还可以指定该特性能否在一个元素上重复使用（使用<code>AllowMultiple</code>属性），而最后一个<code>Inherited</code>属性则是我们关注的重点，该值指示这个特性能否被继承，也就是在基类的某个元素中定义的特性，在子类中是否有效，这个属性的默认值为<code>true</code>。</p>
-<p>而在<code>SQLite.cs</code>文件中，我们可以找到<code>TableAttribute</code>、<code>ColumnAttribute</code>等的定义：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[AttributeUsage(AttributeTargets.Class)]</span><br><span class="line">public class TableAttribute : System.Attribute &#123; ... &#125;</span><br><span class="line"></span><br><span class="line">[AttributeUsage(AttributeTargets.Property)]</span><br><span class="line">public class ColumnAttribute : System.Attribute &#123; ... &#125;</span><br></pre></td></tr></table></figure></p>
+<p>而在<code>SQLite.cs</code>文件中，我们可以找到<code>TableAttribute</code>、<code>ColumnAttribute</code>等的定义：</p>
+<pre><code class="csharp">[AttributeUsage(AttributeTargets.Class)]
+public class TableAttribute : System.Attribute { ... }
+
+[AttributeUsage(AttributeTargets.Property)]
+public class ColumnAttribute : System.Attribute { ... }
+</code></pre>
 <p>从定义中可以看出，这些特性都可以被继承，因此对于一个子类来说，基类中的数据库表字段它也会拥有，这就简化了我们对实体类的定义，我们可以按照一般的对象抽象方式，为实体类创建相应的继承关系。例如我们可以把一些在所有的数据库表中都存在的字段移到一个公共基类中去定义，而且这样做，以后我们对数据库进行操作时，也可以利用面向对象的多态来进行处理。</p>
 <h3 id="u5206_u6790_-__u8C03_u8BD5"><a href="#u5206_u6790_-__u8C03_u8BD5" class="headerlink" title="分析 - 调试"></a>分析 - 调试</h3><p>实验是检验真理的唯一标准。为了更明确的观察SQLite-net对继承的实体类的处理，我们可以构建相应的测试程序。</p>
-<p>在这里，首先定义如下的测试数据库实体类：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class Data</span><br><span class="line">&#123;</span><br><span class="line">    [PrimaryKey, AutoIncrement, Column("id")]</span><br><span class="line">    public int ID &#123; get; set; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[Table("base_data")]</span><br><span class="line">public class BaseData : Data</span><br><span class="line">&#123;</span><br><span class="line">    [Column("name")]</span><br><span class="line">    public string Name &#123; get; set; &#125;</span><br><span class="line"></span><br><span class="line">    [Column("key_value")]</span><br><span class="line">    public string KeyValue &#123; get; set; &#125;</span><br><span class="line"></span><br><span class="line">    public override string ToString()</span><br><span class="line">    &#123;</span><br><span class="line">        return string.Format("ID: &#123;0&#125;; Name: &#123;1&#125;; KeyValue: &#123;2&#125;", ID, Name, KeyValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[Table("child_data")]</span><br><span class="line">public class ChildData : BaseData</span><br><span class="line">&#123;</span><br><span class="line">    [Column("list")]</span><br><span class="line">    public string List &#123; get; set; &#125;</span><br><span class="line"></span><br><span class="line">    [Column("date")]</span><br><span class="line">    public DateTime? Date &#123; get; set; &#125;</span><br><span class="line"></span><br><span class="line">    [Column("bool_null")]</span><br><span class="line">    public bool? BoolNull &#123; get; set; &#125;</span><br><span class="line"></span><br><span class="line">    public override string ToString()</span><br><span class="line">    &#123;</span><br><span class="line">        return string.Format("&#123;0&#125;\nList: &#123;1&#125;; Date:&#123;2&#125;; Bool: &#123;3&#125;", </span><br><span class="line">            base.ToString(), List, Date, BoolNull);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这里，首先定义如下的测试数据库实体类：</p>
+<pre><code class="csharp">public class Data
+{
+    [PrimaryKey, AutoIncrement, Column(&quot;id&quot;)]
+    public int ID { get; set; }
+}
+
+[Table(&quot;base_data&quot;)]
+public class BaseData : Data
+{
+    [Column(&quot;name&quot;)]
+    public string Name { get; set; }
+
+    [Column(&quot;key_value&quot;)]
+    public string KeyValue { get; set; }
+
+    public override string ToString()
+    {
+        return string.Format(&quot;ID: {0}; Name: {1}; KeyValue: {2}&quot;, ID, Name, KeyValue);
+    }
+}
+
+[Table(&quot;child_data&quot;)]
+public class ChildData : BaseData
+{
+    [Column(&quot;list&quot;)]
+    public string List { get; set; }
+
+    [Column(&quot;date&quot;)]
+    public DateTime? Date { get; set; }
+
+    [Column(&quot;bool_null&quot;)]
+    public bool? BoolNull { get; set; }
+
+    public override string ToString()
+    {
+        return string.Format(&quot;{0}\nList: {1}; Date:{2}; Bool: {3}&quot;, 
+            base.ToString(), List, Date, BoolNull);
+    }
+}
+</code></pre>
 <p>然后再应用中创建数据库并向两个表中填充一些数据。之后在进行查询操作，通过<code>select * from table</code>列出数据库表中的所有数据，从查询结果可以看出，对于基类<code>BaseData</code>所对应的数据库表的查询并不会返回其子类所对应的表中的数据。</p>
 <h2 id="u7ED3_u8BBA"><a href="#u7ED3_u8BBA" class="headerlink" title="结论"></a>结论</h2><p>SQLite-net并没有完整的实现一种继承映射，但是依靠<code>.Net</code>中的<code>Attribute</code>，使得我们在为数据库创建实体类的时候，完全可以按照一般的分析分析方法，而对数据库的操作，在SQLite-net中也是反映到对类的操作上，因此我们也可以完全的利用面向对象中的各种特性，例如多态。</p>
   
@@ -243,7 +338,7 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
@@ -253,7 +348,7 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
@@ -282,7 +377,7 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
 		  
 		
 		  
-			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -303,7 +398,7 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
 			
 		
 			
-				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -323,7 +418,15 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
 			
 		
 			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -361,7 +464,7 @@ SQLite 完全驻留在客户端进程中，这使之成为一种嵌入式数据�
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -448,10 +551,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -463,18 +584,18 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
 });
 </script>
 
@@ -615,6 +736,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
   </body>
 </html>

@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="平时如果一个项目需要网络连接，一般都是直接用如C#、Java等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用C#中的Socket相关类做过一点有关长连接的事情。
 而最近，恰好由于网络课程实验要求，使用Windows Sockets API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是">
-<meta property="og:updated_time" content="2015-12-08T12:22:42.000Z">
+<meta property="og:updated_time" content="2016-02-22T14:24:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Windows Sockets：多线程WEB服务器">
 <meta name="twitter:description" content="平时如果一个项目需要网络连接，一般都是直接用如C#、Java等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用C#中的Socket相关类做过一点有关长连接的事情。
@@ -36,6 +36,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
   <body>
@@ -112,9 +118,9 @@
 <li>能够发送可被客户端解析的响应报文</li>
 <li>对于错误的请求能够定位错误的原因并给出相应的响应</li>
 <li>支持多种类型文件的输出</li>
-<li>具备图形GUI界面<a id="more"></a>
-</li>
+<li>具备图形GUI界面</li>
 </ol>
+<a id="more"></a>
 <h2 id="u5F00_u59CB"><a href="#u5F00_u59CB" class="headerlink" title="开始"></a>开始</h2><p>在介绍主要流程之前，先说一些完成实验之后的体会，或者说学到的东西吧。首先是在调试时，启动服务器后需要绑定IP地址和端口，这里IP地址只能是<code>127.0.0.1</code>或者<code>0.0.0.0</code>，据说也可以是你的网卡IP地址，但是我没有测试成功；而端口号必须大于<strong>1024</strong>，否则虽然绑定地址时虽然不会发生错误，但是也无法监听客户端请求。</p>
 <p>其次，为了及时响应GUI界面的操作，需要使用异步I/O模式，因此需要将Socket操作设置为非阻塞模式，这时在Socket上的各种操作就需要自己去干涉了；虽然这看起来更复杂，但是也可以更好的认识Socket。</p>
 <p>第三，要注意线程之间的通信，特别是传递引用类型时，更需要注意局部变量的陷阱。因为我们是要在另一个线程中访问数据，所以需要保证在另一个线程结束之前，传递的数据是有效的，通常可以采用静态变量/全局变量、动态分配内存等方式来实现，但是在这里，由于需要确保线程函数是线程安全的，也就是可重入的，因此不宜采用静态变量方式，所以将需要传递的数据保存在堆中，只是最后需要记得手动释放这块内存。</p>
@@ -128,13 +134,37 @@
 <p>在这里，根据实验的要求，图形化界面应该提供启动、停止服务的操作，而且还要能设置一些基本参数，因此在<em>Socket</em> 类中，应该提供一个启动和停止监听的接口，而为了简单考虑，我们将在UI界面设定的一些基本配置参数通过启动接口传递到<em>Socket</em> 类中，而不是要求在初始化<em>Socket</em> 类时传入，这样在GUI类中就可以将<em>Socket</em> 类的初始化和启动操作放到不同的方法中，而且通过重新调用启动方法就可以实现监听新的端口，而不用去构造一个新的<em>Socket</em> 类。此外，为了让UI界面知道当前监听的状态（是否正在监听端口），还需要在<em>Socket</em> 类中提供一个只读属性方法。</p>
 </blockquote>
 <p>这里，Socket核心类被命名为<strong><em>SocketUnits</em></strong>。</p>
-<h3 id="u516C_u5F00_u65B9_u6CD5"><a href="#u516C_u5F00_u65B9_u6CD5" class="headerlink" title="公开方法"></a>公开方法</h3><p>Socket核心类定义的公开方法如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Start</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span> &amp;ip, <span class="keyword">unsigned</span> <span class="keyword">short</span> port, <span class="keyword">const</span> wstring &amp;baseDir)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Stop</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">GetIsListening</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    DWORD extCode = <span class="number">0</span>;</span><br><span class="line">    GetExitCodeThread(_lastThread, &amp;extCode);</span><br><span class="line">    <span class="keyword">return</span> extCode == STILL_ACTIVE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="u516C_u5F00_u65B9_u6CD5"><a href="#u516C_u5F00_u65B9_u6CD5" class="headerlink" title="公开方法"></a>公开方法</h3><p>Socket核心类定义的公开方法如下：</p>
+<pre><code class="c++">bool Start(const string &amp;ip, unsigned short port, const wstring &amp;baseDir);
+void Stop();
+bool GetIsListening()
+{
+    DWORD extCode = 0;
+    GetExitCodeThread(_lastThread, &amp;extCode);
+    return extCode == STILL_ACTIVE;
+}
+</code></pre>
 <p>其中<code>GetIsListening</code>用于获取监听状态，此处作为内联函数存在。_lastThread保存了监听线程的句柄，如果还没有创建监听线程，则<code>_lastThread = INVALID_HANDLE_VALUE</code>。</p>
 <h3 id="u56DE_u8C03_u63A5_u53E3"><a href="#u56DE_u8C03_u63A5_u53E3" class="headerlink" title="回调接口"></a>回调接口</h3><p>上面是外部与Socket类通信的主要接口，由外部方法调用，设置Socket的属性，但却无法获取Socket类的当前状态，因为采用了异步Socket实现，所以如果还是像上面一样单纯的提供接口，让调用者使用轮询的方式查询Socket状态，那么不仅让调用类的实现难度增加，同时也会无端的消耗CPU时间片。因此这里采用了一种类似Windows消息事件的回调机制，利用纯虚类定义回调接口，当Socket类满足某一状态时会自动调用回调接口中定义的对应方法。</p>
 <blockquote>
 <p>回调接口中需要哪些方法，这个我们也要根据实际情况来决定，在这里，我们暂时只需将一些基本状态传递给UI即可。首先是服务的启动和关闭信息，虽然提供了公开的启动和关闭方法，但是由于在该方法内部是需要创建新的线程来进行<em>Socket</em> 的监听工作，因此，当启动方法（<em>SocketUnits::Start</em> 函数）返回时，并不意味着监听<em>Socket</em> 创建成功，所以我们需要在监听线程中来告诉调用者服务是否启动；同理，关闭时也需要在监听线程中实现。其次，对于每一个来自客户端的连接<em>Socket</em>，我们也需要向外通知这个连接的状态，包括建立连接、关闭连接，此外为了方便查看连接信息，将与客户端的具体请求和响应消息也发送出去。最后，还需要一个出现错误时的回调接口，方便调用者在出错时及时作出反应。</p>
 </blockquote>
-<p>回调接口<strong><em>ISocketEvent</em></strong> 定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> ISocketEvent</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnListenSocketChanged</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ip, <span class="keyword">unsigned</span> <span class="keyword">short</span> port, </span><br><span class="line">        <span class="keyword">const</span> wchar_t *dir)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* stopCode：结束状态码 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnServiceStopped</span><span class="params">(<span class="keyword">int</span> stopCode)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnSocketConnected</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ip)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnSocketFinished</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ip)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* isSend：指示是发送还是接收数据。 info：发送或接收的数据 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnNewLogs</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ip, <span class="keyword">const</span> <span class="keyword">char</span> *info, <span class="keyword">bool</span> isSend)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* eor：错误代码。 msg：错误说明 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnError</span><span class="params">(<span class="keyword">int</span> eor, <span class="keyword">const</span> <span class="keyword">char</span> *msg)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>回调接口<strong><em>ISocketEvent</em></strong> 定义如下：</p>
+<pre><code class="c++">class ISocketEvent
+{
+public:
+    virtual void OnListenSocketChanged(const char *ip, unsigned short port, 
+        const wchar_t *dir) = 0;
+    /* stopCode：结束状态码 */
+    virtual void OnServiceStopped(int stopCode) = 0;
+    virtual void OnSocketConnected(const char *ip) = 0;
+    virtual void OnSocketFinished(const char *ip) = 0;
+    /* isSend：指示是发送还是接收数据。 info：发送或接收的数据 */
+    virtual void OnNewLogs(const char *ip, const char *info, bool isSend) = 0;
+    /* eor：错误代码。 msg：错误说明 */
+    virtual void OnError(int eor, const char *msg) = 0;
+};
+</code></pre>
 <p>这里的形参<code>ip</code>是字符串形式的点分十进制IP地址。<code>OnListenSocketChanged</code>函数的形参含义依次为IP地址、监听端口号、主目录。</p>
 <p><strong><em>ISocketEvent</em></strong> 类中各方法解释：</p>
 <blockquote>
@@ -148,42 +178,391 @@
 </ul>
 </blockquote>
 <h3 id="u7EBF_u7A0B_u51FD_u6570_u5B9A_u4E49"><a href="#u7EBF_u7A0B_u51FD_u6570_u5B9A_u4E49" class="headerlink" title="线程函数定义"></a>线程函数定义</h3><p>前面的都是为实现Socket类与外部通信和发送数据所定义的方法，而实现一个多线程WEB服务器最核心的部分则是此处要说的，线程以及Socket的处理。我们需要将监听Socket和响应Socket都放在单独的线程中进行处理，因此需要定义两个线程函数，分别用于处理监听操作和响应操作。在C++中，如果一个线程函数是类的成员，那么它必须被定义为<code>static</code>的，这里涉及到一个<code>this</code>指针的问题。</p>
-<p>因此，按照线程函数的格式定义如下两个函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> DWORD WINAPI <span class="title">ListenThread</span><span class="params">(LPVOID lpParameter)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> DWORD WINAPI <span class="title">WorkerThread</span><span class="params">(LPVOID lpParameter)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>因此，按照线程函数的格式定义如下两个函数：</p>
+<pre><code class="c++">static DWORD WINAPI ListenThread(LPVOID lpParameter);
+static DWORD WINAPI WorkerThread(LPVOID lpParameter);
+</code></pre>
 <p>形参<code>lpParameter</code>是一个<code>void *</code>型的指针，它的值在创建线程时通过线程创建方法传入。返回值会作为线程的退出值，可以由方法<code>bool GetExitCodeThread(HANDLE, LPDWORD)</code>获取。</p>
-<p>此外，还定义了两个静态方法，以便在线程函数中调用，完成相应的功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">GetType</span><span class="params">(<span class="keyword">const</span> wstring &amp;fileName, <span class="built_in">string</span> &amp;type)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">SignalSend</span><span class="params">(SOCKET s, <span class="keyword">const</span> <span class="keyword">char</span> *buf, size_t len, <span class="keyword">bool</span> *stop)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>此外，还定义了两个静态方法，以便在线程函数中调用，完成相应的功能：</p>
+<pre><code class="c++">static int GetType(const wstring &amp;fileName, string &amp;type);
+static bool SignalSend(SOCKET s, const char *buf, size_t len, bool *stop);
+</code></pre>
 <p><code>GetType</code>函数用于获取指定文件（文件名由<code>fileName</code>指示）的类型，在这里，仅仅对一些WEB中常用的文件进行判断，返回值指示文件是二进制格式还是文本格式。<code>SignalSend</code>函数则是对Socket对象非阻塞模式下的<code>send</code>方法进行了一个封装。</p>
 <h3 id="u7C7B_u578B_u5B9A_u4E49"><a href="#u7C7B_u578B_u5B9A_u4E49" class="headerlink" title="类型定义"></a>类型定义</h3><p>这里简要说明一下Socket类中用到的一些自定义数据格式。</p>
-<p>首先定义了一个<code>HANDLE</code>列表的标识符：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">list</span>&lt;HANDLE&gt; ThreadList;</span><br></pre></td></tr></table></figure></p>
-<p>之后在<strong><em>SocketUnits</em></strong> 类中定义了两个结构体类型，用于向线程函数传递参数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 监听线程函数参数类型定义 */</span></span><br><span class="line"><span class="keyword">struct</span> ListenParameter</span><br><span class="line">&#123;</span><br><span class="line">    HANDLE lastThread;</span><br><span class="line">    ISocketEvent *event;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">short</span> port;</span><br><span class="line">    <span class="built_in">string</span> ip;</span><br><span class="line">    wstring baseDir;</span><br><span class="line">    <span class="keyword">bool</span> *stop;</span><br><span class="line">    <span class="keyword">bool</span> *notifyStop;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 响应线程函数参数类型定义 */</span></span><br><span class="line"><span class="keyword">struct</span> ThreadParameter</span><br><span class="line">&#123;</span><br><span class="line">    sockaddr_in remoteAddr;</span><br><span class="line">    SOCKET remoteSocket;</span><br><span class="line">    ISocketEvent *event;</span><br><span class="line">    wstring baseDir;</span><br><span class="line">    <span class="keyword">bool</span> *stop;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>首先定义了一个<code>HANDLE</code>列表的标识符：</p>
+<pre><code class="c++">typedef list&lt;HANDLE&gt; ThreadList;
+</code></pre>
+<p>之后在<strong><em>SocketUnits</em></strong> 类中定义了两个结构体类型，用于向线程函数传递参数：</p>
+<pre><code class="c++">/* 监听线程函数参数类型定义 */
+struct ListenParameter
+{
+    HANDLE lastThread;
+    ISocketEvent *event;
+    unsigned short port;
+    string ip;
+    wstring baseDir;
+    bool *stop;
+    bool *notifyStop;
+};
+
+/* 响应线程函数参数类型定义 */
+struct ThreadParameter
+{
+    sockaddr_in remoteAddr;
+    SOCKET remoteSocket;
+    ISocketEvent *event;
+    wstring baseDir;
+    bool *stop;
+};
+</code></pre>
 <h2 id="Socket_u6838_u5FC3_u7C7B_u5B9E_u73B0"><a href="#Socket_u6838_u5FC3_u7C7B_u5B9E_u73B0" class="headerlink" title="Socket核心类实现"></a>Socket核心类实现</h2><p>完成Socket类的定义之后，可以开始实现每个方法的功能了。</p>
 <h3 id="u521D_u59CB_u5316_u548C_u9000_u51FA"><a href="#u521D_u59CB_u5316_u548C_u9000_u51FA" class="headerlink" title="初始化和退出"></a>初始化和退出</h3><p>首先当然是Socket类的构造函数了，这里我们定义一个构造函数，带一个<strong>ISocketEvent * </strong>类型的形参，这里不对实际传入的值做任何检查，也就是要求调用者必须传入一个在Socket类生存期间保持有效的值，这个值被用来初始化Socket类，从而实现回调。</p>
-<p>初始化主要代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">SocketUnits::SocketUnits(ISocketEvent *event)</span><br><span class="line">&#123;</span><br><span class="line">    WSADATA wsd;</span><br><span class="line">    _stop = <span class="literal">false</span>;</span><br><span class="line">    _lastThread = INVALID_HANDLE_VALUE;</span><br><span class="line">    _lsParam.event = event;</span><br><span class="line">    _lsParam.stop = &amp;_stop;</span><br><span class="line">    _lsParam.notifyStop = &amp;_notifyStop;</span><br><span class="line"></span><br><span class="line">    _nRC = WSAStartup(MAKEWORD(<span class="number">2</span>, <span class="number">2</span>), &amp;wsd);</span><br><span class="line">    <span class="keyword">if</span> (_nRC)</span><br><span class="line">    &#123;</span><br><span class="line">        event-&gt;OnError(-<span class="number">1</span>, <span class="string">"初始化WinSock时出错！"</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (wsd.wVersion != MAKEWORD(<span class="number">2</span>, <span class="number">2</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        _nRC = -<span class="number">1</span>;</span><br><span class="line">        WSACleanup();</span><br><span class="line">        event-&gt;OnError(-<span class="number">2</span>, <span class="string">"不受支持的WinSock版本。"</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>初始化主要代码如下：</p>
+<pre><code class="c++">SocketUnits::SocketUnits(ISocketEvent *event)
+{
+    WSADATA wsd;
+    _stop = false;
+    _lastThread = INVALID_HANDLE_VALUE;
+    _lsParam.event = event;
+    _lsParam.stop = &amp;_stop;
+    _lsParam.notifyStop = &amp;_notifyStop;
+
+    _nRC = WSAStartup(MAKEWORD(2, 2), &amp;wsd);
+    if (_nRC)
+    {
+        event-&gt;OnError(-1, &quot;初始化WinSock时出错！&quot;);
+        return;
+    }
+    if (wsd.wVersion != MAKEWORD(2, 2))
+    {
+        _nRC = -1;
+        WSACleanup();
+        event-&gt;OnError(-2, &quot;不受支持的WinSock版本。&quot;);
+        return;
+    }
+}
+</code></pre>
 <p>其中<code>_lsParam</code>是一个<code>SocketUnit::ListenParameter</code>类型的变量，此处对它进行初始化，当创建监听线程时，它被作为一个参数传入到线程中。</p>
 <p>接下来就是调用<code>WSAStartup</code>函数完成Windows Socket的一系列初始化工作，这个函数是应用程序应该第一个调用的 Winsock API 函数。</p>
-<p>而在Socket类被析构时，则应该完成一些清理工作。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SocketUnits::~SocketUnits()</span><br><span class="line">&#123;</span><br><span class="line">    Stop();</span><br><span class="line">    <span class="keyword">if</span> (!_nRC)</span><br><span class="line">        WSACleanup();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而在Socket类被析构时，则应该完成一些清理工作。</p>
+<pre><code class="c++">SocketUnits::~SocketUnits()
+{
+    Stop();
+    if (!_nRC)
+        WSACleanup();
+}
+</code></pre>
 <p><code>WSACleanup</code>就是用来清除WinSock的函数。</p>
 <h3 id="u5F00_u59CB_u4E0E_u7ED3_u675F_u670D_u52A1"><a href="#u5F00_u59CB_u4E0E_u7ED3_u675F_u670D_u52A1" class="headerlink" title="开始与结束服务"></a>开始与结束服务</h3><p>虽然真正的监听工作是在另外一个线程中完成的，但是对于开始方法来说，我们也必须返回一个状态表示方法是否调用成功，而不能让调用者仅仅依赖<code>OnListenSocketChanged</code>方法回调。</p>
-<p>在<code>Start</code>方法中，做了一些简单的判断，来确定其返回状态值。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> SocketUnits::Start(<span class="keyword">const</span> <span class="built_in">string</span> &amp;ip, <span class="keyword">unsigned</span> <span class="keyword">short</span> port, <span class="keyword">const</span> wstring &amp;baseDir)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_stop || (_lsParam.ip.compare(ip) == <span class="number">0</span> &amp;&amp; _lsParam.port == port &amp;&amp;</span><br><span class="line">                  _lsParam.baseDir.compare(baseDir) == <span class="number">0</span>))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    _notifyStop = <span class="literal">false</span>;</span><br><span class="line">    _stop = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    _lsParam.ip = ip;</span><br><span class="line">    _lsParam.baseDir = baseDir;</span><br><span class="line">    _lsParam.port = port;</span><br><span class="line">    _lsParam.lastThread = _lastThread;</span><br><span class="line">    <span class="keyword">if</span> (_lastThread != INVALID_HANDLE_VALUE)</span><br><span class="line">        CloseHandle(_lastThread);</span><br><span class="line"></span><br><span class="line">    _lastThread = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, (LPTHREAD_START_ROUTINE)(SocketUnits::ListenThread),</span><br><span class="line">        (LPVOID)&amp;_lsParam, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (_lastThread == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        _lsParam.event-&gt;OnError(<span class="number">1</span>, <span class="string">"启动监听失败！"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在<code>Start</code>方法中，做了一些简单的判断，来确定其返回状态值。</p>
+<pre><code class="c++">bool SocketUnits::Start(const string &amp;ip, unsigned short port, const wstring &amp;baseDir)
+{
+    if (_stop || (_lsParam.ip.compare(ip) == 0 &amp;&amp; _lsParam.port == port &amp;&amp;
+                  _lsParam.baseDir.compare(baseDir) == 0))
+        return false;
+    _notifyStop = false;
+    _stop = true;
+
+    _lsParam.ip = ip;
+    _lsParam.baseDir = baseDir;
+    _lsParam.port = port;
+    _lsParam.lastThread = _lastThread;
+    if (_lastThread != INVALID_HANDLE_VALUE)
+        CloseHandle(_lastThread);
+
+    _lastThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(SocketUnits::ListenThread),
+        (LPVOID)&amp;_lsParam, 0, NULL);
+    if (_lastThread == INVALID_HANDLE_VALUE)
+    {
+        _lsParam.event-&gt;OnError(1, &quot;启动监听失败！&quot;);
+    }
+    return true;
+}
+</code></pre>
 <p>注意此处当创建线程失败的时候，并没有返回<code>false</code>，是因为线程创建失败时，则原来运行的监听线程（如果有）也会停止，那么调用者此时会接收到<code>OnServiceStopped</code>回调，此时，调用者应该响应这个回调函数，而不是依赖<code>Start</code>方法的返回值。</p>
-<p>由于采用非阻塞I/O，所以要结束整个服务，只需要做一个类似广播的操作即可。在这里，我们只需要将<code>_stop</code>置为<code>true</code>且<code>_notifyStop</code>也置为<code>true</code>即可，此时所有的线程（包括监听线程和响应线程）均会执行线程结束部分代码，并正常结束线程，回收线程所占用资源。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> SocketUnits::Stop()</span><br><span class="line">&#123;</span><br><span class="line">    _notifyStop = <span class="literal">true</span>;</span><br><span class="line">    _stop = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (_lastThread == INVALID_HANDLE_VALUE)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    CloseHandle(_lastThread);</span><br><span class="line">    _lastThread = INVALID_HANDLE_VALUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于采用非阻塞I/O，所以要结束整个服务，只需要做一个类似广播的操作即可。在这里，我们只需要将<code>_stop</code>置为<code>true</code>且<code>_notifyStop</code>也置为<code>true</code>即可，此时所有的线程（包括监听线程和响应线程）均会执行线程结束部分代码，并正常结束线程，回收线程所占用资源。</p>
+<pre><code class="c++">void SocketUnits::Stop()
+{
+    _notifyStop = true;
+    _stop = true;
+    if (_lastThread == INVALID_HANDLE_VALUE)
+        return;
+    CloseHandle(_lastThread);
+    _lastThread = INVALID_HANDLE_VALUE;
+}
+</code></pre>
 <h3 id="u7EBF_u7A0B_u51FD_u6570_u5B9E_u73B0"><a href="#u7EBF_u7A0B_u51FD_u6570_u5B9E_u73B0" class="headerlink" title="线程函数实现"></a>线程函数实现</h3><p>这里就是整个Socket类的核心实现了，主要需要注意的是线程之间传递数据时一定要保持数据在线程生存期间的有效性，否则可能导致不可预见的逻辑错误。此外就是采用异步I/O时需要进行的处理和优化。</p>
-<p>首先是监听线程函数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ListenParameter *lp = (ListenParameter*)lpParameter;</span><br><span class="line">    HANDLE handle = lp-&gt;lastThread;</span><br><span class="line">    ISocketEvent *event = lp-&gt;event;</span><br><span class="line">    <span class="keyword">bool</span> *stop = lp-&gt;stop;</span><br><span class="line">    <span class="keyword">if</span> (handle != INVALID_HANDLE_VALUE)</span><br><span class="line">        WaitForSingleObject(handle, INFINITE);</span><br><span class="line">    *stop = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先是监听线程函数。</p>
+<pre><code class="c++">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)
+{
+    ListenParameter *lp = (ListenParameter*)lpParameter;
+    HANDLE handle = lp-&gt;lastThread;
+    ISocketEvent *event = lp-&gt;event;
+    bool *stop = lp-&gt;stop;
+    if (handle != INVALID_HANDLE_VALUE)
+        WaitForSingleObject(handle, INFINITE);
+    *stop = false;
+
+    // ......
+}
+</code></pre>
 <p>在函数的开头，首先从传入参数中取出各个值，其中<code>handle</code>保存上一个监听线程的句柄，在这里线程会首先判断<code>handle</code>的有效性，如果有效，说明程序曾经创建过一个监听线程，那么此处会调用<code>WaitForSingleObject</code>方法来等待上一个监听线程结束，然后才会开始执行。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    SOCKET server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">    <span class="keyword">if</span> (server == INVALID_SOCKET)</span><br><span class="line">    &#123;</span><br><span class="line">        event-&gt;OnError(<span class="number">2</span>, <span class="string">"无法创建Socket连接！"</span>);</span><br><span class="line">        event-&gt;OnServiceStopped(WSAGetLastError());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    sockaddr_in addr;</span><br><span class="line">    addr.sin_family = AF_INET;</span><br><span class="line">    addr.sin_addr.S_un.S_addr = inet_addr(lp-&gt;ip.c_str());</span><br><span class="line">    addr.sin_port = htons(lp-&gt;port);</span><br><span class="line">    <span class="keyword">if</span> (bind(server, (LPSOCKADDR)&amp;addr, <span class="keyword">sizeof</span>(addr)) == SOCKET_ERROR)</span><br><span class="line">    &#123;</span><br><span class="line">        event-&gt;OnError(<span class="number">3</span>, <span class="string">"无法绑定服务器地址！"</span>);</span><br><span class="line">        event-&gt;OnServiceStopped(WSAGetLastError());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (listen(server, SOMAXCONN) == SOCKET_ERROR)</span><br><span class="line">    &#123;</span><br><span class="line">        event-&gt;OnError(<span class="number">4</span>, <span class="string">"无法设置Socket为等待连接状态！"</span>);</span><br><span class="line">        event-&gt;OnServiceStopped(WSAGetLastError());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">4</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    u_long mode = <span class="number">1</span>;</span><br><span class="line">    ioctlsocket(server, FIONBIO, &amp;mode);</span><br><span class="line">    event-&gt;OnListenSocketChanged(lp-&gt;ip.c_str(), lp-&gt;port, lp-&gt;baseDir.c_str());</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)
+{
+    // ......
+
+    SOCKET server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (server == INVALID_SOCKET)
+    {
+        event-&gt;OnError(2, &quot;无法创建Socket连接！&quot;);
+        event-&gt;OnServiceStopped(WSAGetLastError());
+        return 2;
+    }
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.S_un.S_addr = inet_addr(lp-&gt;ip.c_str());
+    addr.sin_port = htons(lp-&gt;port);
+    if (bind(server, (LPSOCKADDR)&amp;addr, sizeof(addr)) == SOCKET_ERROR)
+    {
+        event-&gt;OnError(3, &quot;无法绑定服务器地址！&quot;);
+        event-&gt;OnServiceStopped(WSAGetLastError());
+        return 3;
+    }
+    if (listen(server, SOMAXCONN) == SOCKET_ERROR)
+    {
+        event-&gt;OnError(4, &quot;无法设置Socket为等待连接状态！&quot;);
+        event-&gt;OnServiceStopped(WSAGetLastError());
+        return 4;
+    }
+    u_long mode = 1;
+    ioctlsocket(server, FIONBIO, &amp;mode);
+    event-&gt;OnListenSocketChanged(lp-&gt;ip.c_str(), lp-&gt;port, lp-&gt;baseDir.c_str());
+
+    // ......
+}
+</code></pre>
 <p>接下来就是创建Socket了，这个Socket就是用来监听指定端口的。这里通过调用<code>ioctlsocket</code>方法将此Socket设置为非阻塞模式。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    ThreadList workerTrds;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ThreadParameter *tp = <span class="keyword">new</span> ThreadParameter();</span><br><span class="line">        <span class="keyword">int</span> nAddrLen = <span class="keyword">sizeof</span>(sockaddr_in);</span><br><span class="line">        <span class="keyword">while</span> ((<span class="keyword">int</span>)(tp-&gt;remoteSocket = accept(server, (LPSOCKADDR)&amp;(tp-&gt;remoteAddr),</span><br><span class="line">            &amp;nAddrLen)) &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (*stop)</span><br><span class="line">                <span class="keyword">goto</span> finish;</span><br><span class="line">            Sleep(<span class="number">400</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tp-&gt;baseDir = lp-&gt;baseDir;</span><br><span class="line">        tp-&gt;event = lp-&gt;event;</span><br><span class="line">        tp-&gt;stop = lp-&gt;stop;</span><br><span class="line">        HANDLE thandle = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>,</span><br><span class="line">            (LPTHREAD_START_ROUTINE)(SocketUnits::WorkerThread),</span><br><span class="line">            tp, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">        <span class="keyword">if</span> (thandle == INVALID_HANDLE_VALUE)</span><br><span class="line">        &#123;</span><br><span class="line">            closesocket(tp-&gt;remoteSocket);</span><br><span class="line">            <span class="keyword">delete</span> tp;</span><br><span class="line">            event-&gt;OnError(<span class="number">5</span>, <span class="string">"无法创建与客户端通信的线程！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            workerTrds.push_back(thandle);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)
+{
+    // ......
+
+    ThreadList workerTrds;
+    while (true)
+    {
+        ThreadParameter *tp = new ThreadParameter();
+        int nAddrLen = sizeof(sockaddr_in);
+        while ((int)(tp-&gt;remoteSocket = accept(server, (LPSOCKADDR)&amp;(tp-&gt;remoteAddr),
+            &amp;nAddrLen)) &lt; 0)
+        {
+            if (*stop)
+                goto finish;
+            Sleep(400);
+        }
+
+        tp-&gt;baseDir = lp-&gt;baseDir;
+        tp-&gt;event = lp-&gt;event;
+        tp-&gt;stop = lp-&gt;stop;
+        HANDLE thandle = CreateThread(NULL, 0,
+            (LPTHREAD_START_ROUTINE)(SocketUnits::WorkerThread),
+            tp, 0, NULL);
+        if (thandle == INVALID_HANDLE_VALUE)
+        {
+            closesocket(tp-&gt;remoteSocket);
+            delete tp;
+            event-&gt;OnError(5, &quot;无法创建与客户端通信的线程！&quot;);
+        }
+        else
+        {
+            workerTrds.push_back(thandle);
+        }
+    }
+
+    // ......
+}
+</code></pre>
 <p>这里开始正式监听，如果有来自客户端的请求，则会创建一个新的线程，将<code>tp</code>作为参数传递进去，<code>tp</code>中保存了这个请求的所有信息。由于此处<code>tp</code>是一个局部变量，因此我们需要在堆中分配它的内存，以免当本次循环结束时其内容所在内存区域被回收。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">finish:</span><br><span class="line">    closesocket(server);</span><br><span class="line">    ThreadList::iterator itor = workerTrds.begin();</span><br><span class="line">    <span class="keyword">for</span> (; itor != workerTrds.end(); ++itor)</span><br><span class="line">    &#123;</span><br><span class="line">        WaitForSingleObject((HANDLE)*itor, INFINITE);</span><br><span class="line">        CloseHandle((HANDLE)*itor);</span><br><span class="line">    &#125;</span><br><span class="line">    Sleep(<span class="number">800</span>);</span><br><span class="line">    <span class="keyword">if</span> (*(lp-&gt;notifyStop))</span><br><span class="line">    &#123;</span><br><span class="line">        *stop = <span class="literal">false</span>;</span><br><span class="line">        event-&gt;OnServiceStopped(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::ListenThread(LPVOID lpParameter)
+{
+    // ......
+
+finish:
+    closesocket(server);
+    ThreadList::iterator itor = workerTrds.begin();
+    for (; itor != workerTrds.end(); ++itor)
+    {
+        WaitForSingleObject((HANDLE)*itor, INFINITE);
+        CloseHandle((HANDLE)*itor);
+    }
+    Sleep(800);
+    if (*(lp-&gt;notifyStop))
+    {
+        *stop = false;
+        event-&gt;OnServiceStopped(0);
+    }
+    return 0;
+}
+</code></pre>
 <p>这里就是结束代码了，当这个线程结束时，便执行这一部分代码，关闭Socket、释放资源并通知调用者。</p>
-<p>然后便是响应函数了。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ThreadParameter *tp = (ThreadParameter*)lpParameter;</span><br><span class="line">    SOCKET remoteSocket = tp-&gt;remoteSocket;</span><br><span class="line">    sockaddr_in remoteAddr = tp-&gt;remoteAddr;</span><br><span class="line">    ISocketEvent *event = tp-&gt;event;</span><br><span class="line">    <span class="keyword">bool</span> *stop = tp-&gt;stop;</span><br><span class="line">    <span class="keyword">char</span> addr[<span class="number">16</span>];</span><br><span class="line">    <span class="built_in">strncpy</span>(addr, inet_ntoa(remoteAddr.sin_addr), <span class="number">15</span>);</span><br><span class="line">    addr[<span class="number">15</span>] = <span class="number">0</span>;</span><br><span class="line">    event-&gt;OnSocketConnected(addr);</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后便是响应函数了。</p>
+<pre><code class="c++">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)
+{
+    ThreadParameter *tp = (ThreadParameter*)lpParameter;
+    SOCKET remoteSocket = tp-&gt;remoteSocket;
+    sockaddr_in remoteAddr = tp-&gt;remoteAddr;
+    ISocketEvent *event = tp-&gt;event;
+    bool *stop = tp-&gt;stop;
+    char addr[16];
+    strncpy(addr, inet_ntoa(remoteAddr.sin_addr), 15);
+    addr[15] = 0;
+    event-&gt;OnSocketConnected(addr);
+
+    // ......
+}
+</code></pre>
 <p>首先同样是取出参数中的值。<code>remoteSocket</code>保存了与客户端连接的Socket对象，<code>remoteAddr</code>保存了客户端IP地址。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> buffer[<span class="number">1024</span>] = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">int</span> byteRecv = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">stringstream</span> ss;</span><br><span class="line">    wstring filepath;</span><br><span class="line">    <span class="built_in">string</span> filetype;</span><br><span class="line">    <span class="built_in">string</span> header = <span class="string">"HTTP/1.1 200 OK\r\nContent-Type: "</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)    <span class="comment">// 接收数据</span></span><br><span class="line">    &#123;</span><br><span class="line">        byteRecv = recv(remoteSocket, buffer, <span class="number">1023</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (byteRecv == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">goto</span> finish;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (byteRecv &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (*stop)</span><br><span class="line">                <span class="keyword">goto</span> finish;</span><br><span class="line"></span><br><span class="line">            Sleep(<span class="number">10</span>);</span><br><span class="line">            <span class="keyword">int</span> err = WSAGetLastError();</span><br><span class="line">            <span class="comment">//if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)</span></span><br><span class="line">            <span class="keyword">if</span> (err == WSAEWOULDBLOCK)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                event-&gt;OnError(WSAGetLastError(), <span class="string">"无法从套接字接收数据。"</span>);</span><br><span class="line">                <span class="keyword">goto</span> finish;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    buffer[byteRecv] = <span class="number">0</span>;</span><br><span class="line">    event-&gt;OnNewLogs(addr, buffer, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)
+{
+    // ......
+
+    char buffer[1024] = { 0 };
+    int byteRecv = 0;
+    stringstream ss;
+    wstring filepath;
+    string filetype;
+    string header = &quot;HTTP/1.1 200 OK\r\nContent-Type: &quot;;
+    while (true)    // 接收数据
+    {
+        byteRecv = recv(remoteSocket, buffer, 1023, 0);
+        if (byteRecv == 0)
+            goto finish;
+        else if (byteRecv &lt; 0)
+        {
+            if (*stop)
+                goto finish;
+
+            Sleep(10);
+            int err = WSAGetLastError();
+            //if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+            if (err == WSAEWOULDBLOCK)
+                continue;
+            else
+            {
+                event-&gt;OnError(WSAGetLastError(), &quot;无法从套接字接收数据。&quot;);
+                goto finish;
+            }
+        }
+        else
+            break;
+    }
+    buffer[byteRecv] = 0;
+    event-&gt;OnNewLogs(addr, buffer, false);
+
+    // ......
+}
+</code></pre>
 <p>接下来开始从客户端接收数据。注意异步调用需要进行的判断，这里仅处理了一些简单错误，实现基本的接收数据功能。同时，在循环之前定义了一些变量，这是因为在循环中含有<code>goto</code>语句，而C++不允许在<code>goto</code>语句后面进行非基本类型变量的初始化操作，因此将这些变量（<code>string</code>类型）的初始化移到循环体之前。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    ss &lt;&lt; buffer;</span><br><span class="line">    char tbuff[128];</span><br><span class="line">    while (ss.getline(tbuff, sizeof(tbuff)))</span><br><span class="line">    &#123;</span><br><span class="line">        char *p = strstr(tbuff, "GET");</span><br><span class="line">        if (p)</span><br><span class="line">        &#123;</span><br><span class="line">            strrchr(p, ' ')[0] = 0;</span><br><span class="line">            string fp = strchr(p, '/');</span><br><span class="line">            int len = fp.size();</span><br><span class="line">            if (len &gt; 0 &amp;&amp; fp.c_str()[len - 1] == '/')</span><br><span class="line">                fp += "index.html";</span><br><span class="line">            wstring ws(fp.size(), ' ');</span><br><span class="line">            copy(fp.begin(), fp.end(), ws.begin());</span><br><span class="line">            filepath = tp-&gt;baseDir + ws;</span><br><span class="line">            string ft;</span><br><span class="line">            int tp = GetType(ws, ft);</span><br><span class="line">            if (tp == 0)</span><br><span class="line">                filepath += L"/index.html";</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    if (filepath.size() == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        const char *notSupport = "HTTP/1.1 501 Not Implemented\r\n\r\n";</span><br><span class="line">        SignalSend(remoteSocket, notSupport, strlen(notSupport), stop);</span><br><span class="line">        event-&gt;OnNewLogs(addr, notSupport, true);</span><br><span class="line">        goto finish;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)
+{
+    // ......
+
+    ss &lt;&lt; buffer;
+    char tbuff[128];
+    while (ss.getline(tbuff, sizeof(tbuff)))
+    {
+        char *p = strstr(tbuff, &quot;GET&quot;);
+        if (p)
+        {
+            strrchr(p, &#39; &#39;)[0] = 0;
+            string fp = strchr(p, &#39;/&#39;);
+            int len = fp.size();
+            if (len &gt; 0 &amp;&amp; fp.c_str()[len - 1] == &#39;/&#39;)
+                fp += &quot;index.html&quot;;
+            wstring ws(fp.size(), &#39; &#39;);
+            copy(fp.begin(), fp.end(), ws.begin());
+            filepath = tp-&gt;baseDir + ws;
+            string ft;
+            int tp = GetType(ws, ft);
+            if (tp == 0)
+                filepath += L&quot;/index.html&quot;;
+            break;
+        }
+    }
+    if (filepath.size() == 0)
+    {
+        const char *notSupport = &quot;HTTP/1.1 501 Not Implemented\r\n\r\n&quot;;
+        SignalSend(remoteSocket, notSupport, strlen(notSupport), stop);
+        event-&gt;OnNewLogs(addr, notSupport, true);
+        goto finish;
+    }
+
+    // ......
+}
+</code></pre>
 <p>在收到客户端发送的请求数据之后，就开始解析。此处仅仅检查<code>GET</code>方法，对于其他的请求方法，服务器会直接返回<code>501 Not Implemented</code>响应报文，表示不支持的方法。对于<code>GET</code>方法，这里会检查其请求的URL，并将其映射到本地文件路径，保存在<code>filepath</code>中。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    int type = GetType(filepath, filetype);</span><br><span class="line">    header.append(filetype);</span><br><span class="line">    header.append("\r\nConnection: close\r\n\r\n");</span><br><span class="line">    if (type &gt; 0 &amp;&amp; type &lt; 6)</span><br><span class="line">    &#123;</span><br><span class="line">        ifstream in(filepath.c_str());</span><br><span class="line">        if (!in)</span><br><span class="line">            goto fileNotExist;</span><br><span class="line"></span><br><span class="line">        if (!SignalSend(remoteSocket, header.c_str(), header.size(), stop))</span><br><span class="line">            goto finish;</span><br><span class="line">        event-&gt;OnNewLogs(addr, header.c_str(), true);</span><br><span class="line">        string data;</span><br><span class="line">        while (getline(in, data))</span><br><span class="line">        &#123;</span><br><span class="line">            if (data.size() == 0) continue;</span><br><span class="line">            if (!SignalSend(remoteSocket, data.c_str(), data.size(), stop))</span><br><span class="line">                goto finish;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        ifstream in(filepath.c_str(), ios::binary);</span><br><span class="line">        if (!in)</span><br><span class="line">            goto fileNotExist;</span><br><span class="line"></span><br><span class="line">        if (!SignalSend(remoteSocket, header.c_str(), header.size(), stop))</span><br><span class="line">            goto finish;</span><br><span class="line">        event-&gt;OnNewLogs(addr, header.c_str(), true);</span><br><span class="line">        while (!in.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            char str[1024];</span><br><span class="line">            in.read(str, 1024);</span><br><span class="line">            if (!SignalSend(remoteSocket, str, sizeof(char) * in.gcount(), stop))</span><br><span class="line">                goto finish;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    goto finish;</span><br><span class="line"></span><br><span class="line">fileNotExist:</span><br><span class="line">    const char *resp = "HTTP/1.1 404 Not Found\r\n\r\n";</span><br><span class="line">    SignalSend(remoteSocket, resp, strlen(resp), stop);</span><br><span class="line">    event-&gt;OnNewLogs(addr, resp, true);</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)
+{
+    // ......
+
+    int type = GetType(filepath, filetype);
+    header.append(filetype);
+    header.append(&quot;\r\nConnection: close\r\n\r\n&quot;);
+    if (type &gt; 0 &amp;&amp; type &lt; 6)
+    {
+        ifstream in(filepath.c_str());
+        if (!in)
+            goto fileNotExist;
+
+        if (!SignalSend(remoteSocket, header.c_str(), header.size(), stop))
+            goto finish;
+        event-&gt;OnNewLogs(addr, header.c_str(), true);
+        string data;
+        while (getline(in, data))
+        {
+            if (data.size() == 0) continue;
+            if (!SignalSend(remoteSocket, data.c_str(), data.size(), stop))
+                goto finish;
+        }
+    }
+    else
+    {
+        ifstream in(filepath.c_str(), ios::binary);
+        if (!in)
+            goto fileNotExist;
+
+        if (!SignalSend(remoteSocket, header.c_str(), header.size(), stop))
+            goto finish;
+        event-&gt;OnNewLogs(addr, header.c_str(), true);
+        while (!in.eof())
+        {
+            char str[1024];
+            in.read(str, 1024);
+            if (!SignalSend(remoteSocket, str, sizeof(char) * in.gcount(), stop))
+                goto finish;
+        }
+    }
+    goto finish;
+
+fileNotExist:
+    const char *resp = &quot;HTTP/1.1 404 Not Found\r\n\r\n&quot;;
+    SignalSend(remoteSocket, resp, strlen(resp), stop);
+    event-&gt;OnNewLogs(addr, resp, true);
+
+    // ......
+}
+</code></pre>
 <p>接下来就是响应客户端请求，发送指定的文件给客户端了。这里通过<code>GetType</code>方法简单的判断请求文件的类型，然后进行读取并发送给客户端，这里需要注意文本文件和二进制文件的读取方法是不同的，我们需要根据文件的格式来确定读取方法。发送操作通过<code>SignalSend</code>来完成，此方法会返回一个布尔值，表示操作是否成功完成。如果请求的文件不存在，则会发送响应报文<code>404 Not Found</code>给客户端，表示请求资源不存在。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)</span><br><span class="line">&#123;</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">finish:</span><br><span class="line">    closesocket(remoteSocket);</span><br><span class="line">    event-&gt;OnSocketFinished(addr);</span><br><span class="line">    <span class="keyword">delete</span> tp;</span><br><span class="line">    Sleep(<span class="number">800</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">DWORD WINAPI SocketUnits::WorkerThread(LPVOID lpParameter)
+{
+    // ......
+
+finish:
+    closesocket(remoteSocket);
+    event-&gt;OnSocketFinished(addr);
+    delete tp;
+    Sleep(800);
+    return 0;
+}
+</code></pre>
 <p>结束代码，关闭Socket连接，并通知调用者。此处需要注意，要释放<code>tp</code>所占内存，因为这个<code>tp</code>是我们在<code>ListenThread</code>方法中通过<code>new</code>创建的，所以要在不再使用的时候通过<code>delete</code>释放它。</p>
 <p>最后，写一下在编写这两个线程函数时学到的东西。</p>
 <blockquote>
@@ -192,9 +571,95 @@
 <p><strong> 因此，我们需要主动请求Windows对我们的线程进行调度。一般情况下是通过使用网上所说的<code>select</code>模式，而这里，我则是简单的通过调用<code>Sleep</code>函数来让Windows将线程休眠指定时间，从而让出CPU。 </strong></p>
 <h3 id="u4E24_u4E2A_u5E2E_u52A9_u65B9_u6CD5"><a href="#u4E24_u4E2A_u5E2E_u52A9_u65B9_u6CD5" class="headerlink" title="两个帮助方法"></a>两个帮助方法</h3><p>最后还有两个在线程函数中被调用的帮助方法：<code>GetType</code>方法和<code>SignalSend</code>方法。</p>
 <p>先介绍<em>GetType</em>方法，此方法主要就是判断指定文件的类型和格式，通过文件扩展名进行判断，比如在常用WEB文件中，<code>.html</code>、<code>.css</code>、<code>.js</code>等文件就是文本格式文件，而像<code>.jpg</code>、<code>.png</code>、<code>.gif</code>等文件则是二进制文件。此方法同时还返回一个<code>Content-Type</code>字符串，虽然这个属性值也可以从HTTP请求头中获取。</p>
-<p><em>GetType</em>方法主要代码如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">int SocketUnits::GetType(const wstring &amp;fileName, string &amp;type)</span><br><span class="line">&#123;</span><br><span class="line">    size_t pos = fileName.rfind('.');</span><br><span class="line">    if (pos &lt; 0 || pos &gt;= fileName.size() - 1)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "file/file";</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line">    wstring extName = fileName.substr(pos + 1);</span><br><span class="line">    if (extName.compare(L"html") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "text/html";</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    if (extName.compare(L"css") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "text/css";</span><br><span class="line">        return 2;</span><br><span class="line">    &#125;</span><br><span class="line">    if (extName.compare(L"js") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "application/javascript";</span><br><span class="line">        return 3;</span><br><span class="line">    &#125;</span><br><span class="line">    if (extName.compare(L"json") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "application/json";</span><br><span class="line">        return 4;</span><br><span class="line">    &#125;</span><br><span class="line">    if (extName.compare(L"txt") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type = "plain/text";</span><br><span class="line">        return 5;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    string str(extName.size(), ' ');</span><br><span class="line">    copy(extName.begin(), extName.end(), str.begin());</span><br><span class="line">    if (extName.compare(L"jpg") == 0 || extName.compare(L"gif") == 0 ||</span><br><span class="line">        extName.compare(L"png") == 0 || extName.compare(L"jpeg") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type.assign("image/");</span><br><span class="line">        type.append(str);</span><br><span class="line">        return 6;</span><br><span class="line">    &#125;</span><br><span class="line">    if (extName.compare(L"mp3") == 0 || extName.compare(L"mp4") == 0)</span><br><span class="line">    &#123;</span><br><span class="line">        type.assign("audio/");</span><br><span class="line">        type.append(str);</span><br><span class="line">        return 7;</span><br><span class="line">    &#125;</span><br><span class="line">    type.assign("file/");</span><br><span class="line">    type.append(str);</span><br><span class="line">    return -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><em>GetType</em>方法主要代码如下：</p>
+<pre><code class="c++">int SocketUnits::GetType(const wstring &amp;fileName, string &amp;type)
+{
+    size_t pos = fileName.rfind(&#39;.&#39;);
+    if (pos &lt; 0 || pos &gt;= fileName.size() - 1)
+    {
+        type = &quot;file/file&quot;;
+        return 0;
+    }
+    wstring extName = fileName.substr(pos + 1);
+    if (extName.compare(L&quot;html&quot;) == 0)
+    {
+        type = &quot;text/html&quot;;
+        return 1;
+    }
+    if (extName.compare(L&quot;css&quot;) == 0)
+    {
+        type = &quot;text/css&quot;;
+        return 2;
+    }
+    if (extName.compare(L&quot;js&quot;) == 0)
+    {
+        type = &quot;application/javascript&quot;;
+        return 3;
+    }
+    if (extName.compare(L&quot;json&quot;) == 0)
+    {
+        type = &quot;application/json&quot;;
+        return 4;
+    }
+    if (extName.compare(L&quot;txt&quot;) == 0)
+    {
+        type = &quot;plain/text&quot;;
+        return 5;
+    }
+
+    string str(extName.size(), &#39; &#39;);
+    copy(extName.begin(), extName.end(), str.begin());
+    if (extName.compare(L&quot;jpg&quot;) == 0 || extName.compare(L&quot;gif&quot;) == 0 ||
+        extName.compare(L&quot;png&quot;) == 0 || extName.compare(L&quot;jpeg&quot;) == 0)
+    {
+        type.assign(&quot;image/&quot;);
+        type.append(str);
+        return 6;
+    }
+    if (extName.compare(L&quot;mp3&quot;) == 0 || extName.compare(L&quot;mp4&quot;) == 0)
+    {
+        type.assign(&quot;audio/&quot;);
+        type.append(str);
+        return 7;
+    }
+    type.assign(&quot;file/&quot;);
+    type.append(str);
+    return -1;
+}
+</code></pre>
 <p>至于<em>SignalSend</em>方法，则是对非阻塞<code>send</code>方法的封装，实现发送指定长度字符串的功能。当发送期间出现错误、或者接收到结束线程的信号时，此方法会返回<code>false</code>值，否则返回<code>true</code>。</p>
-<p><em>SignalSend</em>方法主要代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> SocketUnits::SignalSend(SOCKET s, <span class="keyword">const</span> <span class="keyword">char</span> *buf, <span class="keyword">size_t</span> len, <span class="keyword">bool</span> *stop)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">size_t</span> total = len;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> slen = send(s, buf, (<span class="keyword">int</span>)total, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (slen &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (*stop)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">            Sleep(<span class="number">10</span>);</span><br><span class="line">            <span class="keyword">int</span> err = WSAGetLastError();</span><br><span class="line">            <span class="comment">//if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)</span></span><br><span class="line">            <span class="keyword">if</span> (err == WSAEWOULDBLOCK)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (slen == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (slen == total)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        buf += slen;</span><br><span class="line">        total -= len;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><em>SignalSend</em>方法主要代码如下：</p>
+<pre><code class="c++">bool SocketUnits::SignalSend(SOCKET s, const char *buf, size_t len, bool *stop)
+{
+    size_t total = len;
+    while (true)
+    {
+        int slen = send(s, buf, (int)total, 0);
+        if (slen &lt; 0)
+        {
+            if (*stop)
+                return false;
+
+            Sleep(10);
+            int err = WSAGetLastError();
+            //if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+            if (err == WSAEWOULDBLOCK)
+                continue;
+            else
+                return false;
+        }
+        else if (slen == 0)
+            return false;
+
+        if (slen == total)
+            break;
+        buf += slen;
+        total -= len;
+    }
+
+    return true;
+}
+</code></pre>
 <p>至此，Socket核心类就已经完成了，可以实现基本的WEB服务功能。</p>
 <h2 id="UI_u754C_u9762"><a href="#UI_u754C_u9762" class="headerlink" title="UI界面"></a>UI界面</h2><p>在完成Socket类之后，就可以开始设计UI界面了，这里使用Qt创建界面，具体内容就和Socket无关了，所以此处也不做详细分析了。</p>
 <p>唯一要注意的就是，Qt的UI类是不允许重入的，因此我们只能在主线程、或者说UI线程中去访问，因此要注意回调接口类的实现，保证接口中的方法是在主线程中被调用的。</p>
@@ -266,7 +731,7 @@
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
@@ -276,7 +741,7 @@
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
@@ -305,7 +770,7 @@
 		  
 		
 		  
-			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -326,7 +791,7 @@
 			
 		
 			
-				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -346,7 +811,15 @@
 			
 		
 			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -384,7 +857,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -471,10 +944,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -486,18 +977,18 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
 });
 </script>
 
@@ -638,6 +1129,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
   </body>
 </html>

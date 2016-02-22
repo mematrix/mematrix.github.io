@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Tag: Hexo | 一千二百年的清风明月</title>
+    <title>Tag: hexo | 一千二百年的清风明月</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="一粒尘埃">
@@ -14,7 +14,7 @@
     <meta name="description" content="blog | C# | .Net | Windows Phone">
 <meta property="og:type" content="website">
 <meta property="og:title" content="一千二百年的清风明月">
-<meta property="og:url" content="http://3meng.github.io/tags/Hexo/index.html">
+<meta property="og:url" content="http://3meng.github.io/tags/hexo/index.html">
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="blog | C# | .Net | Windows Phone">
 <meta name="twitter:card" content="summary">
@@ -32,6 +32,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
     <body>
@@ -73,7 +79,7 @@
         
 
 <div class="archive-title" >
-  <h2 class="tag-icon">Hexo</h2>
+  <h2 class="tag-icon">hexo</h2>
   
 </div>
 <div id="main" class="archive-part clearfix">
@@ -81,26 +87,13 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2016/01/14/Migrate-hexo-from-Windows-to-OS-X/" title="将Hexo从Windows迁移到OS X" itemprop="url">
+    <a href="/2016/02/21/custom-the-hexo-theme/" title="自定义Hexo主题" itemprop="url">
   
 
-    <time datetime="2016-01-14T09:49:00.000Z" itemprop="datePublished">2016-01-14</time>
+    <time datetime="2016-02-21T15:53:41.000Z" itemprop="datePublished">2016-02-21</time>
 
 
-    <h1 itemprop="name">将Hexo从Windows迁移到OS X</h1>
-
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/03/21/hello-world/" title="Hello World" itemprop="url">
-  
-
-    <time datetime="2015-03-20T16:52:19.000Z" itemprop="datePublished">2015-03-21</time>
-
-
-    <h1 itemprop="name">Hello World</h1>
+    <h1 itemprop="name">自定义Hexo主题</h1>
 
   </a>
 </section>
@@ -164,10 +157,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -177,18 +188,15 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
 });
 </script>
 
@@ -247,6 +255,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
     </body>
    </html>

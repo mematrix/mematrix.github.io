@@ -1,0 +1,826 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>自定义Hexo主题 | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。
+
+当前使用主题为Jacman，作者博客在此，顺便附上GitHub链接。
+
+这里讲记录所有对Hexo主题的自定义部分，当然，所有的操作都是基于Jacman主题的，因此，有些操作可能并不适用于其它主题。
+
+另外，主题安装日期为201">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义Hexo主题">
+<meta property="og:url" content="http://3meng.github.io/2016/02/21/custom-the-hexo-theme/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。
+
+当前使用主题为Jacman，作者博客在此，顺便附上GitHub链接。
+
+这里讲记录所有对Hexo主题的自定义部分，当然，所有的操作都是基于Jacman主题的，因此，有些操作可能并不适用于其它主题。
+
+另外，主题安装日期为201">
+<meta property="og:updated_time" content="2016-02-22T14:11:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自定义Hexo主题">
+<meta name="twitter:description" content="很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。
+
+当前使用主题为Jacman，作者博客在此，顺便附上GitHub链接。
+
+这里讲记录所有对Hexo主题的自定义部分，当然，所有的操作都是基于Jacman主题的，因此，有些操作可能并不适用于其它主题。
+
+另外，主题安装日期为201">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/21/custom-the-hexo-theme/" title="自定义Hexo主题" itemprop="url">自定义Hexo主题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-21T15:53:41.000Z" itemprop="datePublished"> 发表于 2016-02-21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a></li></ol>
+		
+		</div>
+		
+		<p>很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。</p>
+<blockquote>
+<p>当前使用主题为<code>Jacman</code>，作者博客<a href="http://wuchong.me/" target="_blank" rel="external">在此</a>，顺便附上<a href="https://github.com/wuchong/jacman" target="_blank" rel="external">GitHub链接</a>。</p>
+</blockquote>
+<p>这里讲记录所有对<code>Hexo</code>主题的自定义部分，当然，所有的操作都是基于<code>Jacman</code>主题的，因此，<strong>有些操作可能并不适用于其它主题</strong>。</p>
+<blockquote>
+<p>另外，主题安装日期为<strong>2015年3月18日</strong>，此后并未进行更新过，因此不保证代码和GitHub上最新版一致。也许某些下面提到的修复或者更改已经在上述GitHub链接中添加。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><a href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757" class="headerlink" title="隐藏评论模块"></a>隐藏评论模块</h2><p>有些时候，我们可能需要在某一个页面隐藏评论模块，但这个在原生主题中并没有提供，因此需要自己添加支持。至于方式，我们也可以采用类似默认配置的样式，在<code>front-matter</code>（即标题以及日期等设置所在位置，以三个<code>-</code>标记结束）中添加配置，然后在代码中可以使用<code>page</code>属性来检查是否设置了相关配置。</p>
+<p>比如这里我添加了一个属性名：<code>disableshare</code>，<code>bool</code>类型，用来标记是否需要隐藏评论模块，当设置了该属性并且其值为<code>true</code>的时候，将不会再相应页面生成结果中添加评论模块，否则将会加入。这里需要注意的是，如果我们的<code>.md</code>文件中本就没有写这个配置的话，将等价于属性值为<code>false</code>，因此对于之前的一些文件，完全不需要修改配置部分。</p>
+<p>与评论模块相关的源代码位于<code>[jacman]/layout/_partial/post/footer.ejs</code>文件中，其中<code>[jacman]</code>为你的主题目录。修改后代码如下：</p>
+<pre><code class="html">&lt;footer class=&quot;article-footer clearfix&quot;&gt;
+&lt;%- partial(&#39;catetags&#39;) %&gt;
+&lt;% if (!index){ %&gt;
+    &lt;div class=&quot;article-share&quot; id=&quot;share&quot;&gt;
+    &lt;% if(theme.jiathis.enable){ %&gt;
+    &lt;div class=&quot;share-jiathis&quot;&gt;
+      &lt;%- partial(&#39;jiathis&#39;) %&gt;
+     &lt;/div&gt;
+    &lt;!-- 此处首先检查设置，而不是直接输出 --&gt;
+    &lt;% } else if(!page.disableshare) { %&gt;
+      &lt;div data-url=&quot;&lt;%- item.permalink %&gt;&quot; data-title=&quot;&lt;% if (item.title){ %&gt;&lt;%= item.title %&gt; | &lt;% } %&gt;&lt;%= config.title %&gt;&quot; data-tsina=&quot;&lt;%= theme.author.tsina %&gt;&quot; class=&quot;share clearfix&quot;&gt;
+      &lt;/div&gt;
+    &lt;% } %&gt;
+    &lt;/div&gt;
+&lt;% } %&gt;
+&lt;% if (index){ %&gt;
+&lt;div class=&quot;comments-count&quot;&gt;
+    &lt;% if((config.disqus_shortname || theme.disqus_shortname) &amp;&amp; !theme.duoshuo_shortname) { %&gt;
+          &lt;span&gt;&lt;/span&gt;
+        &lt;a href=&quot;&lt;%- config.root %&gt;&lt;%- item.path %&gt;#disqus_thread&quot; class=&quot;comments-count-link&quot;&gt;Comments&lt;/a&gt;
+    &lt;% } else if(theme.duoshuo_shortname) { %&gt;
+          &lt;span&gt;&lt;/span&gt;
+        &lt;a href=&quot;&lt;%- config.root %&gt;&lt;%- item.path %&gt;#comments&quot; class=&quot;ds-thread-count comments-count-link&quot; data-thread-key=&quot;&lt;%- item.path %&gt;&quot; data-count-type=&quot;comments&quot;&gt;&amp;nbsp;&lt;/a&gt;
+    &lt;% } %&gt;
+&lt;/div&gt;
+&lt;% } %&gt;
+&lt;/footer&gt;
+</code></pre>
+<p>最后别忘了在需要的页面添加配置<code>disableshare: true</code>。</p>
+<h2 id="u6570_u5B66_u516C_u5F0F"><a href="#u6570_u5B66_u516C_u5F0F" class="headerlink" title="数学公式"></a>数学公式</h2><p>在<code>Jacman</code>主题中，已经内置了数学公式的支持，因此就不用我们自己去手动修改源码了。相关文件位置为<code>[jacman]/layout/_partial/mathjax.ejs</code>，其中<code>[jacman]</code>表示你的主题目录，这个文件默认类容大概如下：</p>
+<pre><code class="html">&lt;!-- mathjax config similar to math.stackexchange --&gt;
+&lt;% if (page.mathjax){ %&gt;
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ [&#39;$&#39;,&#39;$&#39;], [&quot;\\(&quot;,&quot;\\)&quot;] ],
+      processEscapes: true
+    }
+  });
+&lt;/script&gt;
+
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: [&#39;script&#39;, &#39;noscript&#39;, &#39;style&#39;, &#39;textarea&#39;, &#39;pre&#39;, &#39;code&#39;]
+      }
+    });
+&lt;/script&gt;
+
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i &lt; all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += &#39; has-jax&#39;;
+        }
+    });
+&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;
+&lt;/script&gt;
+&lt;% } %&gt;
+</code></pre>
+<p>这是默认的类容，而我更愿意使用<a href="http://asciimath.org/" target="_blank" rel="external">AsciiMath语法</a>来书写数学公式，具体来说，就是使用两个<code>` </code>符号包围数学公式的字符串就可以了，而公式语法形式也非常类似与平时在代码中的样式，因此上手相对要快一些。例如，下面的内容：</p>
+<pre><code class="c">`x = (-b +- sqrt(b^2-4ac))/(2a) .`
+</code></pre>
+<p>将会被转换成如下样式：</p>
+<p style="text-align:center"><br>  `x = (-b +- sqrt(b^2-4ac))/(2a) .`<br></p>
+
+<p>这里使用了<a href="https://www.mathjax.org" target="_blank" rel="external">MathJax</a>来解析数学公式，有关这个JS库的使用方法，可以参见<a href="http://docs.mathjax.org/en/latest/start.html" target="_blank" rel="external">它的文档</a>。需要注意的是，由于我们是在<code>Markdown</code>文档中使用<code>AsciiMath</code>语法，因此<strong>需要注意代码区块与数学公式区块之间的区别</strong>，因为他们使用了同一种字符来标记（当然，<code>MathJax</code>中可以配置数学公式区块的标记字符）。</p>
+<p>而还有一些细节，可能关乎到具体你使用的<code>Markdown</code>解析器，就不多说了。</p>
+<p>下面是修改后的<code>mathjax.ejs</code>文件内容，主要是更换了JS文件引用，删除了一些无用的配置代码：</p>
+<pre><code class="html">&lt;!-- custom mathjax config --&gt;
+&lt;% if (page.mathjax){ %&gt;
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i &lt; all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += &#39; has-jax&#39;;
+        }
+    });
+&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot; async src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML&quot;&gt;
+&lt;/script&gt;
+&lt;% } %&gt;
+</code></pre>
+<p>而最后，需要记得在有数学公式的页面，<code>front-matter</code>中加入<code>mathjax: true</code>。</p>
+<h2 id="u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><a href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898" class="headerlink" title="修复close_aside配置无效的问题"></a>修复<code>close_aside</code>配置无效的问题</h2><p>在这一版本中，有一个配置<code>close_aside</code>用于设置当进入文章阅读页面的时候，时候关闭右边的侧栏（侧栏中包括有<strong>标签</strong>、<strong>分类</strong>、<strong>友链</strong>等等小部件），从而提供更好的阅读体验。但是当实际配置的时候，即使在<code>_config.yml</code>文件中设置<code>close_aside: true</code>也没有作用，进入内容详情页，右边侧栏依然默认是展开的，之前就说要看看这个问题所在，但是也一直没有去查看原因，今天也算是一起解决了。</p>
+<p>因为那个侧边栏上本来就有个汉堡按钮来控制边栏的隐藏与否，因此很容易想到在源代码的某个地方，肯定提供了JS控制方法，所以最简单的方法就是找到这些方法所在位置，并在后面按照主题中的配置来决定时候执行隐藏边栏的方法。</p>
+<p><code>Jacman</code>源代码的组织还是很具有结构性的，从主题源代码根目录下<code>layout</code>目录中可以找到一个<code>layout.ejs</code>文件，这个文件用于控制每个页面布局，包括首页以及每个文章详情页，在其中我们可以找到这样的一个调用：</p>
+<pre><code class="javascript">&lt;%- partial(&#39;_partial/after_footer&#39;) %&gt;
+</code></pre>
+<p>然后在<code>_partial</code>目录下可以看到有个<code>after_footer.ejs</code>文件，打开就可以看到所有的<code>JavaScript</code>引用以及代码了。其中有个<code>&lt;script&gt;</code>元素内容如下：</p>
+<pre><code class="javascript">$(document).ready(function(){ 
+  $(&#39;.navbar&#39;).click(function(){
+    $(&#39;header nav&#39;).toggleClass(&#39;shownav&#39;);
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == &#39;number&#39; ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement &amp;&amp; document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $(&#39;#main&#39;),
+      a = $(&#39;#asidepart&#39;),
+      c = $(&#39;.closeaside&#39;),
+      o = $(&#39;.openaside&#39;);
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth &gt;= 1024) {
+      $(&#39;header nav&#39;).removeClass(&#39;shownav&#39;);
+    }else
+    {
+      m.removeClass(&#39;moveMain&#39;);
+      a.css(&#39;display&#39;, &#39;block&#39;).removeClass(&#39;fadeOut&#39;);
+      o.css(&#39;display&#39;, &#39;none&#39;);
+      &lt;% if( is_post()&amp;&amp;(page.toc !== false) &amp;&amp; theme.toc.aside){ %&gt;
+      $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;none&#39;);
+      &lt;% } %&gt;  
+    }
+  });
+  c.click(function(){
+    a.addClass(&#39;fadeOut&#39;).css(&#39;display&#39;, &#39;none&#39;);
+    o.css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+    m.addClass(&#39;moveMain&#39;);
+  });
+  o.click(function(){
+    o.css(&#39;display&#39;, &#39;none&#39;).removeClass(&#39;beforeFadeIn&#39;);
+    a.css(&#39;display&#39;, &#39;block&#39;).removeClass(&#39;fadeOut&#39;).addClass(&#39;fadeIn&#39;);      
+    m.removeClass(&#39;moveMain&#39;);
+  });
+  $(window).scroll(function(){
+    o.css(&quot;top&quot;,Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</code></pre>
+<p>主要控制代码就在<code>c.click()</code>以及<code>o.click()</code>中了，稍作修改，就可以实现我们需要的效果了；同时也顺便对<code>$(window).resize()</code>中的不完善之处稍作修改。最终主要代码如下：</p>
+<pre><code class="javascript">  // ...
+
+  var m = $(&#39;#main&#39;),
+      a = $(&#39;#asidepart&#39;),
+      c = $(&#39;.closeaside&#39;),
+      o = $(&#39;.openaside&#39;);
+  var is_open = true;
+  function closeAside(){
+    a.addClass(&#39;fadeOut&#39;).css(&#39;display&#39;, &#39;none&#39;);
+    o.css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+    m.addClass(&#39;moveMain&#39;);
+    is_open = false;
+  };
+  function openAside(){
+    o.css(&#39;display&#39;, &#39;none&#39;).removeClass(&#39;beforeFadeIn&#39;);
+    a.css(&#39;display&#39;, &#39;block&#39;).removeClass(&#39;fadeOut&#39;).addClass(&#39;fadeIn&#39;);      
+    m.removeClass(&#39;moveMain&#39;);
+    is_open = true;
+  }
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth &gt;= 1024) {
+      $(&#39;header nav&#39;).removeClass(&#39;shownav&#39;);
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
+    }else
+    {
+      m.removeClass(&#39;moveMain&#39;);
+      a.css(&#39;display&#39;, &#39;block&#39;).removeClass(&#39;fadeOut&#39;);
+      o.css(&#39;display&#39;, &#39;none&#39;);
+      &lt;% if( is_post()&amp;&amp;(page.toc !== false) &amp;&amp; theme.toc.aside){ %&gt;
+      $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;none&#39;);
+      &lt;% } %&gt;  
+    }
+  });
+  c.click(function(){
+    closeAside();
+  });
+  o.click(function(){
+    openAside();
+  });
+  &lt;% if (is_post() &amp;&amp; theme.close_aside){ %&gt;
+  closeAside();
+  $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+  &lt;% } %&gt;
+
+  // ...
+</code></pre>
+<p>中间曾去找过判断当前页面是否是首页的方法，但是几种方式均代价太大，需要修改的地方也不少，直到偶然看到上面有一句<code>if (is_post() &amp;&amp; ...)</code>语句调用，猜测这个<code>is_post()</code>方法便是判断当前页面是否为详情页（<code>layout</code>属性为<code>post</code>），于是也照着用，运行良好，可以保证只在详情页才会自动关闭边栏。</p>
+<p>最后顺便修改了一下开关侧边栏那个按钮点击时的行为，默认情况那个按钮是个<code>&lt;a&gt;</code>元素，并且其<code>href</code>属性为<code>#</code>，因此点击时候会回到页面顶部；将<code>href</code>值改为<code>javascript:void(0)</code>就好了。</p>
+<h2 id="u4EE3_u7801_u9AD8_u4EAE"><a href="#u4EE3_u7801_u9AD8_u4EAE" class="headerlink" title="代码高亮"></a>代码高亮</h2><p><code>Hexo</code>的一切都不错，但是唯独这个代码高亮做的总是不尽如人意，在<code>Hexo</code>（而非其主题）的配置文件中，有一个<code>highlight</code>配置，可以通过<code>enable</code>属性配置开关，当设置<code>enable: true</code>之后，就可以启用<code>Hexo</code>的默认代码高亮行为，这是一个预处理行为，也就是在编译时期就已经确定了每个被显示的字符(串)的颜色，而无需再运行时在进行分析处理。</p>
+<p>但是很不幸的一点是，<code>Hexo</code>中使用的默认分析器没有做的足够好，很多时候都会出现不完整甚至错误的高亮行为，而更为棘手的一点是，这个用于处理代码高亮的模块，好像被内置于<code>Hexo</code>的默认<code>Markdown</code>编译器中了，外部可以更改的仅有几种简单的颜色属性；而在翻遍主题源码以及<a href="https://hexo.io/docs/" target="_blank" rel="external">Hexo官网文档</a>无果后，只能选择在运行时使用JS方式处理高亮。</p>
+<p>既然决定使用JS进行高亮处理，那么自然也就不用使用内置的行为了，因为如果启用了内置行为，那么我们看起来一行行的代码，其实不知道被分成了多少个<code>&lt;p&gt;</code>、<code>&lt;span&gt;</code>等进行组织；这里就有一点很幸运了，当关闭内置处理之后，代码块会使用<code>&lt;pre&gt;&lt;code&gt;...&lt;/code&gt;&lt;/pre&gt;</code>处理，而这就很符合一般代码高亮插件的要求了。而如果我们使用下面的方式来表示代码块：</p>
+<pre><code class="markdown">``` language-type
+// ...
+```
+</code></pre>
+<p>那么会自动转换成如下的HTML代码：</p>
+<pre><code class="html">&lt;pre&gt;&lt;code class=&quot;language-type&quot;&gt;...&lt;/code&gt;&lt;/pre&gt;
+</code></pre>
+<p>这种处理方式，刚好符合<a href="https://highlightjs.org/" target="_blank" rel="external">highlight.js</a>要求。而在这里，我也是决定使用<code>highlight.js</code>来进行高亮处理。</p>
+<blockquote>
+<p>有关<strong>highlight.js</strong>的主题样式，可以在这个<a href="https://highlightjs.org/static/demo/" target="_blank" rel="external">Demo站点</a>查看。</p>
+</blockquote>
+<p>为了方便，也是为了能尽可能的利用浏览器缓存进行加速，我是选择从网上寻找一个提供<strong>highlight.js</strong>的CDN服务器。我目前使用的是<a href="http://www.bootcdn.cn/highlight.js/" target="_blank" rel="external">这个站点</a>里面给出的地址。</p>
+<p>在选择需要处理的语言以及代码块的主题样式之后，我们就可以将对应的<code>css</code>以及<code>js</code>文件引用分别加入到布局模板中了。其中在<code>[jacman]/layout/_partial/head.ejs</code>添加需要的CSS样式文件引用（根据你需要的主题设置）：</p>
+<pre><code class="html">&lt;link rel=&quot;stylesheet&quot; href=&quot;//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css&quot;&gt;
+</code></pre>
+<p>然后在<code>&lt;body&gt;</code>元素结尾的地方加入需要的JS引用，如上面所述，在<code>[jacman]/layout/_partial/after_footer.ejs</code>中修改：</p>
+<pre><code class="javascript">&lt;script src=&quot;//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;
+</code></pre>
+<p>同样，这里可以根据需要，选择更专门化的js文件。</p>
+<blockquote>
+<p>经过测试，在主动标示语言类型的时候，需要使用小写方式，例如<strong>JavaScript</strong>应该写成<strong>javascript</strong>。</p>
+<p>此外，由于<code>Jacman</code>默认生成的代码块样式与高亮插件有点冲突，可能需要自己手动调整一下，例如在<code>&lt;head&gt;</code>元素中手动重写一遍高亮样式，并使用<code>!important</code>来保证不会被覆盖。</p>
+</blockquote>
+<p>至此，语法高亮基本解决，如果有不完善的地方，以后再慢慢修正了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Jacman/">Jacman</a><a href="/tags/hexo/">hexo</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2016/02/21/custom-the-hexo-theme/" data-title="自定义Hexo主题 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/02/17/non-recursive-traversal-of-binary-tree/"  title="非递归遍历二叉树：线性时间&amp;常量额外空间">
+ <strong>下一篇：</strong><br/> 
+ <span>非递归遍历二叉树：线性时间&amp;常量额外空间
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/02/21/custom-the-hexo-theme/" data-title="自定义Hexo主题" data-url="http://3meng.github.io/2016/02/21/custom-the-hexo-theme/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Algorithm/" title="Algorithm">Algorithm<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/binary-tree/" title="binary tree">binary tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Maximum-SubArray/" title="Maximum SubArray">Maximum SubArray<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    closeAside();
+  });
+  o.click(function(){
+    openAside();
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
+
+  </body>
+</html>

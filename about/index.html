@@ -12,25 +12,16 @@
     
 
     
-    <meta name="description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？
-游戏从古老的竞技运动中传承而来，游戏，从来都是人们生活中不可或缺的一部分。而总有那样一个游戏，能让我们无法忘怀，无论什么时候，只要回忆起其中的一点一滴，总会有无法释怀的感伤。
-诚然，现在的游戏已经数不胜数，每年都有优秀的作品诞生，但弱水三千，只取一瓢饮，从第一次接触仙剑这个世界后，“承君此诺，必守一生”的誓言便注定相随一生了。
-很庆幸在那个懵懂">
+    <meta name="description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？">
 <meta property="og:type" content="website">
 <meta property="og:title" content="一粒尘埃">
 <meta property="og:url" content="http://3meng.github.io/about/index.html">
 <meta property="og:site_name" content="一千二百年的清风明月">
-<meta property="og:description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？
-游戏从古老的竞技运动中传承而来，游戏，从来都是人们生活中不可或缺的一部分。而总有那样一个游戏，能让我们无法忘怀，无论什么时候，只要回忆起其中的一点一滴，总会有无法释怀的感伤。
-诚然，现在的游戏已经数不胜数，每年都有优秀的作品诞生，但弱水三千，只取一瓢饮，从第一次接触仙剑这个世界后，“承君此诺，必守一生”的誓言便注定相随一生了。
-很庆幸在那个懵懂">
+<meta property="og:description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？">
 <meta property="og:updated_time" content="2015-07-18T08:43:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一粒尘埃">
-<meta name="twitter:description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？
-游戏从古老的竞技运动中传承而来，游戏，从来都是人们生活中不可或缺的一部分。而总有那样一个游戏，能让我们无法忘怀，无论什么时候，只要回忆起其中的一点一滴，总会有无法释怀的感伤。
-诚然，现在的游戏已经数不胜数，每年都有优秀的作品诞生，但弱水三千，只取一瓢饮，从第一次接触仙剑这个世界后，“承君此诺，必守一生”的誓言便注定相随一生了。
-很庆幸在那个懵懂">
+<meta name="twitter:description" content="当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？">
 
     
     <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
@@ -43,6 +34,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
       <body>
@@ -101,6 +98,7 @@
 	<div class="article-content">
 		
 		<p>当岁月渐行渐远，曾经的记忆又会尘封在哪一粒尘埃之中？</p>
+<a id="more"></a>
 <h2 id="u6E38_u620F"><a href="#u6E38_u620F" class="headerlink" title="游戏"></a>游戏</h2><p>从古老的竞技运动中传承而来，游戏，从来都是人们生活中不可或缺的一部分。而总有那样一个游戏，能让我们无法忘怀，无论什么时候，只要回忆起其中的一点一滴，总会有无法释怀的感伤。</p>
 <p>诚然，现在的游戏已经数不胜数，每年都有优秀的作品诞生，但弱水三千，只取一瓢饮，从第一次接触仙剑这个世界后，“<strong>承君此诺，必守一生</strong>”的誓言便注定相随一生了。</p>
 <p>很庆幸在那个懵懂的年月遇到了仙剑，遇到了那些美丽的善良的人们；当“凤歌青天”的音乐响起时，一段不平凡而又命中注定的生活也就要拉开序幕了，伴随着玉水明沙的轻快节奏，少年开始远行……前路也许艰辛，但是“<strong>你没有不仁，我不可以对你不义</strong>”，一路相伴而来，始终不忘的是那颗赤子之心。而<strong>最难忘的，莫过于即墨的欢声笑语</strong>，当烟花灿烂、花灯入海的时候，“冰块脸”小师叔也终于露出了笑容：<strong><code>为侠者一生所求，除魔卫道，可不正是为了此情此景、为了这些人脸上的笑容？</code></strong></p>
@@ -230,10 +228,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -243,18 +259,15 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
 });
 </script>
 
@@ -363,6 +376,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
       </body>
      </html>

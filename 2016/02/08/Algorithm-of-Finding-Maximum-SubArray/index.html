@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="最近开始看《算法导论（第三版）》这本书，在第4章讲解分治策略的时候，举了一个例子：最大子数组问题（4.1节），简单来说，就是在一个给定的数组中，找出一个非空连续子数组，使这个数组中元素的总和最大，我们称这样的子数组为最大子数组。
 在书中讲解分析了两种解决方法，一种就是最容易想到的暴力求解方法，另一种自然就是主题相关的分治法；然后在结束的时候，提到了可以实现一种更快速的线性时间的算法，这里将给出我的">
-<meta property="og:updated_time" content="2016-02-10T13:01:47.000Z">
+<meta property="og:updated_time" content="2016-02-22T14:16:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="最大子数组查找算法">
 <meta name="twitter:description" content="最近开始看《算法导论（第三版）》这本书，在第4章讲解分治策略的时候，举了一个例子：最大子数组问题（4.1节），简单来说，就是在一个给定的数组中，找出一个非空连续子数组，使这个数组中元素的总和最大，我们称这样的子数组为最大子数组。
@@ -36,6 +36,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
   <body>
@@ -128,10 +134,45 @@
 </blockquote>
 <h3 id="FIND_MAX_CROSSING_SUBARRAY"><a href="#FIND_MAX_CROSSING_SUBARRAY" class="headerlink" title="FIND_MAX_CROSSING_SUBARRAY"></a>FIND_MAX_CROSSING_SUBARRAY</h3><p>使用过程<code>FIND_MAX_CROSSING_SUBARRAY</code>描述这个方法，这个过程接收数组<em>A</em>和下标<em>low</em>、<em>mid</em>、<em>high</em>为输入，返回一个具有三个元素的元组，这三个元素分别表示最大子数组的上下边界以及值得和。</p>
 <p>下面给出伪代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">FIND_MAX_CROSSING_SUBARRAY(A, low, mid, high)</span><br><span class="line">left_sum = -<span class="number">1</span></span><br><span class="line">sum = <span class="number">0</span></span><br><span class="line">max_left = mid</span><br><span class="line"><span class="keyword">for</span> (i = mid; i &gt;= low; --i)</span><br><span class="line">    sum += A[i]</span><br><span class="line">    <span class="keyword">if</span> (sum &gt; left_sum)</span><br><span class="line">        left_sum = sum</span><br><span class="line">        max_left = i</span><br><span class="line">        </span><br><span class="line">right_sum = -<span class="number">1</span></span><br><span class="line">sum = <span class="number">0</span></span><br><span class="line">max_right = mid + <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> (j = mid + <span class="number">1</span>; j &lt;= high; ++j)</span><br><span class="line">    sum += A[j]</span><br><span class="line">    <span class="keyword">if</span> (sum &gt; right_sum)</span><br><span class="line">        right_sum = sum</span><br><span class="line">        max_right = j</span><br><span class="line">        </span><br><span class="line"><span class="keyword">return</span> (max_left, max_right, left_sum + right_sum)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">FIND_MAX_CROSSING_SUBARRAY(A, low, mid, high)
+left_sum = -1
+sum = 0
+max_left = mid
+for (i = mid; i &gt;= low; --i)
+    sum += A[i]
+    if (sum &gt; left_sum)
+        left_sum = sum
+        max_left = i
+
+right_sum = -1
+sum = 0
+max_right = mid + 1
+for (j = mid + 1; j &lt;= high; ++j)
+    sum += A[j]
+    if (sum &gt; right_sum)
+        right_sum = sum
+        max_right = j
+
+return (max_left, max_right, left_sum + right_sum)
+</code></pre>
 <p>两个循环分别向左向右搜索使<code>left_sum</code>和<code>right_sum</code>取值最大的下标，然后返回结果：子数组<code>A[max_left..max_right]</code>和相应的和<code>left_sum + right_sum</code>。可以很容易看出上面两个循环迭代一共执行了<code>(mid - lwo + 1) + (high - mid) = high - low + 1 = n</code>次，因此这个计算过程的时间复杂度可以记为<code>O(n)</code>。</p>
 <h3 id="FIND_MAXIMUM_SUBARRAY"><a href="#FIND_MAXIMUM_SUBARRAY" class="headerlink" title="FIND_MAXIMUM_SUBARRAY"></a>FIND_MAXIMUM_SUBARRAY</h3><p>有了这个<code>FIND_MAX_CORSSING_SUBARRAY</code>在手，就可以设计求解最大子数组的分治算法的伪代码了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">FIND_MAXIMUM_SUBARRAY(A, low, high)</span><br><span class="line"><span class="keyword">if</span> (high == low)</span><br><span class="line">    <span class="keyword">return</span> (low, high, A[low])  // 递归底层，开始回归</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    mid = (low + high) / <span class="number">2</span>  // C语言整数计算方式，结果向下取整</span><br><span class="line">    (left_low, left_high, left_sum) = FIND_MAXIMUM_SUBARRAY(A, low, mid)</span><br><span class="line">    (right_low, right_high, right_sum) = FIND_MAXIMUM_SUBARRAY(A, mid+<span class="number">1</span>, high)</span><br><span class="line">    (cross_low, cross_high, cross_sum) = FIND_MAX_CROSSING_SUBARRAY(A, low, mid, high)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (left_sum &gt;= right_sum &amp;&amp; left_sum &gt;= cross_sum)</span><br><span class="line">        <span class="keyword">return</span> (left_low, left_high, left_sum)</span><br><span class="line">    <span class="keyword">if</span> (right_sum &gt;= left_sum &amp;&amp; right_sum &gt;= cross_sum)</span><br><span class="line">        <span class="keyword">return</span> (right_low, right_high, right_sum)</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> (cross_low, cross_high, cross_sum)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">FIND_MAXIMUM_SUBARRAY(A, low, high)
+if (high == low)
+    return (low, high, A[low])  // 递归底层，开始回归
+else
+    mid = (low + high) / 2  // C语言整数计算方式，结果向下取整
+    (left_low, left_high, left_sum) = FIND_MAXIMUM_SUBARRAY(A, low, mid)
+    (right_low, right_high, right_sum) = FIND_MAXIMUM_SUBARRAY(A, mid+1, high)
+    (cross_low, cross_high, cross_sum) = FIND_MAX_CROSSING_SUBARRAY(A, low, mid, high)
+
+    if (left_sum &gt;= right_sum &amp;&amp; left_sum &gt;= cross_sum)
+        return (left_low, left_high, left_sum)
+    if (right_sum &gt;= left_sum &amp;&amp; right_sum &gt;= cross_sum)
+        return (right_low, right_high, right_sum)
+    else
+        return (cross_low, cross_high, cross_sum)
+</code></pre>
 <p>初始调用<code>FIND_MAXIMUM_SUBARRAY(A, 0, A.length-1)</code>。</p>
 <p>时间复杂度不再细述，由递归深度<code>lg(n)</code>可以得出过程<code>FIND_MAXIMUM_SUBARRAY</code>的时间复杂度为<code>O(n*lg(n))</code>。</p>
 <h2 id="u4E00_u4E2A_u7EBF_u6027_u65F6_u95F4_u7684_u7B97_u6CD5"><a href="#u4E00_u4E2A_u7EBF_u6027_u65F6_u95F4_u7684_u7B97_u6CD5" class="headerlink" title="一个线性时间的算法"></a>一个线性时间的算法</h2><p>在书中分治算法分析结束的时候，提到了对于这个求解最大子数组的问题，存在一个线性时间的算法，并在附加的练习题目中给出了提示：</p>
@@ -145,7 +186,9 @@
 <li>不包含原来的最大子数组。</li>
 </ul>
 <p>而不会出现跨越原来的最大子数组的情况。我们将原来的最大子数组记为<code>A[m..n]</code>，假设可以跨越原来的最大子数组的话，我们将新的最大子数组记为<code>A[x..y]</code>，其中<em>m &lt; x &lt;= n</em>且<em>n &lt;= y</em>，那么很显然我们可以构造一个新的子数组<code>A[m..y]</code>，这个子数组完全包含了原来的最大子数组<code>A[m..n]</code>，<code>A[x..y]</code>和<code>A[m..y]</code>可表示如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A[x..y] = A[x..n] + A[n..y] // 去掉重合的A[n]</span><br><span class="line">A[m..y] = A[m..n] + A[n..y] // 去掉重合的A[n]</span><br></pre></td></tr></table></figure>
+<pre><code class="python">A[x..y] = A[x..n] + A[n..y] // 去掉重合的A[n]
+A[m..y] = A[m..n] + A[n..y] // 去掉重合的A[n]
+</code></pre>
 <p>由于<code>A[x..n]</code>被<strong>最大</strong>子数组<code>A[m..n]</code>所包含，那么很容易得知<code>A[m..n]</code>的和大于<code>A[x..n]</code>的和，所以可推得<code>A[m..y]</code>的和大于<code>A[x..y]</code>的和，那么<code>A[x..y]</code>就不是最大子数组了，与假设矛盾，因此不存在部分包含原来的最大子数组的情况。</p>
 <p>现在我们考虑推导下一个最大子数组的问题。首先要想通下面几条规则：</p>
 <blockquote>
@@ -183,11 +226,120 @@
 </blockquote>
 <p>好了，现在基本分析可以说已经完毕了，剩下的还是通过代码来理顺吧。</p>
 <p>伪<code>C++</code>代码</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">tuple&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">int</span>&gt; find_maximum_subarray(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp;<span class="built_in">array</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 不考虑异常等情况，比如array为空之类的 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> end = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> cur_sum = <span class="built_in">array</span>[<span class="number">0</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (cur_sum &lt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (; i &lt; <span class="built_in">array</span>.size() &amp;&amp; <span class="built_in">array</span>[i] &lt;= <span class="number">0</span>; ++i)   <span class="comment">// 略过开始的非正数序列</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (cur_sum &lt; <span class="built_in">array</span>[i])</span><br><span class="line">            &#123;</span><br><span class="line">                cur_sum = <span class="built_in">array</span>[i];</span><br><span class="line">                start = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (i == <span class="built_in">array</span>.size())  <span class="comment">// 全负数特例</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> tuple&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">int</span>&gt;(start, start, cur_sum);</span><br><span class="line">        &#125;</span><br><span class="line">        cur_sum = <span class="built_in">array</span>[i];</span><br><span class="line">        start = end = i;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> temp_sum = <span class="number">0</span>;   <span class="comment">// 缓存当前最大子数组后面被遍历元素之和</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> next_start = start;  <span class="comment">// 下一个候选最大子数组，以正数开始</span></span><br><span class="line">    <span class="keyword">int</span> next_sum = cur_sum;   <span class="comment">// 下一个候选最大子数组的累积和</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (; i &lt; <span class="built_in">array</span>.size(); ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        temp_sum += <span class="built_in">array</span>[i];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">array</span>[i] &gt; <span class="number">0</span> &amp;&amp; next_sum &lt;= <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">/* 出现正数被负数抵消情况 */</span></span><br><span class="line">            next_start = i;</span><br><span class="line">            next_sum = <span class="built_in">array</span>[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            next_sum += <span class="built_in">array</span>[i];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (next_start == start &amp;&amp; temp_sum &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            end = i;</span><br><span class="line">            cur_sum += temp_sum;</span><br><span class="line">            temp_sum = <span class="number">0</span>;</span><br><span class="line">            next_sum = cur_sum;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (next_start != start &amp;&amp; next_sum &gt; cur_sum)</span><br><span class="line">        &#123;</span><br><span class="line">            start = next_start;</span><br><span class="line">            end = i;</span><br><span class="line">            cur_sum = next_sum;</span><br><span class="line">            temp_sum = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> tuple&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">unsigned</span> <span class="keyword">int</span>, <span class="keyword">int</span>&gt;(start, end, cur_sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">tuple&lt;unsigned int, unsigned int, int&gt; find_maximum_subarray(vector&lt;int&gt; &amp;array)
+{
+    /* 不考虑异常等情况，比如array为空之类的 */
+    unsigned int start = 0;
+    unsigned int end = 0;
+    int cur_sum = array[0];
+
+    unsigned int i = 1;
+    if (cur_sum &lt;= 0)
+    {
+        for (; i &lt; array.size() &amp;&amp; array[i] &lt;= 0; ++i)   // 略过开始的非正数序列
+        {
+            if (cur_sum &lt; array[i])
+            {
+                cur_sum = array[i];
+                start = i;
+            }
+        }
+
+        if (i == array.size())  // 全负数特例
+        {
+            return tuple&lt;unsigned int, unsigned int, int&gt;(start, start, cur_sum);
+        }
+        cur_sum = array[i];
+        start = end = i;
+    }
+
+
+    int temp_sum = 0;   // 缓存当前最大子数组后面被遍历元素之和
+    unsigned int next_start = start;  // 下一个候选最大子数组，以正数开始
+    int next_sum = cur_sum;   // 下一个候选最大子数组的累积和
+
+    for (; i &lt; array.size(); ++i)
+    {
+        temp_sum += array[i];
+
+        if (array[i] &gt; 0 &amp;&amp; next_sum &lt;= 0)
+        {
+            /* 出现正数被负数抵消情况 */
+            next_start = i;
+            next_sum = array[i];
+        }
+        else
+        {
+            next_sum += array[i];
+        }
+
+        if (next_start == start &amp;&amp; temp_sum &gt; 0)
+        {
+            end = i;
+            cur_sum += temp_sum;
+            temp_sum = 0;
+            next_sum = cur_sum;
+        }
+        else if (next_start != start &amp;&amp; next_sum &gt; cur_sum)
+        {
+            start = next_start;
+            end = i;
+            cur_sum = next_sum;
+            temp_sum = 0;
+        }
+    }
+
+    return tuple&lt;unsigned int, unsigned int, int&gt;(start, end, cur_sum);
+}
+</code></pre>
 <p>大概代码最终如上，还没有进行测试，也许考虑仍有不周。但是就上述代码来说，运行时间为线性的，第一个循环是针对开始的负数序列，同时也包括了全负数的形式。而当进入第二个循环的时候，两个保存元素和的变量<code>cur_sum</code>、<code>next_sum</code>均为正值，因此这个循环中的代码可以只针对正数/正负数混合优化，而不用考虑有全负数序列，也不用测试<code>cur_sum</code>等是否为负。而通过变量<code>i</code>的值可知，迭代次数一共为n（==<code>array.size()</code>）次，因此，整个过程的时间复杂度为<code>O(n)</code>。</p>
 <h3 id="u53E6_u4E00_u79CD_u89E3_u6CD5"><a href="#u53E6_u4E00_u79CD_u89E3_u6CD5" class="headerlink" title="另一种解法"></a>另一种解法</h3><p>在<a href="http://clrs.skanev.com/04/01/05.html" target="_blank" rel="external">clrs.skanev.com</a>上又发现了另外一种解决方法，使用<code>C</code>语言实现；<strong>相比较上面的方法，思路更加通俗易懂</strong>，可以很容易的从简单的思考中想到并优化获得最终的优化过的代码。</p>
 <p>下面贴出页面的代码，然后简单分析一下。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> left;</span><br><span class="line">    <span class="keyword">unsigned</span> right;</span><br><span class="line">    <span class="keyword">int</span> sum;</span><br><span class="line">&#125; max_subarray;</span><br><span class="line"></span><br><span class="line"><span class="function">max_subarray <span class="title">find_maximum_subarray</span><span class="params">(<span class="keyword">int</span> A[], <span class="keyword">unsigned</span> low, <span class="keyword">unsigned</span> high)</span> </span><br><span class="line"></span>&#123;</span><br><span class="line">    max_subarray suffixes[high - low];</span><br><span class="line"></span><br><span class="line">    suffixes[<span class="number">0</span>].left = low;</span><br><span class="line">    suffixes[<span class="number">0</span>].right = low + <span class="number">1</span>;</span><br><span class="line">    suffixes[<span class="number">0</span>].sum = A[low];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = low + <span class="number">1</span>; i &lt; high; i++) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (suffixes[i - <span class="number">1</span>].sum &lt; <span class="number">0</span>) </span><br><span class="line">        &#123;</span><br><span class="line">            suffixes[i].left = i;</span><br><span class="line">            suffixes[i].right = i + <span class="number">1</span>;</span><br><span class="line">            suffixes[i].sum = A[i];</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">        &#123;</span><br><span class="line">            max_subarray *previous = &amp;suffixes[i - <span class="number">1</span>];</span><br><span class="line">            suffixes[i].left = previous-&gt;left;</span><br><span class="line">            suffixes[i].right = i + <span class="number">1</span>;</span><br><span class="line">            suffixes[i].sum = previous-&gt;sum + A[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    max_subarray *max = &amp;suffixes[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = low + <span class="number">1</span>; i &lt; high; i++) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (max-&gt;sum &lt; suffixes[i].sum) </span><br><span class="line">        &#123;</span><br><span class="line">            max = &amp;suffixes[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> *max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">typedef struct 
+{
+    unsigned left;
+    unsigned right;
+    int sum;
+} max_subarray;
+
+max_subarray find_maximum_subarray(int A[], unsigned low, unsigned high) 
+{
+    max_subarray suffixes[high - low];
+
+    suffixes[0].left = low;
+    suffixes[0].right = low + 1;
+    suffixes[0].sum = A[low];
+
+    for (int i = low + 1; i &lt; high; i++) 
+    {
+        if (suffixes[i - 1].sum &lt; 0) 
+        {
+            suffixes[i].left = i;
+            suffixes[i].right = i + 1;
+            suffixes[i].sum = A[i];
+        } 
+        else 
+        {
+            max_subarray *previous = &amp;suffixes[i - 1];
+            suffixes[i].left = previous-&gt;left;
+            suffixes[i].right = i + 1;
+            suffixes[i].sum = previous-&gt;sum + A[i];
+        }
+    }
+
+    max_subarray *max = &amp;suffixes[0];
+
+    for (int i = low + 1; i &lt; high; i++) 
+    {
+        if (max-&gt;sum &lt; suffixes[i].sum) 
+        {
+            max = &amp;suffixes[i];
+        }
+    }
+
+    return *max;
+}
+</code></pre>
 <p>这段代码中一共需要对数组遍历两次，但是每次迭代过程中运行的代码也相对更少一些，与<code>C++</code>版本相比，在时间效率上相差不大，对于全正数序列，这段<code>C</code>代码相对要快一点，而如果是一个全负数序列，上面的<code>C++</code>版本运行应该更快，而其它情况下，则需要视实际序列情况而定，但总的来说，差别不大。而在空间复杂度上，<code>C</code>版本的代码很明显通常就需要更多的空间了，因为在第十行声明了一个长度等于<code>n</code>（==<code>high-low</code>）、大小为<code>sizeof(max_subarray) * n</code>的数组，相比而言，<code>C++</code>版本中总共只使用了大约<code>7 * sizeof(int)</code>字节的空间。</p>
 <blockquote>
 <p>除此之外，这段C代码由于使用了不定长数组语法，因此需要能支持<code>C99</code>标准的编译器来进行编译，当然，这在现在基本不是问题，只不过目前很多编译器即使支持部分或完整的<code>C99</code>标准，但默认编译选项依然是使用<code>C89</code>（<code>ISO C</code>/<code>ANSI C</code>）标准，需要注意查看。</p>
@@ -261,7 +413,7 @@
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
@@ -271,7 +423,7 @@
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
@@ -300,7 +452,7 @@
 		  
 		
 		  
-			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -321,7 +473,7 @@
 			
 		
 			
-				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -341,7 +493,15 @@
 			
 		
 			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -379,7 +539,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -466,10 +626,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -481,18 +659,18 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
 });
 </script>
 
@@ -633,6 +811,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
   </body>
 </html>

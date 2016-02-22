@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://3meng.github.io/2015/03/21/hello-world/index.html">
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="第一篇博文，不知道该写个什么名字最好，干脆就保持默认的标题Hello World吧，这也算是学计算机软件的一个启蒙标志吧。">
-<meta property="og:updated_time" content="2015-12-08T12:24:34.000Z">
+<meta property="og:updated_time" content="2016-02-22T15:04:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hello World">
 <meta name="twitter:description" content="第一篇博文，不知道该写个什么名字最好，干脆就保持默认的标题Hello World吧，这也算是学计算机软件的一个启蒙标志吧。">
@@ -33,6 +33,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
   <body>
@@ -108,9 +114,31 @@
 </blockquote>
 <h2 id="u5F00_u59CB_u4F7F_u7528"><a href="#u5F00_u59CB_u4F7F_u7528" class="headerlink" title="开始使用"></a>开始使用</h2><h3 id="Markdown"><a href="#Markdown" class="headerlink" title="Markdown"></a>Markdown</h3><p><code>hexo</code>使用命令行创建文章，但其实也就是一个<code>.md</code>文件，而在这之前，其实我从来没使用过<code>Markdown</code>语法来写东西，所以在大概了解完<code>hexo</code>基本知识之后，又开始学习<code>Markdown</code>文件的常用规则，从网络上找到了一篇比较详细的说明，具体可以自己进去看看：<a href="http://wowubuntu.com/markdown/" target="_blank" rel="external">Markdown语法</a>。而编辑<code>Markdown</code>文件我一般是用<code>Notepad++</code>，没有使用网上传说的神器<code>Sublime</code>，因为习惯了。</p>
 <h3 id="u5176_u5B83"><a href="#u5176_u5B83" class="headerlink" title="其它"></a>其它</h3><p>最近也没有更多的时间来学习关于<code>hexo</code>的更多东西了，所以有很多内容都只能等过一阵子闲下来了才能开始继续。主要在于博客的完善与自定义上。</p>
-<h2 id="u5B8C_u5584"><a href="#u5B8C_u5584" class="headerlink" title="完善"></a>完善</h2><h3 id="u4EE3_u7801_u9AD8_u4EAE"><a href="#u4EE3_u7801_u9AD8_u4EAE" class="headerlink" title="代码高亮"></a>代码高亮</h3><p>代码高亮是肯定要弄的，虽然<code>hexo</code>自带了有高亮功能，但是支持的太有限了，特别对.Net这一块，几乎没有支持，所以需要自己去寻找新的方案。<br>下面同样一段代码，作为C#标记时全然见不到高亮效果，甚至连行号都出错了……</p>
-<p>[C#]<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class Class&#10;&#123;&#10;&#9;private int _index;&#10;&#9;public Class(int index) &#10;&#9;&#123;&#10;&#9;&#9;this._index = index;&#10;&#9;&#125;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>[Java]<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Class</span></span><br><span class="line"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> _index;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Class</span><span class="params">(<span class="keyword">int</span> index)</span> </span><br><span class="line">	</span>&#123;</span><br><span class="line">		<span class="keyword">this</span>._index = index;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="u5B8C_u5584"><a href="#u5B8C_u5584" class="headerlink" title="完善"></a>完善</h2><h3 id="u4EE3_u7801_u9AD8_u4EAE"><a href="#u4EE3_u7801_u9AD8_u4EAE" class="headerlink" title="代码高亮"></a>代码高亮</h3><p>代码高亮是肯定要弄的，虽然<code>hexo</code>自带了有高亮功能，但是支持的太有限了，<del>特别对.Net这一块，几乎没有支持</del>，所以需要自己去寻找新的方案。</p>
+<blockquote>
+<p>之前未曾过多了解<code>Hexo</code>以及一般代码高亮的约定。有关代码高亮的更改可以参见文章<strong>自定义Hexo主题</strong></p>
+</blockquote>
+<p><del>下面同样一段代码，作为C#标记时全然见不到高亮效果，甚至连行号都出错了</del>……</p>
+<p>[C#]</p>
+<pre><code class="csharp">public class Class
+{
+    private int _index;
+    public Class(int index) 
+    {
+        this._index = index;
+    }
+}
+</code></pre>
+<p>[Java]</p>
+<pre><code class="java">public class Class
+{
+    private int _index;
+    public Class(int index) 
+    {
+        this._index = index;
+    }
+}
+</code></pre>
 <h3 id="u5E03_u5C40_u3001_u4E3B_u9898"><a href="#u5E03_u5C40_u3001_u4E3B_u9898" class="headerlink" title="布局、主题"></a>布局、主题</h3><p><code>hexo</code>有很多主题可选，我当前使用的是一个名叫<code>Jacman</code>的主题，大概框架很符合我的要求，不过具体细节有些还是需要调整，具体到<code>_config.yml</code>文件还有很多东西没有测试呢。</p>
 <h3 id="u5176_u5B83-1"><a href="#u5176_u5B83-1" class="headerlink" title="其它"></a>其它</h3><p>其实还有很多东西需要完善，仅仅看网上一个介绍<code>hexo</code>的文章，后面都是介绍统计功能和评论框的，而这两个我也考虑有时间加进来，其中统计其实<code>Jacman</code>默认是提供了代码的，只需要在<code>_config.yml</code>文件中配置相应的统计跟踪ID即可，百度统计还需要单独注册账号，所以目前我是用的<code>Google Analytics</code>，只能但愿一般时候不要被墙。。。（话说我昨天一天都无法进入Google Analytics，挂代理都打不开了）。评论框和其它的优化等有时间在弄了。</p>
 <h2 id="u5199_u5728_u6700_u540E"><a href="#u5199_u5728_u6700_u540E" class="headerlink" title="写在最后"></a>写在最后</h2><p>断断续续的用了几个夜晚，终于大概配置完了，中间走了一些弯路，比如主题一块，一开始我是慢慢从默认的那个主题<code>landscape</code>上摸索修改的，后来发现是在太慢了，只能简单的修改一些内容，要想配置好估计得将整个主题全部文件关联都弄清楚，于是尝试了一下<code>GitHub</code>上的<code>hexo</code>主题，发现也很不错的，而有了前面的经验，修改这个主题也要快多了。</p>
@@ -168,7 +196,7 @@
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
@@ -178,7 +206,7 @@
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
@@ -207,7 +235,7 @@
 		  
 		
 		  
-			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -228,7 +256,7 @@
 			
 		
 			
-				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -248,7 +276,15 @@
 			
 		
 			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -286,7 +322,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -373,10 +409,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -388,18 +442,18 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
 });
 </script>
 
@@ -540,6 +594,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
   </body>
 </html>

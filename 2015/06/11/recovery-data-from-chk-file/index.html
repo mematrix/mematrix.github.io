@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://3meng.github.io/2015/06/11/recovery-data-from-chk-file/index.html">
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="在使用电脑的过程中，总会遇到各种各样的故障，导致电脑非正常关机，或者由于其它的原因，最终使得磁盘某些文件（夹）存储出现错误。一般表现为文件夹无法访问，或者是在资源管理器中看不到对应文件或文件夹（而实际上这些文件还是可访问），这时候我们就需要想办法将这些数据恢复到正常状态或者从磁盘中删除了，因为虽然你无法通过资源管理器或者一般应用去访问这些数据，但是它们其实还是被存储在磁盘中某一个区域，仍然占据着磁">
-<meta property="og:updated_time" content="2015-12-08T12:21:24.000Z">
+<meta property="og:updated_time" content="2016-02-22T14:32:14.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从CHK文件中恢复数据">
 <meta name="twitter:description" content="在使用电脑的过程中，总会遇到各种各样的故障，导致电脑非正常关机，或者由于其它的原因，最终使得磁盘某些文件（夹）存储出现错误。一般表现为文件夹无法访问，或者是在资源管理器中看不到对应文件或文件夹（而实际上这些文件还是可访问），这时候我们就需要想办法将这些数据恢复到正常状态或者从磁盘中删除了，因为虽然你无法通过资源管理器或者一般应用去访问这些数据，但是它们其实还是被存储在磁盘中某一个区域，仍然占据着磁">
@@ -33,6 +33,12 @@
     <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
 </head>
 
   <body>
@@ -97,19 +103,107 @@
 		
 		</div>
 		
-		<p>在使用电脑的过程中，总会遇到各种各样的故障，导致电脑非正常关机，或者由于其它的原因，最终使得磁盘某些文件（夹）存储出现错误。一般表现为文件夹无法访问，或者是在资源管理器中看不到对应文件或文件夹（而实际上这些文件还是可访问），这时候我们就需要想办法将这些数据恢复到正常状态或者从磁盘中删除了，因为虽然你无法通过资源管理器或者一般应用去访问这些数据，但是它们其实还是被存储在磁盘中某一个区域，仍然占据着磁盘空间。<br><a id="more"></a></p>
+		<p>在使用电脑的过程中，总会遇到各种各样的故障，导致电脑非正常关机，或者由于其它的原因，最终使得磁盘某些文件（夹）存储出现错误。一般表现为文件夹无法访问，或者是在资源管理器中看不到对应文件或文件夹（而实际上这些文件还是可访问），这时候我们就需要想办法将这些数据恢复到正常状态或者从磁盘中删除了，因为虽然你无法通过资源管理器或者一般应用去访问这些数据，但是它们其实还是被存储在磁盘中某一个区域，仍然占据着磁盘空间。</p>
+<a id="more"></a>
 <h2 id="u8D77_u56E0"><a href="#u8D77_u56E0" class="headerlink" title="起因"></a>起因</h2><p>前一阵子电脑偶尔出现开机黑屏或者运行时死机的现象，没办法，都是直接长按电源键直接关机了（这里顺便提一下，如果你在碰倒电脑无反应需要强制关机的时候，建议等一等，看一看这个时候硬盘灯是不是亮着，如果亮着，请尽量等待它熄了之后在强关。当然，如果没有硬盘指示灯的就没办法了，可以试着听一下声音看硬盘是否正在被访问），而就在不久前一次开机，就突然发现一个绿色小软件打不开了，提示无法找到路径（桌面快捷方式打开的），于是进资源管理器一看，文件夹还在，但是双击就提示“文件或目录已损坏且无法读取，请运行chkdsk工具修复”，对该文件夹也无法进行任何操作，包括改名删除等。</p>
-<p>于是上网搜了一下，大概就是说磁盘文件目录出错，按照提示用<code>chkdsk</code>命令修复就行了。那么首先就是用管理员权限运行命令提示符（<code>cmd</code>），然后可以输入<code>chkdsk /?</code>来查看这个命令的帮助以及参数：<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Microsoft Windows [版本 <span class="number">6</span>.<span class="number">3</span>.<span class="number">9600</span>]</span><br><span class="line">(c) <span class="number">2013</span> Microsoft Corporation。保留所有权利。</span><br><span class="line"><span class="function"></span><br><span class="line">C:\<span class="title">Windows</span>\<span class="title">system32</span>&gt;<span class="title">chkdsk</span> /?</span><br><span class="line">检查磁盘并显示状态报告。</span><br><span class="line"></span><br><span class="line"><span class="title">CHKDSK</span> [<span class="title">volume</span>[[<span class="title">path</span>]<span class="title">filename</span>]]] [/<span class="title">F</span>] [/<span class="title">V</span>] [/<span class="title">R</span>] [/<span class="title">X</span>] [/<span class="title">I</span>] [/<span class="title">C</span>] [/<span class="title">L</span>[:<span class="title">size</span>]] [/<span class="title">B</span>] [/<span class="title">scan</span>] [/<span class="title">spotfix</span>]</span><br><span class="line"></span><br><span class="line">  <span class="title">volume</span>          指定驱动器号(后面跟一个冒号)、</span><br><span class="line">                  装入点或卷名。</span><br><span class="line">  <span class="title">filename</span>        仅 <span class="title">FAT</span>/<span class="title">FAT32</span>: 指定要检查</span><br><span class="line">                  碎片的文件。</span><br><span class="line">  /<span class="title">F</span>              修复磁盘上的错误。</span><br><span class="line">  /<span class="title">R</span>              查找坏扇区并恢复可读信息</span><br><span class="line">                  (未指定 /<span class="title">scan</span> 时，隐含 /<span class="title">F</span>)。</span><br><span class="line">  /<span class="title">X</span>              如果必要，则先强制卸除卷。</span><br><span class="line">                  该卷的所有打开的句柄都将无效</span><br><span class="line">                  (隐含 /<span class="title">F</span>)。</span><br><span class="line">  /<span class="title">scan</span>           仅 <span class="title">NTFS</span>: 在卷上运行联机扫描</span><br><span class="line">  /<span class="title">offlinescanandfix</span>  在卷上运行脱机扫描并进行修复。</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">/<span class="title">I</span> 或 /<span class="title">C</span> 开关通过跳过对卷的某些检查，</span><br><span class="line">来减少运行 <span class="title">Chkdsk</span> 所需的时间长度。</span></span><br></pre></td></tr></table></figure></p>
-<p>因为我的受损的文件存储在D盘，所以直接输入<code>chkdsk D: /R</code>，这是如果被检查的盘上有文件正在被使用，就会提示是否强制卸载该卷（y/n），一般选择n，然后就会提示是否创建计划任务，在下次开机时运行检查，这时可以选择是，然后重启就会开始进行检查。</p>
+<p>于是上网搜了一下，大概就是说磁盘文件目录出错，按照提示用<code>chkdsk</code>命令修复就行了。那么首先就是用管理员权限运行命令提示符（<code>cmd</code>），然后可以输入<code>chkdsk /?</code>来查看这个命令的帮助以及参数：</p>
+<pre><code>Microsoft Windows [版本 6.3.9600]
+(c) 2013 Microsoft Corporation。保留所有权利。
+
+C:\Windows\system32&gt;chkdsk /?
+检查磁盘并显示状态报告。
+
+CHKDSK [volume[[path]filename]]] [/F] [/V] [/R] [/X] [/I] [/C] [/L[:size]] [/B] [/scan] [/spotfix]
+
+  volume          指定驱动器号(后面跟一个冒号)、
+                  装入点或卷名。
+  filename        仅 FAT/FAT32: 指定要检查
+                  碎片的文件。
+  /F              修复磁盘上的错误。
+  /R              查找坏扇区并恢复可读信息
+                  (未指定 /scan 时，隐含 /F)。
+  /X              如果必要，则先强制卸除卷。
+                  该卷的所有打开的句柄都将无效
+                  (隐含 /F)。
+  /scan           仅 NTFS: 在卷上运行联机扫描
+  /offlinescanandfix  在卷上运行脱机扫描并进行修复。
+  ...
+
+/I 或 /C 开关通过跳过对卷的某些检查，
+来减少运行 Chkdsk 所需的时间长度。
+</code></pre><p>因为我的受损的文件存储在D盘，所以直接输入<code>chkdsk D: /R</code>，这是如果被检查的盘上有文件正在被使用，就会提示是否强制卸载该卷（y/n），一般选择n，然后就会提示是否创建计划任务，在下次开机时运行检查，这时可以选择是，然后重启就会开始进行检查。</p>
 <p>当重启进入系统后，可以发现损坏的目录已经消失了，然后我就去重新下载了那个软件，放到原来的路径下，就继续开始使用了。本以为一切就此结束，但是今天却在用另外一个软件（也是在D盘）的时候发现了问题。</p>
 <h2 id="CHK_u6587_u4EF6"><a href="#CHK_u6587_u4EF6" class="headerlink" title="CHK文件"></a>CHK文件</h2><p>由于突然想来亲自验证一下C++中<code>static</code>成员变量的初始化顺序，以便确定前几天所想的适用于多线程环境中的单实例类是否能正确运行，于是从桌面快捷方式直接启动<em>CodeBlocks</em>，结果进入之后右下角提示在指定的位置找不到编译器。</p>
 <p>于是在桌面右键程序图标查看快捷方式属性，结果突然提示快捷方式起始位置不存在，然后就发现快捷方式中<strong>目标</strong>属性指向了地址<code>D:\found.000\dir0000.chk\codeblocks.exe</code>，而<strong>起始位置</strong>属性则是指向了<code>D:\Program Files(x86)\Codeblocks</code>；于是进入资源管理器，D盘根目录下找不到<em>found.000</em>文件夹，而<em>Program Files(x86)</em>目录下也没有<em>CodeBlocks</em>文件夹…没办法，只有从任务管理器进入进程所在目录了，结果提示文件夹无法访问，在地址栏输入路径也是一样的结果。</p>
 <p>但是明明通过快捷方式是可以打开程序的，这说明程序文件夹依然完好无损，而且在<em>CodeBlocks</em>编译器设置中通过点击自动设置编译器所在目录，编译器也可以正常启动运行了，此时在设置中可以看到设置的编译器位置为<code>D:\found.000\dir0000.chk\MinGW\bin</code>，也说明这个路径是存在的，只是我们需要一些特殊的方法进去了。</p>
 <p>首先在网上搜索了一下CHK文件，结果显示这是Windows磁盘修复时创建的文件，描述为“恢复的文件碎片”，也就是当Windows进行磁盘修复时检测到出现错误的文件或文件夹，会在当前磁盘根目录下创建<em>found.000</em>、<em>found.001</em>等文件夹保存这些恢复的文件，所以通过将这个文件夹中的东西恢复，就可以找回丢失的数据了，当然，不一定全部且正确。</p>
-<h2 id="u6062_u590D_u6587_u4EF6"><a href="#u6062_u590D_u6587_u4EF6" class="headerlink" title="恢复文件"></a>恢复文件</h2><p>那么接下来依然是<code>CMD</code>了，使用管理员权限启动，尝试通过<code>cd</code>命令进入<em>found.000</em>文件夹，居然成功了，那么看起来似乎可行。然后通过<code>dir</code>命令查看这个文件夹下面的所有文件和文件夹信息，结果没有看到<em>dir0000.chk</em>目录，于是查看<code>dir</code>命令帮助：<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Microsoft Windows [版本 <span class="number">6</span>.<span class="number">3</span>.<span class="number">9600</span>]</span><br><span class="line">(c) <span class="number">2013</span> Microsoft Corporation。保留所有权利。</span><br><span class="line"><span class="function"></span><br><span class="line">C:\<span class="title">Windows</span>\<span class="title">system32</span>&gt;<span class="title">dir</span> /?</span><br><span class="line">显示目录中的文件和子目录列表。</span><br><span class="line"></span><br><span class="line"><span class="title">DIR</span> [<span class="title">drive</span>:][<span class="title">path</span>][<span class="title">filename</span>] [/<span class="title">A</span>[[:]<span class="title">attributes</span>]] [/<span class="title">B</span>] [/<span class="title">C</span>] [/<span class="title">D</span>] [/<span class="title">L</span>] [/<span class="title">N</span>]</span><br><span class="line">  [/<span class="title">O</span>[[:]<span class="title">sortorder</span>]] [/<span class="title">P</span>] [/<span class="title">Q</span>] [/<span class="title">R</span>] [/<span class="title">S</span>] [/<span class="title">T</span>[[:]<span class="title">timefield</span>]] [/<span class="title">W</span>] [/<span class="title">X</span>] [/4]</span><br><span class="line"></span><br><span class="line">  [<span class="title">drive</span>:][<span class="title">path</span>][<span class="title">filename</span>]</span><br><span class="line">              指定要列出的驱动器、目录和/或文件。</span><br><span class="line"></span><br><span class="line">  /<span class="title">A</span>          显示具有指定属性的文件。</span><br><span class="line">  属性         <span class="title">D</span>  目录                <span class="title">R</span>  只读文件</span><br><span class="line">               <span class="title">H</span>  隐藏文件            <span class="title">A</span>  准备存档的文件</span><br><span class="line">               <span class="title">S</span>  系统文件            <span class="title">I</span>  无内容索引文件</span><br><span class="line">               <span class="title">L</span>  解析点             -  表示“否”的前缀</span><br><span class="line">  /<span class="title">S</span>          显示指定目录和所有子目录中的文件。</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">可以在 <span class="title">DIRCMD</span> 环境变量中预先设定开关。通过添加前缀 - (破折号)</span><br><span class="line">来替代预先设定的开关。例如，/-<span class="title">W</span>。</span></span><br></pre></td></tr></table></figure></p>
-<p>于是使用<code>dir . /A:H</code>，<em>dir0000.chk</em>目录就可以看到了，当然即使看不到我们也可以使用<code>cd dir0000.chk</code>命令直接进入，这里之所以显示全部文件，是为了看看到底有多少CHK文件。那么接下来就该想办法把文件夹从这里面原样复制出去了，毕竟我们通过资源管理器没办法访问到这里，由于这是一个目录，那么就不能通过<code>copy</code>命令了，这里我们使用<code>copy</code>命令的增强版<code>xcopy</code>命令：<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Microsoft Windows [版本 <span class="number">6</span>.<span class="number">3</span>.<span class="number">9600</span>]</span><br><span class="line">(c) <span class="number">2013</span> Microsoft Corporation。保留所有权利。</span><br><span class="line"><span class="function"></span><br><span class="line">C:\<span class="title">Windows</span>\<span class="title">system32</span>&gt;<span class="title">xcopy</span> /?</span><br><span class="line">复制文件和目录树。</span><br><span class="line"></span><br><span class="line"><span class="title">XCOPY</span> <span class="title">source</span> [<span class="title">destination</span>] [/<span class="title">A</span> | /<span class="title">M</span>] [/<span class="title">D</span>[:<span class="title">date</span>]] [/<span class="title">P</span>] [/<span class="title">S</span> [/<span class="title">E</span>]] [/<span class="title">V</span>] [/<span class="title">W</span>]</span><br><span class="line">                           [/<span class="title">C</span>] [/<span class="title">I</span>] [/<span class="title">Q</span>] [/<span class="title">F</span>] [/<span class="title">L</span>] [/<span class="title">G</span>] [/<span class="title">H</span>] [/<span class="title">R</span>] [/<span class="title">T</span>] [/<span class="title">U</span>]</span><br><span class="line">                           [/<span class="title">K</span>] [/<span class="title">N</span>] [/<span class="title">O</span>] [/<span class="title">X</span>] [/<span class="title">Y</span>] [/-<span class="title">Y</span>] [/<span class="title">Z</span>] [/<span class="title">B</span>] [/<span class="title">J</span>]</span><br><span class="line">                           [/<span class="title">EXCLUDE:file1</span>[+<span class="title">file2</span>][+<span class="title">file3</span>]...]</span><br><span class="line"></span><br><span class="line">  <span class="title">source</span>       指定要复制的文件。</span><br><span class="line">  <span class="title">destination</span>  指定新文件的位置和/或名称。</span><br><span class="line">  /<span class="title">S</span>           复制目录和子目录，不包括空目录。</span><br><span class="line">  /<span class="title">E</span>           复制目录和子目录，包括空目录。</span><br><span class="line">               与 /<span class="title">S</span> /<span class="title">E</span> 相同。可以用来修改 /<span class="title">T</span>。</span><br><span class="line">  /<span class="title">C</span>           即使有错误，也继续复制。</span><br><span class="line">  /<span class="title">G</span>           允许将加密文件复制到</span><br><span class="line">               不支持加密的目标。</span><br><span class="line">  /<span class="title">H</span>           也复制隐藏文件和系统文件。</span><br><span class="line">  /<span class="title">K</span>           复制属性。一般的 <span class="title">Xcopy</span> 会重置只读属性。</span><br><span class="line">  /<span class="title">O</span>           复制文件所有权和 <span class="title">ACL</span> 信息。</span><br><span class="line">  /<span class="title">X</span>           复制文件审核设置(隐含 /<span class="title">O</span>)。</span><br><span class="line">  /<span class="title">J</span>           复制时不使用缓冲的 <span class="title">I</span>/<span class="title">O</span>。推荐复制大文件时使用。</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">开关 /<span class="title">Y</span> 可以预先在 <span class="title">COPYCMD</span> 环境变量中设置。</span><br><span class="line">这可能被命令行上的 /-<span class="title">Y</span> 覆盖。</span></span><br></pre></td></tr></table></figure></p>
-<p>在这里，最好将目录中的所有文件和目录结构都复制出去，而且能保持文件属性是最好的，因此在<em>D:\found.000</em>目录下执行命令<code>xcopy dir0000.chk E:\temp /H /K</code>尝试复制所有文件及目录，其中<em>E:\temp</em>是选择的临时存放位置；复制完成后，经过测试，文件没有损坏，可以正常运行，于是删除<em>D:\found.000\dir0000.chk</em>文件夹，执行<code>rd</code>命令即可：<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Microsoft Windows [版本 <span class="number">6</span>.<span class="number">3</span>.<span class="number">9600</span>]</span><br><span class="line">(c) <span class="number">2013</span> Microsoft Corporation。保留所有权利。</span><br><span class="line"><span class="function"></span><br><span class="line">C:\<span class="title">Windows</span>\<span class="title">system32</span>&gt;<span class="title">rd</span> /?</span><br><span class="line">删除一个目录。</span><br><span class="line"></span><br><span class="line"><span class="title">RMDIR</span> [/<span class="title">S</span>] [/<span class="title">Q</span>] [<span class="title">drive</span>:]<span class="title">path</span></span><br><span class="line"><span class="title">RD</span> [/<span class="title">S</span>] [/<span class="title">Q</span>] [<span class="title">drive</span>:]<span class="title">path</span></span><br><span class="line"></span><br><span class="line">    /<span class="title">S</span>      除目录本身外，还将删除指定目录下的所有子目录和</span><br><span class="line">            文件。用于删除目录树。</span><br><span class="line"></span><br><span class="line">    /<span class="title">Q</span>      安静模式，带 /<span class="title">S</span> 删除目录树时不要求确认</span></span><br></pre></td></tr></table></figure></p>
-<p>在目录<em>D:\found.000</em> 下输入<code>rd dir0000.chk /s</code>即可。</p>
+<h2 id="u6062_u590D_u6587_u4EF6"><a href="#u6062_u590D_u6587_u4EF6" class="headerlink" title="恢复文件"></a>恢复文件</h2><p>那么接下来依然是<code>CMD</code>了，使用管理员权限启动，尝试通过<code>cd</code>命令进入<em>found.000</em>文件夹，居然成功了，那么看起来似乎可行。然后通过<code>dir</code>命令查看这个文件夹下面的所有文件和文件夹信息，结果没有看到<em>dir0000.chk</em>目录，于是查看<code>dir</code>命令帮助：</p>
+<pre><code>Microsoft Windows [版本 6.3.9600]
+(c) 2013 Microsoft Corporation。保留所有权利。
+
+C:\Windows\system32&gt;dir /?
+显示目录中的文件和子目录列表。
+
+DIR [drive:][path][filename] [/A[[:]attributes]] [/B] [/C] [/D] [/L] [/N]
+  [/O[[:]sortorder]] [/P] [/Q] [/R] [/S] [/T[[:]timefield]] [/W] [/X] [/4]
+
+  [drive:][path][filename]
+              指定要列出的驱动器、目录和/或文件。
+
+  /A          显示具有指定属性的文件。
+  属性         D  目录                R  只读文件
+               H  隐藏文件            A  准备存档的文件
+               S  系统文件            I  无内容索引文件
+               L  解析点             -  表示“否”的前缀
+  /S          显示指定目录和所有子目录中的文件。
+  ...
+
+可以在 DIRCMD 环境变量中预先设定开关。通过添加前缀 - (破折号)
+来替代预先设定的开关。例如，/-W。
+</code></pre><p>于是使用<code>dir . /A:H</code>，<em>dir0000.chk</em>目录就可以看到了，当然即使看不到我们也可以使用<code>cd dir0000.chk</code>命令直接进入，这里之所以显示全部文件，是为了看看到底有多少CHK文件。那么接下来就该想办法把文件夹从这里面原样复制出去了，毕竟我们通过资源管理器没办法访问到这里，由于这是一个目录，那么就不能通过<code>copy</code>命令了，这里我们使用<code>copy</code>命令的增强版<code>xcopy</code>命令：</p>
+<pre><code>Microsoft Windows [版本 6.3.9600]
+(c) 2013 Microsoft Corporation。保留所有权利。
+
+C:\Windows\system32&gt;xcopy /?
+复制文件和目录树。
+
+XCOPY source [destination] [/A | /M] [/D[:date]] [/P] [/S [/E]] [/V] [/W]
+                           [/C] [/I] [/Q] [/F] [/L] [/G] [/H] [/R] [/T] [/U]
+                           [/K] [/N] [/O] [/X] [/Y] [/-Y] [/Z] [/B] [/J]
+                           [/EXCLUDE:file1[+file2][+file3]...]
+
+  source       指定要复制的文件。
+  destination  指定新文件的位置和/或名称。
+  /S           复制目录和子目录，不包括空目录。
+  /E           复制目录和子目录，包括空目录。
+               与 /S /E 相同。可以用来修改 /T。
+  /C           即使有错误，也继续复制。
+  /G           允许将加密文件复制到
+               不支持加密的目标。
+  /H           也复制隐藏文件和系统文件。
+  /K           复制属性。一般的 Xcopy 会重置只读属性。
+  /O           复制文件所有权和 ACL 信息。
+  /X           复制文件审核设置(隐含 /O)。
+  /J           复制时不使用缓冲的 I/O。推荐复制大文件时使用。
+  ...
+
+开关 /Y 可以预先在 COPYCMD 环境变量中设置。
+这可能被命令行上的 /-Y 覆盖。
+</code></pre><p>在这里，最好将目录中的所有文件和目录结构都复制出去，而且能保持文件属性是最好的，因此在<em>D:\found.000</em>目录下执行命令<code>xcopy dir0000.chk E:\temp /H /K</code>尝试复制所有文件及目录，其中<em>E:\temp</em>是选择的临时存放位置；复制完成后，经过测试，文件没有损坏，可以正常运行，于是删除<em>D:\found.000\dir0000.chk</em>文件夹，执行<code>rd</code>命令即可：</p>
+<pre><code>Microsoft Windows [版本 6.3.9600]
+(c) 2013 Microsoft Corporation。保留所有权利。
+
+C:\Windows\system32&gt;rd /?
+删除一个目录。
+
+RMDIR [/S] [/Q] [drive:]path
+RD [/S] [/Q] [drive:]path
+
+    /S      除目录本身外，还将删除指定目录下的所有子目录和
+            文件。用于删除目录树。
+
+    /Q      安静模式，带 /S 删除目录树时不要求确认
+</code></pre><p>在目录<em>D:\found.000</em> 下输入<code>rd dir0000.chk /s</code>即可。</p>
 <h2 id="u5176_u5B83"><a href="#u5176_u5B83" class="headerlink" title="其它"></a>其它</h2><p>当然，在<code>found.000</code>目录中不一定只有一个文件夹或文件（这里如果丢失的文件属于目录，那么会被命名为<code>dir0000.chk</code>、<code>dir0001.chk</code>…如果不是目录，那么会被命名为<code>file0000.chk</code>、<code>file0001.chk</code>…），具体情况视磁盘错误情况而定，而一般情况下我们可以按照上面的步骤配合使用<code>dir</code>、<code>cd</code>、<code>xcopy</code>等命令将文件夹恢复，然后根据文件夹内容来确定这个文件夹的本来名称；但是对于文件则比较麻烦，如果不是比较重要的文件，或者文件数目不多且大概可以确定文件类型，也可以按照上面的方法，只是最后使用<code>copy</code>命令复制文件即可，但是复制出来的文件是<em>.CHK</em>类型，所以需要手动修改回本来的扩展名，这里也可以借助网上的一些工具来判断文件类型并自动修改。</p>
 <p>当文件都恢复之后，便可以删除<code>found.xxx</code>文件夹了。</p>
 <p>最后，如果你想在资源管理器中浏览查看有无类似<code>found.000</code>文件夹，可以进入文件夹选项中取消“隐藏受保护的操作系统文件”选项前的对勾。</p>
@@ -175,7 +269,7 @@
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
@@ -185,7 +279,7 @@
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
@@ -214,7 +308,7 @@
 		  
 		
 		  
-			<li><a href="/categories/随笔/" title="随笔">随笔<sup>4</sup></a></li>
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
 		  
 		
 		</ul>
@@ -235,7 +329,7 @@
 			
 		
 			
-				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -255,7 +349,15 @@
 			
 		
 			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -293,7 +395,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -380,10 +482,28 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
       $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
     }else
     {
       m.removeClass('moveMain');
@@ -395,18 +515,18 @@ $(document).ready(function(){
     }
   });
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
+    closeAside();
   });
   o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
+    openAside();
   });
   $(window).scroll(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
 });
 </script>
 
@@ -547,6 +667,11 @@ ga('send', 'pageview');
 
 
 <!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
 
   </body>
 </html>
