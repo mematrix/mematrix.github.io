@@ -1,0 +1,715 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Treap树 | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="下面的题目是《算法导论（第三版）》中红黑树一章的思考题13-4，主要介绍与分析了Treap树的一些知识和性质。本文也将以原题内容作为线索，通过证明和解答其中的问题，来说明Treap树的主要特点。
+有些问题也是比较棘手的，受限于个人能力，因此并无法保证所有证明过程的正确性，而在合适的时机，我将会给出社区讨论链接。
+
+原书中对部分地方配有图片描述，在这里，目前没有添加配图，如果有时间再行补上。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Treap树">
+<meta property="og:url" content="http://3meng.github.io/2016/02/24/Treap-tree/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="下面的题目是《算法导论（第三版）》中红黑树一章的思考题13-4，主要介绍与分析了Treap树的一些知识和性质。本文也将以原题内容作为线索，通过证明和解答其中的问题，来说明Treap树的主要特点。
+有些问题也是比较棘手的，受限于个人能力，因此并无法保证所有证明过程的正确性，而在合适的时机，我将会给出社区讨论链接。
+
+原书中对部分地方配有图片描述，在这里，目前没有添加配图，如果有时间再行补上。">
+<meta property="og:updated_time" content="2016-02-25T08:18:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Treap树">
+<meta name="twitter:description" content="下面的题目是《算法导论（第三版）》中红黑树一章的思考题13-4，主要介绍与分析了Treap树的一些知识和性质。本文也将以原题内容作为线索，通过证明和解答其中的问题，来说明Treap树的主要特点。
+有些问题也是比较棘手的，受限于个人能力，因此并无法保证所有证明过程的正确性，而在合适的时机，我将会给出社区讨论链接。
+
+原书中对部分地方配有图片描述，在这里，目前没有添加配图，如果有时间再行补上。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/24/Treap-tree/" title="Treap树" itemprop="url">Treap树</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-24T13:25:47.000Z" itemprop="datePublished"> 发表于 2016-02-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B9A_u4E49"><span class="toc-number">1.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u57FA_u7840_u6027_u8D28"><span class="toc-number">2.</span> <span class="toc-text">基础性质</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u63D2_u5165_u64CD_u4F5C"><span class="toc-number">3.</span> <span class="toc-text">插入操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F15_u7406_u5B9A_u4E49"><span class="toc-number">4.</span> <span class="toc-text">引理定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6027_u80FD_u5206_u6790"><span class="toc-number">5.</span> <span class="toc-text">性能分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u675F"><span class="toc-number">6.</span> <span class="toc-text">结束</span></a></li></ol>
+		
+		</div>
+		
+		<p>下面的题目是<strong>《算法导论（第三版）》</strong>中红黑树一章的思考题13-4，主要介绍与分析了<code>Treap树</code>的一些知识和性质。本文也将以原题内容作为线索，通过证明和解答其中的问题，来说明<code>Treap树</code>的主要特点。</p>
+<p>有些问题也是比较棘手的，受限于个人能力，因此并无法保证所有证明过程的正确性，而在合适的时机，我将会给出社区讨论链接。</p>
+<blockquote>
+<p>原书中对部分地方配有图片描述，在这里，目前没有添加配图，如果有时间再行补上。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="u5B9A_u4E49"><a href="#u5B9A_u4E49" class="headerlink" title="定义"></a>定义</h2><p>如果将一个含 <em>n</em> 个元素的集合插入到一棵二叉搜索树中，所得到的树可能会相当不平衡，从而导致查找时间很长。然而从<strong>12.4</strong>节（<strong>随机构建二叉搜索树</strong>）可知，随机构造二叉搜索树是趋向于平衡的。因此，一般来说，要为一组固定的元素建立一棵平衡树，可以采用的一种策略就是先随机排列这些元素，然后按照排列的顺序将它们插入到树中。</p>
+<p>如果没法同时得到所有的元素，应该怎样处理呢？如果一次收到一个元素，是否仍然能用它们来随机建立一棵二叉搜索树？</p>
+<p>我们将通过考察一个数据结构来正面回答这个问题。一棵<strong>treap树</strong>是一棵更改了结点排序方式的二叉搜索树。<del>图13-9显示了一个例子。</del>通常，树内的每个结点 <em>x</em> 都有一个关键字 <em>x.key</em>。另外，还要为每个结点指定 <em>x.priority</em>，它是一个独立选取的随机数。<strong>假设所有的优先级都是不同的，而且所有的关键字也是不同的。</strong> <strong>treap树</strong>的结点被排列成让关键字遵循二叉搜索树的性质，且优先级遵循最小堆顺序性质：</p>
+<ul>
+<li>如果 <em>v</em> 是 <em>u</em> 的左孩子，则 <em>v.key &lt; u.key</em>。</li>
+<li>如果 <em>v</em> 是 <em>u</em> 的右孩子，则 <em>v.key &gt; u.key</em>。</li>
+<li>如果 <em>v</em> 是 <em>u</em> 的孩子，则 <em>v.priority &gt; u.priority</em>。</li>
+</ul>
+<blockquote>
+<p>这两个性质的结合就是这种树被称为“treap”树的原因：它同时具有二叉搜索树和堆的特征。</p>
+</blockquote>
+<h2 id="u57FA_u7840_u6027_u8D28"><a href="#u57FA_u7840_u6027_u8D28" class="headerlink" title="基础性质"></a>基础性质</h2><p>用以下方式考虑<strong>treap树</strong>是会有帮助的。假设将已有相应关键字的结点 `x_1, x_2, …, x_n`插入到一棵<strong>treap树</strong>内。得到的<strong>treap树</strong>是通过将这些结点以它们的优先级（随机选取的）顺序插入一棵正常的二叉搜索树形成的，即 `x_i.prio rity &lt; x_j.prio rity`表示 `x_i`在`x_j`之前被插入。</p>
+<p><strong>a.</strong> 证明：给定一个已有相应关键字和优先级（互异）的结点`x_1, x_2, …, x_n`组成的集合，存在<strong>唯一</strong>的一棵treap树与这些结点相关联。</p>
+<p>这第一个问题很容易给出一个非形式化的描述来证明。我们根据<strong>treap树</strong>的定义可以知道，当给定了一个结点集合之后，那么二叉树的根节点肯定是这些结点之中<strong>优先级最小</strong>的那个结点（堆的性质），然后又可以按照二叉搜索树的要求，将剩余的元素分为两个部分，分别用于构建根节点的左右子树。概括来讲，给定一个结点的集合之后，我们可以通过下列步骤来构建起一个<strong>treap树</strong>：</p>
+<ol>
+<li>从元素集合里面选取<strong>优先级最小</strong>的那个元素（集合为空，则选择<code>nil</code>）；</li>
+<li>将剩余元素按照二叉搜索树要求方式分为两个部分，其中<strong>一部分所有元素均小于上面选择的元素，而另一部分则不小于</strong>；</li>
+<li>以上面获得的两部分元素作为集合，转到步骤1递归执行，并将子过程选择的元素分别作为当前选取元素的左右孩子。</li>
+</ol>
+<p>由于每次运行步骤1的时候，选择的元素是唯一的，因此从第一次执行开始，对于一个给定的集合，我们每次执行的结果都是一定的，所以最后得到的<strong>treap树</strong>也是唯一的。</p>
+<p><strong>b.</strong> 证明：treap树的期望高度是`Theta(lgn)`，因此在treap树内查找一个值所花的时间为`Theta(lgn)`。</p>
+<blockquote>
+<p>对于这一问题，我的答案最多只能作为参考思路，我并不确定解答过程的正确性。</p>
+</blockquote>
+<p>对于一个有 <em>n</em> 个元素的<strong>treap树</strong>，我们假设所有元素的关键字分别为 `k_1, k_2, …, k_n`，所有的优先级集合为 `p_1, p_2,…,p_n`，然后定义`A_(ij)`表示一个关键字为`k_j`、优先级为`p_i`的一个结点。因此一个 <em>n</em> 元素的<strong>treap树</strong>的高度 `h_n` 就是以结点 `A_(1j)` 为根的树的高度，并且我们可以知道根节点的两个子树分别有 `j-1` 和 `n-j` 个元素，其高度也可以表示为 `h_(j-1)` 和 `h_(n-j)`。因此，我们可以得到下面的表达式：</p>
+<p style="text-align: center"><br>  `h_n = MAX(h_(j-1), h_(n-j)) + 1,  1 &lt;= j &lt;= n`<br></p>
+
+<p>因此要计算`h_n`的期望，我们可以通过对 <em>j</em> 的所有取值所得结果取平均值，即：</p>
+<p style="text-align: center"><br>  `E(h_n) = 1/n sum_(j=1)^n MAX(h_(j-1), h_(n-j)) + 1`<br></p>
+
+<p>其中我们可以令`h_0 = 0`。</p>
+<p>使用代入法来证明。即我们需要证明：存在一个正数<strong>C</strong>，使得`h_n &lt;= Clgn`。在这里，我们假设对于上面的<strong>MAX</strong>方法，每次返回的均是第二个参数的值，那么我们可以得到：</p>
+<p style="text-align: center"><br>  `E(h_n) = 1/n sum_(j=0)^(n-1) h_j` <br><br>  `E(h_n) = 1/n sum_(j=1)^(n-1) Clgj` <br><br>  `E(h_n) = C/n lg(prod_(j=1)^(n-1))` <br><br>  `E(h_n) &lt;= C/n lg(n!)` <br><br>  `E(h_n) = C/n Theta(nlgn)` 因为`lg(n!) = Theta(nlgn)`<br></p>
+
+<p>所以可推出`E(h_n) &lt;= C/n * nlgn = Clgn`，同理也可推出期望值下限为`Omega(lgn)`。因此<strong>treap树</strong>的期望高度为`Theta(lgn)`。</p>
+<h2 id="u63D2_u5165_u64CD_u4F5C"><a href="#u63D2_u5165_u64CD_u4F5C" class="headerlink" title="插入操作"></a>插入操作</h2><p>让我们如何将一个新的结点插入到一个已存在的<strong>treap树</strong>中。要做的第一件事就是讲一个随机的优先级赋予这个新结点。然后调用成为<code>TREAT_INSERT</code>的插入算法，<del>其操作如图13-10所示。</del></p>
+<blockquote>
+<p>暂时没有配图，因此简述一下插入过程，当给定一个要插入的结点时，我们假设这个结点的关键字和优先级都已经设置好了，并且其左右孩子的值均为<code>nil</code>。</p>
+<p>首先我们按照二叉搜索树的插入过程，将结点插入到相应的位置，这个过程只考虑结点的关键字；然后接下来我们就要开始通过<strong>旋转</strong>操作来恢复<strong>treap树</strong>的堆性质了，这个过程只考虑结点的优先级即可。</p>
+</blockquote>
+<p><strong>c.</strong> 解释<code>TREAP_INSERT</code>是如何工作的。说明其思想并给出伪代码。（提示：执行通常的二叉搜索树插入过程，然后做旋转来恢复最小堆顺序的性质。）</p>
+<p>关于插入过程的工作概要已经在题目的提示以及上面的简述中说明了。之所以这么做可行，是因为<strong>treap树</strong>的关键字和优先级属性之间是独立的，相互之间并不存在影响，因此我们可以单独分别处理每一个属性。</p>
+<ol>
+<li><p>首先进行常规二叉搜索树的插入过程，也就是一次二叉树简单路径的搜索过程，最后将结点插入到某一个叶结点；</p>
+<blockquote>
+<p>这个时候，整个树的关键字集合已经满足二叉搜索树的性质了，但是优先级顺序不一定满足，因此我们需要通过<strong>旋转</strong>来恢复最小堆顺序的性质，因为<strong>旋转</strong>操作不改变二叉搜索树的性质；</p>
+</blockquote>
+</li>
+<li><p>接下来从被插入的结点开始，如果其优先级小于父结点的优先级，则说明最小堆顺序的性质被破坏，根据结点是父结点的左孩子还是右孩子，执行相应的右旋或者左旋操作，然后重复这一过程直到恢复最小堆顺序的性质。</p>
+</li>
+</ol>
+<p>伪代码：</p>
+<pre><code class="c++">TREAP_INSERT(T, z)
+    TREE_INSERT(T, z)   // 二叉搜索树的插入过程
+    while z.priority &lt; z.p.priority
+        if z == z.p.left
+            RIGHT_ROTATION(T, z.p)  // 右旋
+        else
+            LEFT_ROTATION(T, z.p)   // 左旋
+</code></pre>
+<p>这里我们不用考虑如果 <em>z</em> 为根节点的时候的边界情况，因为我们假设在树中引入了哨兵<code>T.nil</code>来代替<code>nil</code>值，因此根节点的父结点也就是<code>T.nil</code>，我们将其优先级设置为`-oo`，这样就可以使我们减少对边界条件的判断（这也是旋转过程的基本假设条件）。</p>
+<p><strong>d.</strong> 证明：<code>TREAP_INSERT</code>的期望运行时间是`Theta(lgn)`。</p>
+<p><strong>证明：</strong>首先，对于<code>TREE_INSERT</code>过程的调用期望运行时间为`Theta(lgn)`。</p>
+<p>然后我们可以分析第3到7行的<code>while</code>过程运行时间。第一次循环之前，<em>z</em> 是一个叶结点，最好情况下当然是循环过程一次都没有执行，此时这段代码的运行时间为`O(1)`；那么最坏情况呢？根据循环过程的代码，每次循环或者执行一次左旋、或者执行一次右旋操作，这两个操作都是常数级别的，并且操作结束之后，将会导致根节点到 <em>z</em> 的简单路径长度减一，因此我们很容易可以知道，最多经过 <em>z</em> 的初始高度的操作次数之后，循环将结束，而 <em>z</em> 的移动路径，也就是一条从根节点到 <em>z</em> 的简单路径，因此最坏情况下也就是 <em>z</em> 从叶结点一直移动到根节点，期望运行时间为`O(lgn)`。</p>
+<p>所以最后整个过程的期望运行时间为上面两个部分的运行时间之和，即`Theta(lgn)`。</p>
+<h2 id="u5F15_u7406_u5B9A_u4E49"><a href="#u5F15_u7406_u5B9A_u4E49" class="headerlink" title="引理定义"></a>引理定义</h2><p><code>TREAP_INSERT</code>先执行一个查找，然后做一系列旋转。虽然这两种操作的期望运行时间相同，但他们的实际代价不同。查找操作从<strong>treap树</strong>中读取信息而不做修改。相反，旋转操作会改变<strong>treap树</strong>内的父结点和子节点的指针。在大部分的计算机上，读取操作要比写入操作快很多。所以我们希望<code>TREAP_INSERT</code>执行少量的旋转。后面将说明所执行旋转的期望次数有一个常数界。</p>
+<p>为此，需要做一些定义，<del>如图13-11所示。</del>一棵二叉搜索树 <em>T</em> 的<strong>左脊柱</strong>（left spine）是从根节点到有最小关键字的结点的简单路径。换句话说，左脊柱是从根节点开始只包含左边缘的简单路径。对称的，<em>T</em> 的<strong>右脊柱</strong>（right spine）是从根节点开始只包含右边缘的简单路径。<strong>一条脊柱的长度是它包含的结点数目。</strong></p>
+<p><strong>e.</strong> 考虑利用<code>TREAP_INSERT</code>插入结点 <em>x</em> 后的 treap <em>T</em>。设 <em>C</em> 为 <em>x</em> 左子树的右脊柱的长度，<em>D</em> 为 <em>x</em> 右子树的左脊柱的长度。证明：在插入 <em>x</em> 期间所执行的旋转的总次数等于 <em>C + D</em>。</p>
+<p>这一个问题我们也可以通过非形式化的说明来解决。考察一下旋转操作，对于左旋来说，操作结果就是 <em>x</em> 的右孩子结点 <em>y</em> 接替了 <em>x</em> 的位置，同时 <em>x</em> 成了其结点 <em>y</em> 的的左孩子，而原来结点 <em>y</em> 的左孩子则成为了 <em>x</em> 的右孩子，因此，对结点 <em>x</em> 的一次左旋操作，其结果就是让结点 <em>y</em> 的左子树的右脊柱长度加一（增加了 <em>x</em> 结点）。同理对于右旋操作来说，结果就是让 <em>y</em> 结点的右子树的左脊柱长度加一。</p>
+<p>回到题目，因为被插入结点 <em>x</em> 最开始左右子树均为<code>nil</code>，因此 <em>C = D = 0</em>，然后每执行一次左旋操作，<em>C</em> 的值加一，而每执行一次右旋操作，<em>D</em> 的值加一，因此当操作结束之后，<em>C + D</em> 的值也就是左旋和右旋的总次数。</p>
+<h2 id="u6027_u80FD_u5206_u6790"><a href="#u6027_u80FD_u5206_u6790" class="headerlink" title="性能分析"></a>性能分析</h2><p>现在来计算 <em>C</em> 和 <em>D</em> 的期望值。不失一般性，假设关键字为1，2，…，n，因为只是将它们两两比较。</p>
+<p>对 treap <em>T</em> 中的结点 <em>x</em> 和 <em>y</em>，其中`y != x`，设 <em>k = x.key</em> 以及 <em>i = y.key</em>。定义指示器随机变量</p>
+<p style="text-align: center"><br>  `X_(ik) = I{y`在`x`的左子树的右脊柱中`}`<br></p>
+
+<p><strong>f.</strong> 证明：`X_(ik) = 1`当且仅当`y.prio rity &gt; x.prio rity, y.key &lt; x.key`成立，且对于每个满足`y.key &lt; z.key &lt; x.key`的 <em>z</em>，有`y.prio rity &lt; z.prio rity`。</p>
+<p><strong>证明：</strong>首先我们来证明正向推导过程。如果`X_(ik) = 1`，则意味着 <em>y</em> 在 <em>x</em> 的左子树的右脊柱中，因此有`y.prio rity &gt; x.prio rity, y.key &lt; x.key`，而对于满足`y.key &lt; z.key &lt; x.key`条件的 <em>z</em>结点，可以确定 <em>z</em> 必然在 <em>y</em> 的右子树中，所以`y.prio rity &lt; z.prio rity`成立。</p>
+<p>然后证明逆向过程。根据`y.prio rity &gt; x.prio rity, y.key &lt; x.key`可以得知，<em>y</em> 必然在 <em>x</em> 的左子树中。现在假设 <em>y</em> 不在 <em>x</em> 的左子树的右脊柱中，那么也就意味着 <em>y</em> 在 <em>x</em> 的左孩子结点的左子树中，那么我们很容易就可以发现，对于 <em>x</em> 的左孩子结点 <em>z</em> 来说，其满足`y.key &lt; z.key &lt; x.key`，但是却又有`y.prio rity &lt; z.prio rity`，这与题设不符合，因此可知 <em>y</em> 必然在 <em>x</em> 的左子树的右脊柱中，才能使每个满足`y.key &lt; z.key &lt; x.key`的 <em>z</em>，有`y.prio rity &lt; z.prio rity`。</p>
+<p>综合上述过程，可以证明`X_(ik) = 1`当且仅当`y.prio rity &gt; x.prio rity, y.key &lt; x.key`成立，且对于每个满足`y.key &lt; z.key &lt; x.key`的 <em>z</em>，有`y.prio rity &lt; z.prio rity`。</p>
+<p><strong>g.</strong> 证明：</p>
+<p style="text-align: center"><br>  `Pr{X_(ik)=1} = ((k-i-1)!)/((k-i+1)!) = 1/((k-i+1)(k-i))`<br></p>
+
+<p><strong>证明：</strong>由于每个结点的关键字和优先级之间是独立的，因此我们可以把所有结点按照关键字排序，则`X_(ik)`则涉及到从关键字从 <em>i</em> 到 <em>k</em> 的所有结点，由上面的假设关键字为1到n，可以得知`X_(ik)`涉及的结点个数为 <em>k - i + 1</em>。为了方便起见，我们把每个结点都用其关键字表示，由于序列已经按照关键字排序，因此`X_(ik)`对应的序列可以表示为<code>T[i..k]</code>。</p>
+<p>根据上一题中的证明结果，`X_(ik) = 1`意味着在序列<code>T[i..k]</code>中，<code>T[k]</code>的优先级应该是最小的，而<code>T[i]</code>的优先级应该是第二小的。因为序列<code>T[i..k]</code>排列顺序是随机的，所以<code>T[i..k]</code>使得`X_(ik) = 1`成立的概率为：</p>
+<p style="text-align: center"><br>  `1/(k-i+1) * 1/(k-i) = 1/((k-i+1)(k-i))`<br></p>
+
+<p>所以</p>
+<p style="text-align: center"><br>  `Pr{X_(ik)=1} = ((k-i-1)!)/((k-i+1)!) = 1/((k-i+1)(k-i))`<br></p>
+
+<p>而对于上式中间的表达式的解释，我们可以理解为：对于序列<code>T[i..k]</code>，其元素排列所有可能顺序的总数为 (k - i + 1) 个元素的一个全排列，即 <em>(k - i + 1)!</em>；而当`X_(ik) = 1`时，则我们需要固定序列中的两个元素，其它元素仍然是可以随机排列的，这样，其可能顺序的总数为 (k - i + 1 - 2) 个元素的一个全排列，即 <em>(k - i - 1)!</em>。因此，最后概率即为`X_(ik) = 1`成立的排列数与总排列数的比值。</p>
+<p><strong>h.</strong> 证明：</p>
+<p style="text-align: center"><br>  `E[C] = sum_(j=1)^(k-1) 1/(j(j+1)) = 1-1/k`<br></p>
+
+<p><strong>证明：</strong>根据`X_(ik)`的定义可知，一个结点 <em>x</em> 的左子树的右脊柱的长度为：</p>
+<p style="text-align: center"><br>  `C = sum_(j=1)^(k-1) X_(jk)`<br></p>
+
+<p>对上式两边取期望，可得：</p>
+<p style="text-align: center"><br>  `E[C] = sum_(j=1)^(k-1) E[X_(jk)] = sum_(j=1)^(k-1) Pr{X_(jk)=1}`<br></p>
+
+<p>代入问题<strong>g</strong>中的证明结果，并稍作变换（令<code>j = k - j</code>），即可得到下式：</p>
+<p style="text-align: center"><br>  `E[C] = sum_(j=1)^(k-1) 1/(j(j+1))`<br></p>
+
+<p>而`1/(j(j+1)) = 1/j - 1/(j+1)`，展开上面等号右边的和式，得：</p>
+<p style="text-align: center"><br>  `sum_(j=1)^(k-1) 1/(j(j+1)) = 1/1 - 1/2 + 1/2 - 1/3 + … + 1/(k-1) - 1/k = 1 - 1/k`<br></p>
+
+<p>因此</p>
+<p style="text-align: center"><br>  `E[C] = sum_(j=1)^(k-1) 1/(j(j+1)) = 1-1/k`<br></p>
+
+<p>得证。</p>
+<p><strong>i.</strong> 利用对称性证明：</p>
+<p style="text-align: center"><br>  `E[D] = 1-1/(n-k+1)`<br></p>
+
+<p><strong>证明：</strong>如果 <em>y</em> 在 <em>x</em> 的左子树中，有 <em>y.key &lt; x.key</em>，而如果在 <em>x</em> 的右子树中，则有 <em>y.key &gt; x.key</em>。因此，根据对称性，我们有：</p>
+<p style="text-align: center"><br>  `Pr{X_(ik)=1} = 1/((i-k+1)(i-k))` <br><br>  `D = sum_(j=k+1)^n X_(jk)` <br><br>  `E[D] = sum_(j=k+1)^n E[X_(jk)] = sum_(j=k+1)^n Pr{X_(jk)=1}` <br><br>  `E[D] = sum_(j=1)^(n-k) 1/(j(j+1)) = 1-1/(n-k+1)`<br></p>
+
+<p>所以原式得证。</p>
+<p><strong>j.</strong> 得出如下结论：<strong>当在一棵treap树中插入一个结点时，执行旋转的期望次数小于2</strong>。</p>
+<p><strong>证明：</strong>有了<strong>h</strong>和<strong>i</strong>中的结果，这一结论的得出也就是水到渠成了。执行旋转的总次数为 <em>C + D</em>，根据期望的线性性质，我们有：</p>
+<p style="text-align: center"><br>  `E[C+D] = E[C]+E[D] = 1-1/k+1-1/(n-k+1) = 2-1/k-1/(n-k+1)`<br></p>
+
+<p>由于`0 &lt; k &lt;= n`，所以有`1/k &gt; 0`且`1/(n-k+1) &gt; 0`，所以</p>
+<p style="text-align: center"><br>  `E[C+D] = 2-1/k-1/(n-k+1) &lt; 2`<br></p>
+
+<p>得证。</p>
+<h2 id="u7ED3_u675F"><a href="#u7ED3_u675F" class="headerlink" title="结束"></a>结束</h2><p>通过跟踪书中的<strong>a</strong>到<strong>j</strong>各个问题，逐步给出了<strong>Treap树</strong>的一些基本性质。对于问题<strong>b</strong>，过程仍需讨论和改进，但是<strong>b</strong>的结论我们是可以直接使用的。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Algorithm/">Algorithm</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Algorithm/">Algorithm</a><a href="/tags/Treap/">Treap</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2016/02/24/Treap-tree/" data-title="Treap树 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/02/21/custom-the-hexo-theme/"  title="自定义Hexo主题">
+ <strong>下一篇：</strong><br/> 
+ <span>自定义Hexo主题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/02/24/Treap-tree/" data-title="Treap树" data-url="http://3meng.github.io/2016/02/24/Treap-tree/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B9A_u4E49"><span class="toc-number">1.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u57FA_u7840_u6027_u8D28"><span class="toc-number">2.</span> <span class="toc-text">基础性质</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u63D2_u5165_u64CD_u4F5C"><span class="toc-number">3.</span> <span class="toc-text">插入操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F15_u7406_u5B9A_u4E49"><span class="toc-number">4.</span> <span class="toc-text">引理定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6027_u80FD_u5206_u6790"><span class="toc-number">5.</span> <span class="toc-text">性能分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u675F"><span class="toc-number">6.</span> <span class="toc-text">结束</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Maximum-SubArray/" title="Maximum SubArray">Maximum SubArray<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    closeAside();
+  });
+  o.click(function(){
+    openAside();
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
+
+  </body>
+</html>
