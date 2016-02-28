@@ -31,7 +31,7 @@
 <meta property="og:image" content="http://3meng.github.io/images/dlna/img-rtpserver.png">
 <meta property="og:image" content="http://3meng.github.io/images/dlna/img-server-arch.png">
 <meta property="og:image" content="http://3meng.github.io/images/dlna/img-stream-flow.png">
-<meta property="og:updated_time" content="2016-02-28T11:16:47.000Z">
+<meta property="og:updated_time" content="2016-02-28T13:28:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【译】实现一个DLNA兼容的UPnP AV媒体服务器">
 <meta name="twitter:description" content="首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：
@@ -1054,7 +1054,9 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  var is_open = true;
+  
+  var is_open = false;
+  
   function closeAside(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -1075,6 +1077,9 @@ $(document).ready(function(){
         openAside();
       } else {
         closeAside();
+        
+        $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+         
       }
     }else
     {
@@ -1096,8 +1101,13 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
-  closeAside();
-  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  getSize();
+  if (myWidth >= 1024) {
+    closeAside();
+    
+    $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+    
+  }
   
 });
 </script>

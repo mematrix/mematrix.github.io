@@ -227,7 +227,9 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
+  
   var is_open = true;
+  
   function closeAside(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -248,6 +250,7 @@ $(document).ready(function(){
         openAside();
       } else {
         closeAside();
+         
       }
     }else
     {

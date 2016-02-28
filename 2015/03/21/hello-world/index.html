@@ -467,7 +467,9 @@ $(document).ready(function(){
       a = $('#asidepart'),
       c = $('.closeaside'),
       o = $('.openaside');
-  var is_open = true;
+  
+  var is_open = false;
+  
   function closeAside(){
     a.addClass('fadeOut').css('display', 'none');
     o.css('display', 'block').addClass('fadeIn');
@@ -488,6 +490,9 @@ $(document).ready(function(){
         openAside();
       } else {
         closeAside();
+        
+        $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+         
       }
     }else
     {
@@ -509,8 +514,13 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
-  closeAside();
-  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  getSize();
+  if (myWidth >= 1024) {
+    closeAside();
+    
+    $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+    
+  }
   
 });
 </script>

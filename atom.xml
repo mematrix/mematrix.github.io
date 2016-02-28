@@ -4,7 +4,7 @@
   <subtitle><![CDATA[历劫由来谁一笑，仙踪尽飞羽衣飘。]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://3meng.github.io/"/>
-  <updated>2016-02-28T11:16:47.000Z</updated>
+  <updated>2016-02-28T13:28:16.000Z</updated>
   <id>http://3meng.github.io/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/"/>
     <id>http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/</id>
     <published>2016-02-27T17:25:38.000Z</published>
-    <updated>2016-02-28T11:16:47.000Z</updated>
+    <updated>2016-02-28T13:28:16.000Z</updated>
     <content type="html"><![CDATA[<p>首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
 <ul>
 <li>题目：<strong>Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support</strong>.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）</li>
@@ -817,7 +817,7 @@ server: rtpserver 0.0.2svn
     <link href="http://3meng.github.io/2016/02/21/custom-the-hexo-theme/"/>
     <id>http://3meng.github.io/2016/02/21/custom-the-hexo-theme/</id>
     <published>2016-02-21T15:53:41.000Z</published>
-    <updated>2016-02-28T15:44:40.000Z</updated>
+    <updated>2016-02-28T16:59:24.000Z</updated>
     <content type="html"><![CDATA[<p>很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。</p>
 <blockquote>
 <p>当前使用主题为<code>Jacman</code>，作者博客<a href="http://wuchong.me/" target="_blank" rel="external">在此</a>，顺便附上<a href="https://github.com/wuchong/jacman" target="_blank" rel="external">GitHub链接</a>。</p>
@@ -975,7 +975,11 @@ server: rtpserver 0.0.2svn
       a = $(&#39;#asidepart&#39;),
       c = $(&#39;.closeaside&#39;),
       o = $(&#39;.openaside&#39;);
+  &lt;% if (is_post() &amp;&amp; theme.close_aside){ %&gt;
+  var is_open = false;
+  &lt;% }else{ %&gt;
   var is_open = true;
+  &lt;% } %&gt;
   function closeAside(){
     a.addClass(&#39;fadeOut&#39;).css(&#39;display&#39;, &#39;none&#39;);
     o.css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
@@ -996,6 +1000,9 @@ server: rtpserver 0.0.2svn
         openAside();
       } else {
         closeAside();
+        &lt;% if( is_post()&amp;&amp;(page.toc !== false) &amp;&amp; theme.toc.aside){ %&gt;
+        $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+        &lt;% } %&gt; 
       }
     }else
     {
@@ -1014,8 +1021,13 @@ server: rtpserver 0.0.2svn
     openAside();
   });
   &lt;% if (is_post() &amp;&amp; theme.close_aside){ %&gt;
-  closeAside();
-  $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+  getSize();
+  if (myWidth &gt;= 1024) {
+    closeAside();
+    &lt;% if( is_post()&amp;&amp;(page.toc !== false) &amp;&amp; theme.toc.aside){ %&gt;
+    $(&#39;#toc.toc-aside&#39;).css(&#39;display&#39;, &#39;block&#39;).addClass(&#39;fadeIn&#39;);
+    &lt;% } %&gt;
+  }
   &lt;% } %&gt;
 
   // ...
