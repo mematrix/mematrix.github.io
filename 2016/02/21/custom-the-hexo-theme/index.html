@@ -29,7 +29,7 @@
 这里讲记录所有对Hexo主题的自定义部分，当然，所有的操作都是基于Jacman主题的，因此，有些操作可能并不适用于其它主题。
 
 另外，主题安装日期为201">
-<meta property="og:updated_time" content="2016-02-24T13:30:58.000Z">
+<meta property="og:updated_time" content="2016-02-28T15:44:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自定义Hexo主题">
 <meta name="twitter:description" content="很久很久以前就说过，要修改博客界面的一些细节样式，但是一直没有去做多少，只是在当前主题上修改了一点小细节（这也主要是因为这个主题基本符合我的要求，所以一直懒得继续修改）。
@@ -117,7 +117,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u7279_u6B8A_u5904_u7406"><span class="toc-number">4.1.</span> <span class="toc-text">特殊处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u663E_u793A_u6807_u9898_u7F16_u53F7"><span class="toc-number">5.</span> <span class="toc-text">显示标题编号</span></a></li></ol>
 		
 		</div>
 		
@@ -347,12 +347,67 @@
 <pre><code class="javascript">&lt;script src=&quot;//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;
 </code></pre>
+<blockquote>
+<p>多说一句，这里我们可以看到链接中有个版本号，所以当<code>highlight.js</code>更新之后，只要CDN服务器已经同步更新，我们也可以直接更新相关文件引用。</p>
+</blockquote>
 <p>同样，这里可以根据需要，选择更专门化的js文件。</p>
 <blockquote>
 <p>经过测试，在主动标示语言类型的时候，需要使用小写方式，例如<strong>JavaScript</strong>应该写成<strong>javascript</strong>。</p>
-<p>此外，由于<code>Jacman</code>默认生成的代码块样式与高亮插件有点冲突，可能需要自己手动调整一下，例如在<code>&lt;head&gt;</code>元素中手动重写一遍高亮样式，并使用<code>!important</code>来保证不会被覆盖。</p>
 </blockquote>
-<p>至此，语法高亮基本解决，如果有不完善的地方，以后再慢慢修正了。</p>
+<h3 id="u7279_u6B8A_u5904_u7406"><a href="#u7279_u6B8A_u5904_u7406" class="headerlink" title="特殊处理"></a>特殊处理</h3><p>由于<code>Jacman</code>默认生成的代码块样式与高亮插件有点冲突，可能需要自己手动调整一下，例如在<code>&lt;head&gt;</code>元素中手动重写一遍高亮样式，并使用<code>!important</code>来保证不会被覆盖。</p>
+<p>下面记录下我修改的部分样式（添加于<code>head</code>标签最后面）：</p>
+<pre><code class="css">&lt;style type=&quot;text/css&quot;&gt;
+    pre {display: block; overflow: auto !important; background: #322931 !important; padding: 0.5em;}
+    pre code {display: inline-block !important; color: #b9b5b8 !important;}
+&lt;/style&gt;
+</code></pre>
+<p>这里，为<code>pre</code>标签设置了<code>overflow</code>属性，并为<code>pre</code>中的<code>code</code>标签设置了<code>display</code>样式，以保证代码块中的每一行被正确显示到一行之中，当页面宽度过窄时，代码块显示一个水平的滚动条而不是将代码中断换行。</p>
+<p>至此，语法高亮基本解决（除了行号以外），如果有不完善的地方，以后再慢慢修正了。</p>
+<h2 id="u663E_u793A_u6807_u9898_u7F16_u53F7"><a href="#u663E_u793A_u6807_u9898_u7F16_u53F7" class="headerlink" title="显示标题编号"></a>显示标题编号</h2><p>默认情况下，<code>hexo</code>生成的文章详情页中，只有目录部分会显示标题编号，而到了正文中，每个标题却又如同一般<code>Markdown</code>渲染器那样，只显示个标题了事，并没有给每个标题编号，如<code>1.1</code>、<code>3.2.4</code>等。一开始以为目录中的标题编号是主题自己做的，结果翻到了对应源码位置，发现又是<code>hexo</code>自带了个<code>toc</code>方法，这个方法的第二个参数就是设置是否生成标题编号的，也就是说，这个方法又是一个集成到系统内部的，没有暴露出太多细节，这不得不说是一种遗憾。</p>
+<p>那没办法，只能再次通过js来在运行时动态设置了。通过查看<code>Jacman</code>主题生成的详情页的默认结构，可以发现文章正文全部包含在一个class为<code>.article-content</code>的<code>div</code>元素中，每个标题对应的标签（<code>h1</code>、<code>h2</code>、…）都是该元素的直接子元素，并且内容结构都是类似的：一个长宽都为0的<code>&lt;a&gt;</code>标签（不知道有什么作用）、以及实际的标题文本内容。因此我们可以很容易使用<code>JQuery</code>来操作修改。</p>
+<p>需要注意的是，我们一般并不会同时使用到完整的六种标题，大多数情况下就是使用两种或三种，有时候甚至只有一种，因此我们不能简单的根据标题分类来给标题编号（比如一个二级标题就一定编号为<code>*.1</code>、<code>*.2</code>等）；而在特殊情况下我们有可能会跳过某一级标题（比如只使用二级、三级、五级标题），因此确定了起点标题（比如为二级标题）之后，我们也不能简单的根据当前标题（比如五级标题）与起点标题的级数差来确定编号中的分级。</p>
+<p>下面给出这里使用的js代码，原理很简单，就是先找出每一级标题的数量，如果不为0（即此类型标题存在），那就在数组相应位置标记一下该级别标题的出现顺序。比如在一个只含有二级、三级、四级标题的列表中，二级标题出现顺序就为1，相应的，四级标题顺序为3，这样我们就可以确定每一级标题的编号中需要的分级数量了（即有多少个点<code>.</code>分割）。</p>
+<pre><code class="javascript">$(document).ready(function(){
+  var $article = $(&quot;.article-content&quot;);
+  var count = [0, 0, 0, 0, 0, 0];
+  var mark = [0, 0, 0, 0, 0, 0];
+
+  (function setMark(){
+    var hTag = [&quot;h1&quot;, &quot;h2&quot;, &quot;h3&quot;, &quot;h4&quot;, &quot;h5&quot;, &quot;h6&quot;];
+    var index = 0;
+    for (var i = 0; i &lt; 6; ++i) {
+      if ($article.children(hTag[i]).length &gt; 0) {
+        ++index;
+        mark[i] = index;
+      }
+    }
+  })();
+
+  $article.children(&quot;:header&quot;).each(function(){
+    var t = $(this);
+    var pos = 0;
+    switch (t[0].tagName) {
+      case &quot;H1&quot;: pos = 0; break;
+      case &quot;H2&quot;: pos = 1; break;
+      case &quot;H3&quot;: pos = 2; break;
+      case &quot;H4&quot;: pos = 3; break;
+      case &quot;H5&quot;: pos = 4; break;
+      case &quot;H6&quot;: pos = 5; break;
+    }
+
+    var len = mark[pos];
+    if (len &lt; 6) { count[len] = 0; }
+    count[len - 1]++;
+
+    var listStr = count[0] + &quot;&quot;;
+    for (var i = 1; i &lt; len; ++i) { listStr += &quot;.&quot; + count[i]; }
+    listStr += &quot; &quot;;
+    t.html(listStr + t.html());
+  });
+});
+</code></pre>
+<p>这里我并未没有考虑比如第一个遇到的标题类型并不是最顶级的标题这样的情况，因为在一般博客中，几乎很少有这种现象，因此就不做更多考虑了。如果你需要处理这种情况的话，可以自行修改代码。</p>
+<p>而最后需要注意的是，因为我们只需要在文章详情页使用这段js代码，因此记得使用<code>is_post()</code>方法判断一下是否插入代码。至于代码插入位置，依然是那个<code>after_footer.ejs</code>文件了。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -419,7 +474,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u9690_u85CF_u8BC4_u8BBA_u6A21_u5757"><span class="toc-number">1.</span> <span class="toc-text">隐藏评论模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u6570_u5B66_u516C_u5F0F"><span class="toc-number">2.</span> <span class="toc-text">数学公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4FEE_u590Dclose_aside_u914D_u7F6E_u65E0_u6548_u7684_u95EE_u9898"><span class="toc-number">3.</span> <span class="toc-text">修复close_aside配置无效的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u4EE3_u7801_u9AD8_u4EAE"><span class="toc-number">4.</span> <span class="toc-text">代码高亮</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u7279_u6B8A_u5904_u7406"><span class="toc-number">4.1.</span> <span class="toc-text">特殊处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u663E_u793A_u6807_u9898_u7F16_u53F7"><span class="toc-number">5.</span> <span class="toc-text">显示标题编号</span></a></li></ol>
  
   </div>
 
@@ -434,6 +489,10 @@
 		
 		  
 			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
 		  
 		
 		  
@@ -474,7 +533,7 @@
 			
 		
 			
-				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
+				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
 			
 		
 			
@@ -498,7 +557,7 @@
 			
 		
 			
-				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
 			
 		
 			
@@ -506,7 +565,7 @@
 			
 		
 			
-				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
 			
 		
 			
@@ -519,6 +578,18 @@
 		
 			
 				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UPnP/" title="UPnP">UPnP<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/RTSP-RTP/" title="RTSP/RTP">RTSP/RTP<sup>1</sup></a></li>
 			
 		
 			
@@ -540,7 +611,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 
@@ -609,6 +680,48 @@
     <script src="/js/jquery-2.0.3.min.js"></script>
 <script src="/js/jquery.imagesloaded.min.js"></script>
 <script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  var $article = $(".article-content");
+  var count = [0, 0, 0, 0, 0, 0];
+  var mark = [0, 0, 0, 0, 0, 0];
+  
+  (function setMark(){
+    var hTag = ["h1", "h2", "h3", "h4", "h5", "h6"];
+    var index = 0;
+    for (var i = 0; i < 6; ++i) {
+      if ($article.children(hTag[i]).length > 0) {
+        ++index;
+        mark[i] = index;
+      }
+    }
+  })();
+  
+  $article.children(":header").each(function(){
+    var t = $(this);
+    var pos = 0;
+    switch (t[0].tagName) {
+      case "H1": pos = 0; break;
+      case "H2": pos = 1; break;
+      case "H3": pos = 2; break;
+      case "H4": pos = 3; break;
+      case "H5": pos = 4; break;
+      case "H6": pos = 5; break;
+    }
+    
+    var len = mark[pos];
+    if (len < 6) { count[len] = 0; }
+    count[len - 1]++;
+    
+    var listStr = count[0] + "";
+    for (var i = 1; i < len; ++i) { listStr += "." + count[i]; }
+    listStr += " ";
+    t.html(listStr + t.html());
+  });
+});
+</script>
 
 <script type="text/javascript">
 $(document).ready(function(){ 
@@ -786,7 +899,7 @@ $(document).ready(function(){
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 ga('create', 'UA-60919501-1', 'auto');  
 ga('require', 'linkid', 'linkid.js');
 ga('send', 'pageview');

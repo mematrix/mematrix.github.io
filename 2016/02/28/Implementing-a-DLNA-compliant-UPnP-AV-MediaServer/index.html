@@ -1,0 +1,1261 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>【译】实现一个DLNA兼容的UPnP AV媒体服务器 | 一千二百年的清风明月</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="一粒尘埃">
+    
+
+    
+    <meta name="description" content="首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：
+
+题目：Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）
+作者：Martin Emrich
+上传日期：2009年4月28日
+导师：Manuel Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】实现一个DLNA兼容的UPnP AV媒体服务器">
+<meta property="og:url" content="http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/index.html">
+<meta property="og:site_name" content="一千二百年的清风明月">
+<meta property="og:description" content="首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：
+
+题目：Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）
+作者：Martin Emrich
+上传日期：2009年4月28日
+导师：Manuel Go">
+<meta property="og:image" content="http://3meng.github.io/images/dlna/img-ucdam.png">
+<meta property="og:image" content="http://3meng.github.io/images/dlna/img-rtpserver.png">
+<meta property="og:image" content="http://3meng.github.io/images/dlna/img-server-arch.png">
+<meta property="og:image" content="http://3meng.github.io/images/dlna/img-stream-flow.png">
+<meta property="og:updated_time" content="2016-02-28T11:16:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】实现一个DLNA兼容的UPnP AV媒体服务器">
+<meta name="twitter:description" content="首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：
+
+题目：Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）
+作者：Martin Emrich
+上传日期：2009年4月28日
+导师：Manuel Go">
+
+    
+    <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <!-- highlight.js使用的高亮主题样式 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.1.0/styles/hopscotch.min.css">
+    <style type="text/css">
+        pre {display: block;overflow: auto !important;background: #322931 !important;padding: 0.5em;}
+        pre code {display: inline-block !important;color: #b9b5b8 !important;}
+    </style>
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="一千二百年的清风明月">一千二百年的清风明月</a></h1>
+				<h2 class="blog-motto">历劫由来谁一笑，仙踪尽飞羽衣飘。</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_target">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:3meng.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/" title="【译】实现一个DLNA兼容的UPnP AV媒体服务器" itemprop="url">【译】实现一个DLNA兼容的UPnP AV媒体服务器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-27T17:25:38.000Z" itemprop="datePublished"> 发表于 2016-02-28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F15_u8A00"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u52A8_u673A"><span class="toc-number">1.1.</span> <span class="toc-text">动机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u76EE_u6807"><span class="toc-number">1.2.</span> <span class="toc-text">目标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6"><span class="toc-number">2.</span> <span class="toc-text">已存在的框架和标准</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DVB-IP"><span class="toc-number">2.1.</span> <span class="toc-text">DVB-IP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DVB-HN"><span class="toc-number">2.2.</span> <span class="toc-text">DVB-HN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4E13_u7528_u89E3_u51B3_u65B9_u6848"><span class="toc-number">2.3.</span> <span class="toc-text">专用解决方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VDR"><span class="toc-number">2.4.</span> <span class="toc-text">VDR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UPnP"><span class="toc-number">2.5.</span> <span class="toc-text">UPnP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u548C_u670D_u52A1"><span class="toc-number">2.5.1.</span> <span class="toc-text">设备和服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u83B7_u53D6IP_u5730_u5740"><span class="toc-number">2.5.2.</span> <span class="toc-text">获取IP地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u53D1_u73B0"><span class="toc-number">2.5.3.</span> <span class="toc-text">设备发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63CF_u8FF0"><span class="toc-number">2.5.4.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A7_u5236"><span class="toc-number">2.5.5.</span> <span class="toc-text">控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4E8B_u4EF6"><span class="toc-number">2.5.6.</span> <span class="toc-text">事件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UPnP_AV"><span class="toc-number">2.6.</span> <span class="toc-text">UPnP AV</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u5A92_u4F53_u670D_u52A1_u5668"><span class="toc-number">2.6.1.</span> <span class="toc-text">媒体服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5A92_u4F53_u6E32_u67D3_u5668"><span class="toc-number">2.6.2.</span> <span class="toc-text">媒体渲染器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A7_u5236_u70B9"><span class="toc-number">2.6.3.</span> <span class="toc-text">控制点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u76EE_u5F55"><span class="toc-number">2.6.4.</span> <span class="toc-text">内容目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u8D44_u6E90"><span class="toc-number">2.6.5.</span> <span class="toc-text">内容资源</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLNA"><span class="toc-number">2.7.</span> <span class="toc-text">DLNA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u6570_u636E_u53EF_u7528_u6027_u6A21_u578B"><span class="toc-number">2.7.1.</span> <span class="toc-text">数据可用性模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#protocolInfo_u5B57_u6BB5"><span class="toc-number">2.7.2.</span> <span class="toc-text">protocolInfo字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP_u5934"><span class="toc-number">2.7.3.</span> <span class="toc-text">HTTP头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP_u5934"><span class="toc-number">2.7.4.</span> <span class="toc-text">RTSP头</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F20_u8F93_u534F_u8BAE"><span class="toc-number">2.8.</span> <span class="toc-text">传输协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP"><span class="toc-number">2.8.1.</span> <span class="toc-text">HTTP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP/RTP"><span class="toc-number">2.8.2.</span> <span class="toc-text">RTSP/RTP</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u6784"><span class="toc-number">3.</span> <span class="toc-text">结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u6D41_u5904_u7406"><span class="toc-number">3.1.</span> <span class="toc-text">流处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u6E90"><span class="toc-number">3.1.1.</span> <span class="toc-text">源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8F6C_u6362_u5668"><span class="toc-number">3.1.2.</span> <span class="toc-text">转换器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A5_u6536_u5668"><span class="toc-number">3.1.3.</span> <span class="toc-text">接收器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F1A_u8BDD_u7BA1_u7406"><span class="toc-number">3.2.</span> <span class="toc-text">会话管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP_u4F1A_u8BDD"><span class="toc-number">3.2.1.</span> <span class="toc-text">HTTP会话</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP/RTP_u4F1A_u8BDD"><span class="toc-number">3.2.2.</span> <span class="toc-text">RTSP/RTP会话</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B9E_u73B0"><span class="toc-number">4.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#libupnp++"><span class="toc-number">4.1.</span> <span class="toc-text">libupnp++</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8981_u6C42"><span class="toc-number">4.1.1.</span> <span class="toc-text">要求</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rtpserver"><span class="toc-number">4.2.</span> <span class="toc-text">rtpserver</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8981_u6C42-1"><span class="toc-number">4.2.1.</span> <span class="toc-text">要求</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u793A_u4F8B_u8BBE_u7F6E"><span class="toc-number">4.3.</span> <span class="toc-text">示例设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F7F_u7528_u6848_u4F8B_uFF1A_u901A_u8FC7RTSP/RTP_u8FDB_u884C_u6D41_u5A92_u4F53_u7535_u89C6_u76F4_u64AD"><span class="toc-number">4.4.</span> <span class="toc-text">使用案例：通过RTSP/RTP进行流媒体电视直播</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u542F_u52A8_u548C_u53D1_u73B0"><span class="toc-number">4.4.1.</span> <span class="toc-text">设备启动和发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u53D1_u73B0"><span class="toc-number">4.4.2.</span> <span class="toc-text">内容发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4F1A_u8BDD_u521D_u59CB_u5316"><span class="toc-number">4.4.3.</span> <span class="toc-text">会话初始化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u7F6E_u7BA1_u9053"><span class="toc-number">4.4.4.</span> <span class="toc-text">设置管道</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u7ED3_u675F_u4F1A_u8BDD"><span class="toc-number">4.4.5.</span> <span class="toc-text">结束会话</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLNA_u517C_u5BB9_u6027_u6D4B_u8BD5"><span class="toc-number">4.5.</span> <span class="toc-text">DLNA兼容性测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DLNA_u4E00_u81F4_u6027_u6D4B_u8BD5_u5DE5_u5177"><span class="toc-number">4.5.1.</span> <span class="toc-text">DLNA一致性测试工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rtpserver_u7684_u6D4B_u8BD5_u72B6_u6001"><span class="toc-number">4.5.2.</span> <span class="toc-text">rtpserver的测试状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u8BBA"><span class="toc-number">5.</span> <span class="toc-text">结论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u672A_u6765_u5DE5_u4F5C"><span class="toc-number">5.1.</span> <span class="toc-text">未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u76F4_u63A5_u8BBF_u95EEDVB_u8C03_u8C10_u5668"><span class="toc-number">5.1.1.</span> <span class="toc-text">直接访问DVB调谐器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DVB-SI_u6620_u5C04_u548CEPG"><span class="toc-number">5.1.2.</span> <span class="toc-text">DVB-SI映射和EPG</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4E13_u7528_u63A7_u5236_u70B9"><span class="toc-number">5.1.3.</span> <span class="toc-text">专用控制点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5D4C_u5165_u5F0F_u5A92_u4F53_u670D_u52A1_u5668_u548C_u64AD_u653E_u5668"><span class="toc-number">5.1.4.</span> <span class="toc-text">嵌入式媒体服务器和播放器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u76EE_u5F55_u641C_u7D22"><span class="toc-number">5.1.5.</span> <span class="toc-text">内容目录搜索</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u667A_u80FD_u8F6C_u7801_u5F15_u64CE"><span class="toc-number">5.1.6.</span> <span class="toc-text">智能转码引擎</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u91CD_u5199_u5E26_u7EA0_u9519_u7684RTP_u5E93"><span class="toc-number">5.1.7.</span> <span class="toc-text">重写带纠错的RTP库</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u53C2_u8003_u6587_u732E"><span class="toc-number">6.</span> <span class="toc-text">参考文献</span></a></li></ol>
+		
+		</div>
+		
+		<p>首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
+<ul>
+<li>题目：<strong>Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support</strong>.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）</li>
+<li>作者：<strong>Martin Emrich</strong></li>
+<li>上传日期：2009年4月28日</li>
+<li>导师：Manuel Gorius，硕士</li>
+<li>初审者：Thorsten Herfet，博士，教授 </li>
+<li>二审者：Philipp Slusallek，博士，教授</li>
+</ul>
+<p>本文只为翻译所用，<strong>一切版权和许可均归原作者所有</strong>。</p>
+<blockquote>
+<p><strong>同意声明</strong><br>我同意将论文的两个版本添加到计算机学院的图书馆，使其向公众开放。</p>
+<p><strong>感谢</strong><br>本论文由英特尔股份有限公司的“数字家庭研究实验室”给予支持。 </p>
+</blockquote>
+<p><strong>摘要</strong><br>在家庭多媒体网络中，目前分布式存储的内容（照片、音乐、视频文件）是与直播电视和电台分离的，即使最近已经开始由IP网络传输。本文描述了一个支持发布内容到家庭网络且可以接收数字视频广播的原型媒体服务器的设计和实现。它遵守<code>DLNA</code>设备互操作指南，以兼容许多现有设备，并通过实时传输协议（<code>RTP</code>）以及<code>HTTP</code>提供到<strong>UPnP AV</strong>客户端的直播。 </p>
+<a id="more"></a>
+<p><strong>部分缩写</strong><br><strong>AHEC</strong> 高级混合纠错<br><strong>BGD</strong> 双向网关设备<br><strong>CTT</strong> 一致性测试工具<br><strong>DHCP</strong> 动态主机配置协议<br><strong>DLNA</strong> 数字生活网络联盟<br><strong>DMP</strong> 数字媒体播放器<br><strong>DMS</strong> 数字媒体服务器<br><strong>DNG</strong> 交付网络网关<br><strong>DUT</strong> 测试设备<br><strong>DVB</strong> 数字视频广播<br><strong>DVBSTP</strong> DVB SD&amp;S传输协议<br><strong>EPG</strong> 电子节目指南<br><strong>FEC</strong> 前向纠错<br><strong>GENA</strong> 通用事件通知结构<br><strong>HNED</strong> 家庭网络终端设备<br><strong>IGMP</strong> Internet组管理协议<br><strong>IPI</strong> 互联网协议基础结构（在DVB上下文）<br><strong>IPTV</strong> 因特网协议电视<br><strong>NPT</strong> 本地播放时间<br><strong>RTCP</strong> 实时控制协议<br><strong>RTP</strong> 实时传输协议<br><strong>RTSP</strong> 实时流传输协议<br><strong>SDP</strong> 会话描述协议<br><strong>SSDP</strong> 简单服务发现协议<br><strong>UCDAM</strong> 统一的客户端数据可用性模型<br><strong>UGD</strong> 单向网关设备<br><strong>UPnP</strong> 通用即插即用<br><strong>UUID</strong> 通用唯一标识符</p>
+<h2 id="u5F15_u8A00"><a href="#u5F15_u8A00" class="headerlink" title="引言"></a>引言</h2><h3 id="u52A8_u673A"><a href="#u52A8_u673A" class="headerlink" title="动机"></a>动机</h3><p>过去的几年中，数字广播在快速的取代传统的模拟广播。基于<code>DVB</code>的数字电视目前（只有少数例外）已经在德国成为标准。尽管如此，在一个符合标准的方式下通过IP网络传输实况广播内容到现在为止仅在少数拐角情况可用。</p>
+<blockquote>
+<p>到2008年为止，只有三个德国英特网服务提供商提供免费可用的公共电台IPTV流到他们的客户住所，所有的都只适用于他们自己的专用IPTV订阅。</p>
+</blockquote>
+<p>同时，家庭多媒体网络正变的更加现实。新的标准，比如<strong>UPnP AV</strong>和<strong>DLNA</strong>，允许家用多媒体设备发现彼此而无需终端用户的任何配置。这样一来，很多人已经在使用家庭网络，使他们的照片，视频和音乐集合始终在家庭媒体客户端设备可用。类似DLNA CERTIFIED™徽标计划的新举措将保证不同厂商的设备在协议和内容格式条款之间的<strong>兼容性</strong>。</p>
+<h3 id="u76EE_u6807"><a href="#u76EE_u6807" class="headerlink" title="目标"></a>目标</h3><p>目前，这两个世界几乎独立存在。典型的家庭网络用户有一个网络媒体播放器设备，旁边放着一个DVB接收盒（即使DLNA承认这些“小岛”）。我们的目标是通过提供一个媒体服务器来联合这两个应用程序，媒体服务器<strong>使用现有的标准构建</strong>，并可通过DVB调谐器硬件以及音乐，视频和照片等内容存储提供现场直播。当然，对于每一种类型的内容，适当的传输协议（<code>HTTP</code>，<code>RTSP/RTP</code>单播或多播）将被选择。服务器将是<strong>符合DLNA设备指南</strong>，因此与市场上的许多设备兼容。未来的工作可以包括相应的媒体客户端的设计，包括硬件，操作系统配置和软件。</p>
+<p>一个使用<code>RTP</code>协议直播电视和电台的DLNA兼容的媒体服务器的原型将在本文进行开发。由于目前没有UPnP或DLNA兼容的接收设备可用于接收RTP传输信号，一个合适的媒体渲染器由Jochen Crun同时开发。为了证明DLNA兼容性，最后的媒体服务器使用<strong>DLNA一致性测试工具</strong>（<code>CTT</code>）测试，当然它应该通过所有相关测试。</p>
+<h2 id="u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6"><a href="#u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6" class="headerlink" title="已存在的框架和标准"></a>已存在的框架和标准</h2><p>有几个标准组织以及个别公司正在开发各种框架，使广播和/或媒体可以共享到家庭网络。</p>
+<h3 id="DVB-IP"><a href="#DVB-IP" class="headerlink" title="DVB-IP"></a>DVB-IP</h3><p><code>DVB-IPI</code>（DVB因特网协议基础，最近也被称为<code>DVBIPTV</code>）描述了一种框架，以使DVB进入家庭网络。交付网络网关（<strong>DNG</strong>）连接一个或多个分发网络（DVB-S/-C/-T等基于调谐器以及基于IP的服务）到基于IP的家庭网络。家庭网络的不同段通过家庭网络节点（<strong>HNN</strong>）连接，例如一个无线接入点连接基于电缆的802.3网络和无线的802.11网络。关于家庭网络的另一端是家庭网络终端设备（<strong>HNED</strong>），其接收数据流。</p>
+<blockquote>
+<p>尽管没有任何关于重命名的可靠资料被发现，但是现在很多文献已经在同时使用这两种缩写。</p>
+</blockquote>
+<p>一个家庭网络终端设备通过<em>服务发现和选择协议</em>（<code>SD&amp;S</code>）发现可用的服务。这种情况可以发生在推模式，服务提供者通过<code>DVBSTP</code>组播发送SD&amp;S数据，也可以发生在拉模式，其中终端设备通过HTTP抓取当前SD&amp;S的数据。若干自举方法被定义，例如通过DNS查找，DHCP配置，IANA注册组播信道或用户提供的HTTP URL。</p>
+<p>在发现服务后，终端设备可以通过SD&amp;S获取XML文档的<code>DVB-SI</code>（服务信息）。</p>
+<p>媒体流的唯一容器为<strong>MPEG传输流</strong>（TS），无论是通过<code>RTP</code>还是<code>UDP</code>（<strong>ITU H.610</strong>）传输。会话通过<code>IGMP</code>（组播）或<code>RTSP</code>（同样有限，没有特技播放操作）管理。</p>
+<p>目前，仅有少数的最终用户设备明确兼容<code>DVB-IPTV</code>，尽管有可能一些专有的IPTV产品至少在德国市场上提供了部分<code>DVB-IPI</code>兼容。要确认这些，更多的逆向工程工作可能是必需的。</p>
+<p><code>DVB-IPI</code>的主要缺点是其对于MPEG流之外的媒体类型缺少支持，使得它不适合用于家庭网络中分布式的本地内容存储（照片，音乐）。一些机制，例如<code>多协议封装</code>（MPE，它允许在MPEG数据流中嵌入任意数据发送），理论上可以用于扩展功能，但它们不是DVB-IPI规范的一部分。其更关注提供在现有DVB传输中提供的相同的特性（通过加入视频点播）。</p>
+<p>不过，一个通用设备除了其他框架外还可以实现DVB-IP以获得与现有的DVB-IP服务的兼容性。</p>
+<h3 id="DVB-HN"><a href="#DVB-HN" class="headerlink" title="DVB-HN"></a>DVB-HN</h3><p>DVB项目似乎已经了解了DVB-IPI的局限性，它们现在将DVB-IPI和DLNA的特性组合成一个称为<code>DVB-HN</code>（<strong>DVB家庭网络</strong>）的新框架。本质上，DVB-HN根据DLNA准则，使在广播内容中需要的所有可选部分为必须的。他们还引进新的设备类：</p>
+<ul>
+<li><strong>HNED</strong>（家庭网络终端设备）：这些重用现有的DLNA设备类（DMS，DMP，DMC），分别扩展为<code>DVB-DMS</code>，<code>DVB-DMP</code>和<code>DVB-DMC</code>。</li>
+<li><strong>网关设备</strong>（GD）将家庭网络连接到广播源。一个<strong>DVB-UGD</strong>（单向网关设备）包含一个调谐器和一个DMS，并使得接收到的DVB信道在家庭网络上可用。 一个<strong>DVB-BGD</strong>（双向网关设备）通过宽带连接将家庭网络于服务提供者连接，后者可能包括一个DVB-IPI兼容的交付网络网关以支持现有的DVB-IPI终端设备（这可以是简单的通过直接桥接网络到服务提供商）。</li>
+<li><strong>远程设备</strong>（DVB-RMC）可以控制在家庭网络内的设备，而并不必须在家庭网络（通过VPN连接）中。例如可以用来录制电视节目而不必在家里。</li>
+</ul>
+<p>DVB-HN还引入了新的设备功能（一组<strong>不局限于特定设备类的功能</strong>）。最值得注意的是：</p>
+<ul>
+<li><strong>dvb-sdns</strong>声明对DVB-IPI规定的SD&amp;S协议的支持，使设备与DVB-IPI交付网络网关或终端设备兼容。</li>
+<li><strong>dvb-cpcm</strong>实现兼容DRM的DVB内容保护和复制管理。</li>
+</ul>
+<p>所有在此提出的框架中，DVB-HN最接近这个项目的目标。但同样，该框架是相当新的，仍处于草案状态，在万维网中找不到任何实现了它的设备。如果在DLNA和DVB-HN规范之间没有出现冲突，支持两种标准将是一个真正的的通用设备最好的行动过程。</p>
+<h3 id="u4E13_u7528_u89E3_u51B3_u65B9_u6848"><a href="#u4E13_u7528_u89E3_u51B3_u65B9_u6848" class="headerlink" title="专用解决方案"></a>专用解决方案</h3><p>由于所有提到的标准都是比较新的，许多厂商都在同时开发了自己的专有的家庭网络系统。比如像<strong>AppleTV</strong>、微软的<strong>Windows媒体中心</strong>等，可能在他们的生态系统中工作得很好，他们不可避免地锁定用户到一个单一的供应商控制的世界。而很有可能，AppleTV的设备将决不显示DVB-IPTV，同样可能基于微软媒体室的T-Home娱乐空间接收器将永远不会从iTunes中播放一首歌曲。脱离这种情况的唯一的办法就是随之而来的开放标准的推广和使用。</p>
+<h3 id="VDR"><a href="#VDR" class="headerlink" title="VDR"></a>VDR</h3><p>一个著名的框架，尽管也是一个专有的解决方案，就是<strong>视频硬盘录像机</strong>（VDR）。它是<code>GNU</code>公共许可证下的一个自由软件项目，从一开始的设计目的就是把一个过时的PC系统变成个人视频录像机。它需要一个所谓的全功能的DVB接收机卡（其包括MPEG硬件解码器和在显示器上显示的功能）。除此之外，它具有很低的配置要求：300MHz的CPU，256MB的RAM，当然还要有一个足够大的硬盘以存储电视节目。它被广泛使用的主要原因大概是因为它可以很方便<strong>通过插件来进行扩展</strong>。</p>
+<p>不久，DVB调谐卡厂商推出了缺乏硬件解码器的更便宜的卡（“预算卡”）。在这之后不久，几个模拟软件解码的插件出现了。另一个被普遍使用的插件<code>streamdev</code>，它允许一个VDR实例充当服务器（提供网络上的DVB硬件）或客户机（访问网络上的<code>VDR-streamdev</code>服务器）。<code>Streamdev</code>同时提供所谓的<code>VTP</code>专有协议和标准的HTTP流媒体服务器。通过这些插件，在家庭网络中流直播是可能的，但对一般的终端用户来说配置它们太困难。</p>
+<p>尽管如此，一个运行VDR且带<code>streamdev</code>的服务器也是本文实现的流媒体服务器的可能的来源之一。</p>
+<h3 id="UPnP"><a href="#UPnP" class="headerlink" title="UPnP"></a>UPnP</h3><p><em>通用即插即用</em>架构打算让来自不同厂商的网络设备通过定义IP地址获取、设备发现和描述，远程调用和事件通知来进行互操作。因此，UPnP兼容设备可以找到网络中的其他UPnP设备，调用由他们提供的方法以及得到事件的通知，这一切都无需用户来配置设备。</p>
+<blockquote>
+<p>在UPnP术语中，一个设备并不一定是一个硬件装置，它也有可能是一个运行在台式机上的软件。</p>
+</blockquote>
+<p>UPnP AV定义UPnP设备类型的集合，以使网络设备通过家庭网络共享媒体内容。媒体服务器存储和提供内容项目，而媒体播放器可以接收并显示它们。控制点发现网络上的设备，并初始化媒体传输（播放）。UPnP AV允许多种传输方式，包括<strong>HTTP</strong>，<strong>RTSP/RTP</strong>，<strong>点至点连接</strong>（如<code>IEEE1394</code>）和<strong>专有的连接</strong>。</p>
+<p>由于UPnP是这个项目选择的框架，现在让我们来看看它的设计和使用的协议：</p>
+<h4 id="u8BBE_u5907_u548C_u670D_u52A1"><a href="#u8BBE_u5907_u548C_u670D_u52A1" class="headerlink" title="设备和服务"></a>设备和服务</h4><p>在UPnP的术语中，一台设备可以是提供服务的UPnP<em>设备</em>，也可以是调用其它<em>设备</em>服务的<em>控制点</em>。因此，在本文中，每当一个逻辑实体“设备”是代表UPnP设备结构时，都将会使用斜体书写。</p>
+<p>每个UPnP<em>设备</em>都提供一个或多个服务，并且甚至有可能包含其它<em>设备</em>。在此层次结构中的最上面的<em>设备</em>被称为<em>根设备</em>，而其它的是<em>嵌入式设备</em>。这样一来，一台设备可以同时提供不同的、甚至是不相关的功能。每台<em>根设备</em>都有一个<strong>全局唯一标识符</strong>（UUID），它唯一的标示了一台设备，并且即使设备重启也不会改变。</p>
+<p>每个<em>服务</em>都提供若干个可以远程调用的<em>服务动作</em>。</p>
+<h4 id="u83B7_u53D6IP_u5730_u5740"><a href="#u83B7_u53D6IP_u5730_u5740" class="headerlink" title="获取IP地址"></a>获取IP地址</h4><p>虽然这部分由底层的操作系统而不是<code>rtpserver</code>处理，但它仍应在这里描述。</p>
+<p>首先，UPnP网络目前仅限于IPv4；既不是IPv6也不是其他非IP协议，这是说明书上的一部分。 UPnP规定，在连接到网络后，每个设备都必须首先尝试通过<code>DHCP</code>获取IP地址。只有当获取失败的时候，它才需要自己分配一个本地链接的IPv4地址（也称为“零配置”）。</p>
+<p>整个UPnP网络通信都使用IP地址，即不要求或允许使用DNS域名，也没有像多播DNS这样的免配置解决方案。</p>
+<p>需要注意的是，如果设备具有多个网络接口（例如，802.3和802.11），每个接口都被独立地处理。</p>
+<h4 id="u8BBE_u5907_u53D1_u73B0"><a href="#u8BBE_u5907_u53D1_u73B0" class="headerlink" title="设备发现"></a>设备发现</h4><p>UPnP设备通过<strong>简单服务发现协议</strong>（<code>SSDP</code>）找到彼此。SSDP定义了其它设备可以监听的公告以及适用于特定设备的主动搜索。</p>
+<p>一个UPnP设备的SSDP活动消息示例：</p>
+<pre><code class="http">NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age=1800
+LOCATION: http://10.20.0.76:10080/volatile/description.xml
+NT: urn:schemas-upnp-org:device:MediaServer:1
+NTS: ssdp:alive
+SERVER: Linux/2.6.27-7-generic, UPnP/1.0, Portable SDK for UPnP devices/1.6.6
+X-User-Agent: redsonic
+USN: uuid:a6a69884-7a6d-413b-75cba6a8b07d::urn:schemas-upnp-org:device:MediaServer:1
+</code></pre>
+<p><strong>公告</strong> 每当一个<em>设备</em>或<em>服务</em>进入或离开网络，它将通过组播发送一个数据报到<code>239.255.255.250:1900</code>。上面是一个示例。一个设备进入网络时发送一个子类型通知（<code>NTS</code>），其头部是<code>ssdp:alive</code>；当离开时发送<code>ssdp:byebye</code>。通知消息包括：</p>
+<ul>
+<li>过期时间（在<code>CACHE-CONTROL</code>头部）：为防止由于离开网络的设备没有发送<em>byebye</em>消息（例如，因为它们被突然断电或网络链接被断开）而导致失效条目残留在设备的内部状态中，每个SSDP消息都有超时属性，超过这个时间之后实体将被认为过期，除非它被另一个活动的消息更新。超时时间通常设置为<strong>1800秒</strong>（<strong>30分钟</strong>）。</li>
+<li>设备描述URL（在<code>LOCATION</code>头部）：在这里，感兴趣的网络实体可以找到有关<em>设备</em>或<em>服务</em>更多信息的XML文档。参见2.5.4节。</li>
+<li>通知类型（<code>NT</code>）和一个唯一的服务名称（<code>USN</code>）指定了发送通知的设备或服务的类型。具体内容取决于通知类型。</li>
+</ul>
+<p>一个UPnP根设备公告由三种<em>根设备</em>通知组成，两种用于嵌入式<em>设备</em>，一种用于服务。 这些消息的确切标记可以在<strong>参考文献[7]</strong>中找到。</p>
+<p><strong>搜索</strong> UPnP<em>控制点</em>也能够主动地在网络上搜索特定的<em>设备</em>或服务类型。他们发送一个搜索请求，类似于下面所示内容：</p>
+<pre><code class="http">M-SEARCH * HTTP/1.1
+HOST: 239.255.255.250:1900
+MAN: &quot;ssdp:discover&quot;
+MX: 60
+ST: unpn:rootdevice
+</code></pre>
+<p>搜索包含一个用秒作单位（在<code>MX</code>头部）的<strong>最大等待时间</strong>，它<strong>随机</strong>的指定一个响应延迟时间上限。通过这种方式，多个设备对搜索的响应消息就不太可能会同时涌入搜索方了。此外，搜索还包含一个搜索目标（<code>ST</code>头部），指定要搜索的内容（在简单情况下，它是<code>ssdp:all</code>，搜索任何实体）。通常情况下，搜索请求会被发送多次，以确保即使在有损网络环境中的设备也能收到。</p>
+<p>每一个认为它自己或它的服务与搜索请求相匹配的<em>设备</em>，现在可以返回一个单播搜索响应到发出搜索请求的IP地址。</p>
+<h4 id="u63CF_u8FF0"><a href="#u63CF_u8FF0" class="headerlink" title="描述"></a>描述</h4><p><em>设备</em>和<em>服务</em>的描述都是以XML文档通过HTTP发布。文档中包含一个<em>控制点</em>所需要与<em>设备</em>或<em>服务</em>进行交互的所有信息。</p>
+<p>一个设备描述可以包含设备类型，用于向用户显示的友好名称，一个唯一标识该设备一个实例的UUID以及一些不限类型的字段，比如生产商，一个到制造商网站的URL，模型名称，型号，序列号和UPC等。它还包含<em>设备</em>提供的服务的列表，以及包含的<strong>嵌入式设备</strong>列表。如下所示是一个UPnP AV媒体服务器设备描述的例子：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot; ?&gt;
+&lt;root xmlns=&quot;urn:schemas-upnp-org:device-1-0&quot;
+      xmlns:dlna=&quot;urn:schemas-dlna-org:device-1-0&quot;&gt; 
+  &lt;speVersion&gt; 
+    &lt;minor&gt;0&lt;/minor&gt;  
+    &lt;major&gt;1&lt;/major&gt; 
+  &lt;/speVersion&gt;  
+  &lt;URLBase&gt;http://192.168.80.2:49152&lt;/URLBase&gt;  
+  &lt;device&gt; 
+    &lt;deviceType&gt;urn:shemas-upnp-org:devie:MediaServer:1&lt;/deviceType&gt;  
+    &lt;friendlyName&gt;DVB streaming media server&lt;/friendlyName&gt;  
+    &lt;manufacturer&gt;Martin Emrih&lt;/manufacturer&gt;  
+    &lt;manufacturerURL&gt;http://www.emmes-world.de&lt;/manufacturerURL&gt;  
+    &lt;modelDescription&gt;Martins RTP-Server&lt;/modelDescription&gt;  
+    &lt;modelName&gt;rtpserver&lt;/modelName&gt;  
+    &lt;modelNumber&gt;rtpserver 0.0.2svn&lt;/modelNumber&gt;  
+    &lt;modelURL&gt;http://www.emmes-world.de&lt;/modelURL&gt;  
+    &lt;serialNumber&gt;00123456789&lt;/serialNumber&gt;  
+    &lt;presentationURL&gt;http://192.168.80.2:10080&lt;/presentationURL&gt;  
+    &lt;UDN&gt;uuid:a40777e1-385a-4b47-8f60-295f71aa02b&lt;/UDN&gt;  
+    &lt;dlna:X_DLNADOC&gt;DMS-1.00&lt;/dlna:X_DLNADOC&gt;  
+    &lt;serviceList&gt; 
+      &lt;service&gt; 
+        &lt;serviceType&gt;urn:schemas-upnp-org:service:ConnectionManager:1&lt;/serviceType&gt;  
+        &lt;serviceId&gt;urn:upnp-org:serviceId:ConnectionManager&lt;/serviceId&gt;  
+        &lt;SCPDURL&gt;http://192.168.80.2:10080/volatile/cmsservie.xml&lt;/SCPDURL&gt;  
+        &lt;controlURL&gt;/volatile/cmscontrol&lt;/controlURL&gt;  
+        &lt;eventSubURL&gt;/volatile/cmsevent&lt;/eventSubURL&gt; 
+      &lt;/service&gt;  
+      &lt;service&gt; 
+        &lt;serviceType&gt;urn:schemas-upnp-org:service:ContentDiretory:1&lt;/serviceType&gt;  
+        &lt;serviceId&gt;urn:upnp-org:serviceId:ContentDiretory&lt;/serviceId&gt;  
+        &lt;SCPDURL&gt;http://192.168.80.2:10080/volatile/cdsservice.xml&lt;/SCPDURL&gt;  
+        &lt;controlURL&gt;/volatile/cdscontrol&lt;/controlURL&gt;  
+        &lt;eventSubURL&gt;/volatile/cdsevent&lt;/eventSubURL&gt; 
+      &lt;/service&gt; 
+    &lt;/serviceList&gt; 
+  &lt;/device&gt; 
+&lt;/root&gt;
+</code></pre>
+<p>服务描述包含可用的操作（即可以远程调用的方法）和服务状态的变量列表。下面是从一个服务描述（UPnP AV媒体服务器的内容目录服务）中摘录的例子，有些动作/服务变量被删除：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot; ?&gt;
+&lt;scpd xmlns=&quot;urn:schemas-upnp-org:service-1-0&quot;&gt;  
+  &lt;speVersion&gt; 
+    &lt;major&gt;1&lt;/major&gt;
+    &lt;minor&gt;0&lt;/minor&gt; 
+  &lt;/speVersion&gt;  
+  &lt;actionList&gt; 
+    &lt;action&gt; 
+      &lt;name&gt;GetSortCapabilities&lt;/name&gt;  
+      &lt;argumentList&gt; 
+        &lt;argument&gt; 
+          &lt;name&gt;SortCaps&lt;/name&gt;
+          &lt;direction&gt;out&lt;/direction&gt;
+          &lt;relatedStateVariable&gt;SortCapabilities&lt;/relatedStateVariable&gt; 
+        &lt;/argument&gt; 
+      &lt;/argumentList&gt; 
+    &lt;/action&gt;  
+    &lt;action&gt; 
+      &lt;name&gt;GetSystemUpdateID&lt;/name&gt;  
+      &lt;argumentList&gt; 
+        &lt;argument&gt; 
+          &lt;name&gt;Id&lt;/name&gt;
+          &lt;direction&gt;out&lt;/diretion&gt;
+          &lt;relatedStateVariable&gt;SystemUpdateID&lt;/relatedStateVariable&gt; 
+        &lt;/argument&gt; 
+      &lt;/argumentList&gt; 
+    &lt;/action&gt; 
+  &lt;/actionList&gt;  
+  &lt;serviceStateTable&gt; 
+    &lt;stateVariable sendEvents=&quot;no&quot;&gt; 
+      &lt;name&gt;SearhCapabilities&lt;/name&gt;
+      &lt;dataType&gt;string&lt;/dataType&gt; 
+    &lt;/stateVariable&gt;  
+    &lt;stateVariable sendEvents=&quot;no&quot;&gt; 
+      &lt;name&gt;SortCapabilities&lt;/name&gt;
+      &lt;dataType&gt;string&lt;/dataType&gt; 
+    &lt;/stateVariable&gt;  
+    &lt;stateVariable sendEvents=&quot;yes&quot;&gt; 
+      &lt;name&gt;SystemUpdateID&lt;/name&gt;
+      &lt;dataType&gt;ui4&lt;/dataType&gt;
+      &lt;defaultValue&gt;0&lt;/defaultValue&gt; 
+    &lt;/stateVariable&gt; 
+  &lt;/serviceStateTable&gt; 
+&lt;/scpd&gt;
+</code></pre>
+<h4 id="u63A7_u5236"><a href="#u63A7_u5236" class="headerlink" title="控制"></a>控制</h4><p>当<em>控制点</em>已经发现<em>设备</em>并且读取其描述之后，它就可以调用由该<em>设备</em>提供的操作了。动作调用使用SOAP远程过程调用完成。调用方使用<code>HTTP POST</code>方式发送<code>SOAP</code>请求到服务的<strong>controlURL</strong>。如果该请求是有效的，<em>设备</em>执行相应的动作，并返回响应。如果执行时间需要超过30秒，该服务要求即刻返回，并在执行完成时发送一个事件。</p>
+<p>UPnP标准曾经纳入一个机制来直接查询状态变量，但现在该方式已经<strong>过时</strong>。</p>
+<p>一个<em>服务</em>提供的操作通常使用形如<strong>&lt;服务&gt;:&lt;操作&gt;</strong>或<strong>&lt;服务缩写&gt;:&lt;操作&gt;</strong>的方式引用，如<code>CMS:GetProtocolInfo</code>表示连接管理(<code>ConnectionManager</code>)的<code>GetProtocolInfo</code>操作。</p>
+<h4 id="u4E8B_u4EF6"><a href="#u4E8B_u4EF6" class="headerlink" title="事件"></a>事件</h4><p>作为不断轮询查看<em>服务</em>状态的代替方式，一个<em>控制点</em>可以订阅由<em>服务</em>发出的事件。UPnP使用<em>*通用事件通知结构</em>（<code>GENA</code>）来发出通知。 该协议基于HTTP，但为不同的消息类型引入了新方法。</p>
+<p>对事件感兴趣的客户端可以发送订阅请求到<em>服务</em>的<code>eventSubURL</code>。订阅包括一个回调URL和订阅时间。注意，没有办法将订阅限制到<em>服务状态变量</em>的特定子集。该<em>服务</em>使用一个唯一标识的订阅ID进行相应，并发送第一个、包括所有事件状态变量的<em>初始化</em>事件。之后（直到订阅到期或客户取消订阅），每当一个变量发生变化时，该<em>服务</em>发送相应事件通知给每一个订阅用户。</p>
+<h3 id="UPnP_AV"><a href="#UPnP_AV" class="headerlink" title="UPnP AV"></a>UPnP AV</h3><p>UPnP AV基础设施说明了一组UPnP设备的配置文件和它们之间的相互作用，以帮助在设备之间传输媒体内容（音频，视频，图像，…）。这些设备配置文件是：</p>
+<ul>
+<li>一个典型媒体流来源的<strong>媒体服务器</strong>。例如，一个网络存储设备通过UPnP AV发布其包含的媒体文件。英特尔提供了一套有帮助的设计指导原则。</li>
+<li>一个接收媒体以进行播放的<strong>媒体渲染器</strong>。这可以是一个联网的电视机、音频播放器或机顶盒。</li>
+<li>一个<strong>控制点</strong>，它能够发现其它UPnP AV设备，可从服务器匹配与现有渲染器相符的媒体资源以及控制媒体的传送。它可以被认为是一个网络远程控制。</li>
+</ul>
+<p>设备配置文件可以组合在一起，例如媒体渲染器和控制点可能在一台网络电视中，用户可以在屏幕上选择可用的内容并播放。</p>
+<h4 id="u5A92_u4F53_u670D_u52A1_u5668"><a href="#u5A92_u4F53_u670D_u52A1_u5668" class="headerlink" title="媒体服务器"></a>媒体服务器</h4><p>媒体服务器提供两到三个<em>服务</em>：一个内容目录用于访问可用内容项的列表，一个连接管理服务用于启动或停止媒体传输，以及一个AV传输服务用于控制单独媒体传输。由于大部分流行的传输方法（<strong>HTTP</strong>或<strong>RTSP/RTP</strong>）都自带传输管理，一些连接管理操作和完整AV传输服务都是可选的。</p>
+<h4 id="u5A92_u4F53_u6E32_u67D3_u5668"><a href="#u5A92_u4F53_u6E32_u67D3_u5668" class="headerlink" title="媒体渲染器"></a>媒体渲染器</h4><p>媒体渲染器也提供了两个到三个<em>服务</em>：一个渲染控制服务用于影响其自身呈现（例如音量控制，亮度，对比度），一个连接管理服务以及一个可选的AV传输服务。</p>
+<h4 id="u63A7_u5236_u70B9"><a href="#u63A7_u5236_u70B9" class="headerlink" title="控制点"></a>控制点</h4><p>控制点将前两者结合起来，它查找可用的媒体服务器和渲染器并检索内容目录以显示给用户。控制点匹配源和接收器支持的协议与媒体格式，并<strong>仅</strong>显示可以顺利播放的组合。最后，它初始化并控制媒体传输。</p>
+<h4 id="u5185_u5BB9_u76EE_u5F55"><a href="#u5185_u5BB9_u76EE_u5F55" class="headerlink" title="内容目录"></a>内容目录</h4><p>内容目录包含媒体服务器上所有可用媒体项目的引用，将它们排列在一个树结构中。控制点可以使用<code>CDS:Browse</code>动作来浏览内容目录，或使用<code>CDS:Search</code>动作搜索。可选地，内容目录甚至可以被控制点修改，例如：上传新的媒体到设备。</p>
+<p>每个对象都<strong>至少必须</strong>具有一个唯一的ID，它的父对象的ID（根对象的ID必须为0，且其parentID为-1），一个标题和一个限制标志（如果标志设置为真，则对控制点来说，该对象是只读的）。派生类可能添加其他字段和属性。</p>
+<p>对象类型都是从同一个基类类型（<code>object</code>）中继承。这里有大部分基本类型和一些派生类的例子：</p>
+<ul>
+<li><code>object.container</code>对应一个文件系统目录。它可以有子对象。必填字段为<strong>ID</strong>、<strong>名称</strong>。</li>
+<li><code>object.item</code>是<strong>最基本</strong>的媒体项类型。所有其他媒体类型从这个继承。</li>
+<li><code>object.item.audioItem</code>是一个通用的音频项目。添加了属性比如<em>流派</em>和<em>出版商</em>。</li>
+<li><code>object.item.audioItem.musicTrack</code>指的是一个单一的音乐项目，如一张专辑中的一首歌。添加了属性如<em>艺术家</em>和<em>专辑</em>。</li>
+</ul>
+<p>一个<em>控制点</em>通过<code>CDS:Browse</code>方法访问内容目录，可以用这些参数影响结果：</p>
+<ul>
+<li><code>ObjectID</code>：开始位置</li>
+<li><code>BrowseFlag</code>：<code>BrowseMetadata</code>和<code>BrowseDirectChildren</code>中的一个。前者仅返回关于所请求的对象的信息，而后者返回指定<code>ObjectID</code>的直接子对象。</li>
+<li><code>Filter</code>：如果设置为<code>*</code>，所有必需的属性都会返回。可替代地，可以指定要返回的属性的列表。</li>
+<li><code>StartingIndex</code>：对于<code>BrowseDirectChildren</code>来说，这是一个结果偏移量，例如分页获取对象信息。</li>
+<li><code>RequestCount</code>：限制返回对象的数量。和<code>StartingIndex</code>一起使用，具有小屏幕的设备可以只获取能在当前屏幕上显示的对象的子集。</li>
+<li><code>SortCriteria</code>：指定结果应如何进行排序。例如：<code>+upnp:album,+upnp:originalTrackNumber</code>。</li>
+</ul>
+<p>媒体服务器然后使用一个<code>DIDL-Lite</code>的XML文档返回所请求的内容对象。<code>DIDL-Lite</code>本身是在<strong>MPEG-21(ISO/IEC 21000)</strong>中定义的<em>数字项目声明语言</em>的一个子集，它把上面描述的对象结构转换成XML对象。</p>
+<p>下面是一个示例DIDL-Lite XML文档：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot;
+           xmlns:d=&quot;http://purl.org/dc/elements/1.1/&quot;
+           xmlns:dlna=&quot;urn:schemas-dlna-org:metadata-1-0&quot;
+           xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot;&gt;  
+  &lt;item id=&quot;3&quot; parentID=&quot;2&quot; restricted=&quot;1&quot;&gt; 
+    &lt;d:title&gt;Das Erste&lt;/d:title&gt;  
+    &lt;upnp:channelNr&gt;1&lt;/upnp:channelNr&gt;  
+    &lt;upnp:channelName&gt;Das Erste&lt;/upnp:channelName&gt;  
+    &lt;upnp:class&gt;object.item.videoItem.videoBroadcast&lt;/upnp:class&gt;  
+    &lt;res bitrate=&quot;1875000&quot; protocolInfo=&quot;http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL;DLNA.ORG_FLAGS=8D100000000000000000000000000000&quot;&gt;
+      http://134.96.63.118:10080/192.168.80.1/tv/S19.2E-1-1101-28106.mpg?apid=102&amp;amp;audio=MP2&amp;amp;container=MPEGPS&amp;amp;ppid=101&amp;amp;video=MPEG2&amp;amp;vpid=101
+    &lt;/res&gt;
+    &lt;res protocolInfo=&quot;rtsp-rtp-udp:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_SD_EU_ISO;DLNA.ORG_FLAGS=8D100000000000000000000000000000&quot;&gt;
+      rtsp://134.96.63.118:10554/192.168.80.1/tv/S19.2E-1-1101-28106.mpg?apid=102&amp;amp;audio=MP2&amp;amp;container=MPEGTS&amp;amp;ppid=101&amp;amp;video=MPEG2&amp;amp;vpid=101
+    &lt;/res&gt; 
+  &lt;/item&gt;  
+  &lt;item id=&quot;4&quot; parentID=&quot;2&quot; restricted=&quot;1&quot;&gt; 
+    &lt;d:title&gt;ZDF&lt;/d:title&gt;  
+    &lt;upnp:channelNr&gt;2&lt;/upnp:channelNr&gt;  
+    &lt;upnp:channelName&gt;ZDF&lt;/upnp:channelName&gt;  
+    &lt;upnp:class&gt;objet.item.videoItem.videoBroadcast&lt;/upnp:class&gt;  
+    &lt;res bitrate=&quot;1875000&quot; protocolInfo=&quot;http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL;DLNA.ORG_FLAGS=8D100000000000000000000000000000&quot;&gt;
+      http://134.96.63.118:10080/192.168.80.1/tv/S19.2E-1-1079-28006.mpg?apid=120&amp;amp;audio=MP2&amp;amp;container=MPEGPS&amp;amp;ppid=110&amp;amp;video=MPEG2&amp;amp;vpid=110
+    &lt;/res&gt;
+    &lt;res protocolInfo=&quot;rtsp-rtp-udp:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_SD_EU_ISO;DLNA.ORG_FLAGS=8D100000000000000000000000000000&quot;&gt;
+      rtsp://134.96.63.118:10554/192.168.80.1/tv/S19.2E-1-1079-28006.mpg?apid=120&amp;amp;audio=MP2&amp;amp;container=MPEGTS&amp;amp;ppid=110&amp;amp;video=MPEG2&amp;amp;vpid=110
+    &lt;/res&gt;
+  &lt;/item&gt; 
+&lt;/DIDL-Lite&gt;
+</code></pre>
+<h4 id="u5185_u5BB9_u8D44_u6E90"><a href="#u5185_u5BB9_u8D44_u6E90" class="headerlink" title="内容资源"></a>内容资源</h4><p>每个内容项的对象都包含一个或多个指向实际内容的<em>资源</em>。对于相同内容项的多个资源可以指向不同的可用传输，或者同一内容的不同表示（例如，一个附加的较小版本的照片，或者同一视频使用不同编解码器编码）。每个资源至少包含一个可以访问资源的URL，以及一个<code>protocolInfo</code>字符串，它是由四个字段组成：</p>
+<ul>
+<li><strong>协议</strong>：使用的传输协议：本项目中使用的两个协议是用于HTTP的<code>http-get</code>和用于RTP的<code>rtsp-rtp-udp</code>，还有可能用于设备内部连接的<code>internal</code>，用于IEEE1394链路的<code>iec61883</code>或供应商为其特定的运输已注册的ICANN域名。</li>
+<li><strong>网络</strong>：HTTP或RTP中不需要，因此设置为<code>*</code>。</li>
+<li><strong>内容格式</strong>：通常情况是内容的MIME类型，如<code>video/mpeg</code>或者<code>image/jpeg</code>。</li>
+<li><strong>附加信息</strong>：可能包含有关该资源的详细信息。如果不需要，它被设置为<code>*</code>。</li>
+</ul>
+<h3 id="DLNA"><a href="#DLNA" class="headerlink" title="DLNA"></a>DLNA</h3><p>数字生活网络联盟（<code>DLNA</code>）是全球领先的消费娱乐厂商联盟。它的目标是让用户可以联网家庭娱乐设备并提供无缝的合作工作，只要设备带有DLNA CERTIFIED™标志，即使这些设备是来自不同的厂商。</p>
+<p>DLNA实际上是UPnP AV组的继承人，基本上DLNA架构就是UPnP AV加上许多额外的规范和说明，所有设计都用于避免不同设备之间的兼容性问题。有一些较为明显的增加内容：</p>
+<ul>
+<li>更多的设备配置文件：DLNA不仅区分<strong>媒体服务器</strong>，<strong>媒体渲染器</strong>和<strong>控制点</strong>，还区分不同的设备类别，比如家庭网络设备（HND）或移动手持设备（MHD），以及不同的媒体类别（例如数字媒体播放器（DMP）或移动数字媒体服务器（M-DMS））。还有一种打印体系结构（建立在UPnP打印定义的上层）。通过这，单个设备的功能可以更彻底地指定。</li>
+<li>DLNA媒体控制器（DMC）不仅基于传输协议与格式匹配内容和渲染，还基于标准化的DLNA媒体情景模式，后者指定了容器、编解码器甚至图像尺寸。这样就避免了很多兼容性问题，例如尝试在手机上播放1080p的视频内容。</li>
+<li>强制传输、容器和编解码器：一个设备要被认证，必须至少支持HTTP传输和一组最小的媒体格式集合（包括MPEG 2视频，MP3音频，JPEG和LPCM）。DLNA甚至指定了媒体互操作单元（<code>MIU</code>），其本质上是一个转码器设备，用于使内容与其他设备兼容。</li>
+<li>详细媒体传输规格：DLNA设备准则还规定了如何访问和传输的不能随机访问的内容，例如直播或者硬盘录像机上一个增长的记录。</li>
+</ul>
+<p>一个DLNA CERTIFIED™的设备，必须符合数百项要求，需要使用由DLNA向其成员提供的一种<strong>一致性测试工具</strong>（<code>CTT</code>）测试。DLNA的主页列出了超过1000种认证的设备，包括电视机，笔记本电脑（通常是指经过认证的DLNA软件），当然还有索尼的PlayStation 3视频游戏机。</p>
+<p>尽管DLNA规定了需要在家庭网络直播（RTSP/RTP传输或调谐器管理）的所有内容，截至2008年年底，没有任何实现这些指导方针的设备投放市场。这可能是由于在认证过程这些功能是可选的，因而没有被CTT测试（它测试的大多只是强制性要求），另一个原因可能是RTP传输增加了开发难度。</p>
+<p>除了约束或澄清现有的UPnP AV架构，DLNA准则主要在现有的协议和格式中添加了新的头部和字段。其座右铭是“<strong>分析并解释，或分析而忽视</strong>”，这意味着任何在交流中遇到的无法理解（例如：一个厂商特定的XML元素出现在DIDL-Lite文档中）或看起来畸形的信息，另一方应始终宽容地对待，并当做该元素从没有出现过。通过这种方式，可以扩充更多信息而不会干扰传统客户端。</p>
+<h4 id="u6570_u636E_u53EF_u7528_u6027_u6A21_u578B"><a href="#u6570_u636E_u53EF_u7528_u6027_u6A21_u578B" class="headerlink" title="数据可用性模型"></a>数据可用性模型</h4><p>DLNA知道存储和直播内容之间不同的可用性属性，因而定义了统一的<strong>客户端数据可用性模型</strong>（<code>UCDAM</code>）来描述流边界和有效范围：</p>
+<p><img src="/images/dlna/img-ucdam.png" alt="UCDAM"></p>
+<ul>
+<li>[`d_x`,`d_y`]是整个内容对象，有可能部分无法访问（例如用于直播的内容）。</li>
+<li>[`s_0`,`s_N`]是内容源实际上能够传输的数据范围。对于存储在磁盘上的内容，通常情况下，[`d_x`,`d_y`] = [`s_0`,`s_N`]。对于现场直播的内容（无缓冲或磁盘记录），两者相等，并不断向前移动。基于这，DLNA分别绘制了固定`s_0`、`s_0`增长和固定`s_N`、`s_N`增长之间的区别。</li>
+<li>[`r_0`,`r_N`]是可用于随机访问的范围。`r_0`等于`s_0`，对于可搜索内容`r_N`通常等于`s_N`。对于非随机访问的内容（某些容器只允许从头开始播放，例如索引损坏的AVI文件，或从特定的时间间隔，例如MPEG组的图片），`r_N`等于`s_0`。</li>
+<li>[`d_0`,`d_N`]是内容接收者可访问的范围。如果它在本地缓冲该接收到的数据，则这个范围可能超过[`s_0`,`s_N`]。</li>
+</ul>
+<p>在此描述模型的基础上，DLNA准则规定了三种不同的数据可用性模型下的内容。在所有情况下，假定[`s_0`,`s_N`] = [`r_0`,`r_N`]。需要注意的是DLNA同时通过字节偏移和本地播放时间（<code>NPT</code>）描述寻址。</p>
+<p><strong>完全随机访问数据可用性模型</strong><br>该模型适用于固定`s_0`，固定`s_N`的内容，其中完整的二进制内容始终是可查找的，如存储在磁盘上的内容（包括一个正在记录的增长的内容）。这里，客户端可以从服务器请求任意内容范围，只要该容器格式和使用的编解码器允许。</p>
+<p><strong>受限的随机访问数据可用性模型（模式0）</strong><br>该模型适用于`s_0`增长的内容，诸如实时广播。这种情况下，寻址被限制到二进制内容的子范围，甚至有可能是单个时间点。</p>
+<p><strong>受限的随机访问数据可用性模型（模式1）</strong><br>这是固定`s_0`的内容使用的模型。在DLNA准则给出的例子是当前正由媒体服务器编码的内容项。这种情况下，从开始时刻到编码器当前的工作点之间的内容是及时可用的，而仍然是待编码的部分则是不可用的。</p>
+<h4 id="protocolInfo_u5B57_u6BB5"><a href="#protocolInfo_u5B57_u6BB5" class="headerlink" title="protocolInfo字段"></a>protocolInfo字段</h4><p>DLNA将内容目录资源的<code>protocolInfo</code>（参见2.6.5节）中的第四个字段作为一个逗号分隔的键-值对列表，用于提供有关资源的更详细的信息。可用的键有：</p>
+<ul>
+<li><code>DLNA.ORG_PN</code>字段指定内容的DLNA媒体资料。</li>
+<li>转换指示符<code>DLNA.ORG_CI</code>指定内容是否已被重新编码。如果内容提供了多种资源，客户端可以用它来在通常具有最高质量的原始格式中寻找内容，只要客户端兼容相关格式。</li>
+<li><code>DLNA.ORG_PS</code>列出了可用的额外的播放速度（超出正常的1X播放速度）来表示如快进或慢动作回放的支持。</li>
+<li><code>DLNA.ORG_OP</code>指定寻址的能力。例如，资源支持通过字节便宜或本地播放时间偏移来寻址。</li>
+<li><code>DLNA.ORG_MAXSP</code>表示对RTSP速度头的支持，以及其最大的值。</li>
+<li><code>DLNA.ORG_FLAGS</code>是一个具有32个字符的十六进制字符串，其中含有几十个布尔标志。最重要的标志是<ul>
+<li><code>sp</code>标志：如果为真，内容是发件人节奏的（服务器作为时钟源），因此，接收方不能承担控制传输速度的任务。</li>
+<li>`s_0`增长和`s_N`增长：如果为真，内容的`s_0`（或`s_N`分别）边界随时间增加。</li>
+<li><code>tm-s</code>, <code>tm-b</code>和<code>tm-i</code>：选择DLNA传输模式，<code>Streaming</code>（音频/视频内容实时前台传输）、<code>Background</code>（低优先级批量传输）和<code>Interactive</code>（尽力而为前台传输图像）中的一个。</li>
+<li><code>http-stalling</code>指示该服务器是否允许客户端通过简单断开HTTP连接来暂停传输。</li>
+</ul>
+</li>
+</ul>
+<p>利用这些信息，接收器能够确定每个内容项具有的功能：可以按块获取内容或需要一个连续的传输？可以使用字节范围、甚至时间码进行随机访问？如果这些功能都可用，接收使用标准HTTP或RTSP头部指示其请求，否则如果需要的话，使用特殊的DLNA头部。</p>
+<h4 id="HTTP_u5934"><a href="#HTTP_u5934" class="headerlink" title="HTTP头"></a>HTTP头</h4><p>一些新的HTTP头由DLNA引入，用于指定传输参数：</p>
+<ul>
+<li><p><code>contentFeatures.dlna.org</code>：无论何时，只要客户端发送GET或HEAD请求并且包含一个<code>getContentFeatures.dlna.org: 1</code>头部，服务器就会发送此参数。它包含了内容资源的第四个字段（DLNA的<code>protocolInfo</code>字段）。</p>
+</li>
+<li><p><code>availableSeekRange.dlna.org</code>：客户端通过发送GET或HEAD请求并包含<code>getAvailableSeekRange.dlna.org: 1</code>，可以请求一个给定内容项的当前可用寻址范围。服务器返回一个具有<code>availableSeekRange.dlna.org</code>报头的响应，该值指示数据可用性模式（见上文）以及以字节和/或NPT表示的可用寻址范围。例如值为<code>0 bytes=0-0</code>（受限的随机访问数据可用性模型，模式0，可能没有任何寻址范围），或<code>1 npt=00:00:00-00:08:31 bytes=0-204356823</code>（受限的随机访问数据可用性模式，模式1，在NPT和字节下都可以寻址）。</p>
+</li>
+<li><p><code>transferMode.dlna.org</code>：使用<code>transferMode.dlna.org</code>头部，客户端指定传输是流式，交互式或后台传输。然后服务器使用相同的头部在给定的传输模式进行响应，并为传输模式应用必要的QoS机制。为了向后兼容性（与以前版本的DLNA和非DLNA设备），省略了此头部则意味着使用流传输。</p>
+</li>
+<li><p><code>Range</code>和<code>timeSeekRange.dlna.org</code>：除了使用正常HTTP头<code>Range</code>获取字节寻址之外，DLNA还定义了<code>timeSeekRange.dlna.org</code>头，它用于实现使用NPT寻址。</p>
+</li>
+<li><p><code>PlaySpeed.dlna.org</code>：客户端发送这个头部来指定预期的播放速度。如果服务器发送相同的头部确认请求，之后它将发送播放时间被缩放过的内容（例如，通过加倍帧和减缓音频实现慢动作回放）。</p>
+</li>
+<li><p><code>realTimeInfo.dlna.org</code>：对于实时传输字符的内容（如直播），客户端和服务器可以在键值对中通信附加信息。当前唯一使用的键是<code>DLNA.ORG_TLAG</code>。如果它是一个有限数（正实数），它指定在当前时间（例如：当从调谐器硬件接收内容片段时）和它必须被发送到客户端的时间之间的用秒表示的时间差。如果超过此时间（因为客户端在此时间不接受它），服务器被允许删除数据以保持传输的实时特性。如果它是无限的，该标记被设置为<code>*</code>。</p>
+</li>
+</ul>
+<h4 id="RTSP_u5934"><a href="#RTSP_u5934" class="headerlink" title="RTSP头"></a>RTSP头</h4><p>支持(<code>dlna.annouce</code>, …)功能列表可以通过客户端或服务器发出。它包含一个逗号分割的发送端点的功能列表，例如，<code>dlna annouce</code>表示服务器可以发送RTSP ANNOUNCE消息。</p>
+<ul>
+<li><p><code>Buffer-Info.dlna.org</code>：当服务器支持RTCP缓冲器充满报告时，这将在客户端的RTSP SETUP请求中发送，指示客户端缓冲字符。它包括去抖动缓冲器字节大小、编码数据缓冲器字节大小、接收缓冲器传送机构（去抖动缓冲区是立即将数据推送到编码数据缓冲器，还是基于数据包的时间标记）、以毫秒计算的接收机缓冲区大小。</p>
+</li>
+<li><p><code>WCT.dlna.org</code>：如果客户端设置为1，服务器必须添加挂钟时间样本到数据流。</p>
+</li>
+<li><p><code>Max-Prate.dlna.org</code>是由客户端发送以指示其最大传入分组速率。</p>
+</li>
+<li><p><code>Event-Type.dlna.org</code>在一个来自服务器的RTSP <strong>ANNOUNCE</strong>消息中指示事件。例如，如果到达流的结束时，服务器将其设置为2000。</p>
+</li>
+<li><p><code>Available-Range.dlna.org</code>由服务器在RTSP <strong>DESCRIBE</strong>响应中指示可用搜索范围（UCDAM `r_0`和`r_N`），类似于HTTP头<code>availableSeekRange</code>。</p>
+</li>
+<li><p><code>Predec-Buffer-Size.dlna.org</code>, <code>Initial-Buffering.dlna.org</code>由RTP流接收者指定需要的缓冲区大小。</p>
+</li>
+</ul>
+<h3 id="u4F20_u8F93_u534F_u8BAE"><a href="#u4F20_u8F93_u534F_u8BAE" class="headerlink" title="传输协议"></a>传输协议</h3><h4 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h4><p>HTTP协议，大概占了大部分的互联网流量（除了可能的对等文件共享网络），想必不需要太多的介绍。它的简单和可扩展的头部结构，发送内容类型的独立性和其可靠性使其成为了家庭媒体网络最喜欢的传输协议。请求和响应任何传送的内容（<code>body</code>）之前都使用纯文本头部。请求的第一行指定了<em>请求方法</em>、资源和协议标识符（例如<code>HTTP/1.1</code>）。</p>
+<p>请求示例：</p>
+<pre><code class="http">GET /hello.txt HTTP/1.1
+Host: www.example.org
+</code></pre>
+<p>和相应的响应：</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Length: 12
+Connection: close
+Content-Type: text/plain
+
+Hello World!
+</code></pre>
+<p>基于TCP协议，该协议被设计用于尽力而为、可靠的顺序数据传输，HTTP它不会做任何实时的保证。对于经典的万维网，这当然不是必需的，但是对于流媒体应用，需要一定量的工作使HTTP同步。只要接收者保持足够大的缓冲器，对于存储内容的传输，如果由发送器和接收器之间的信道提供的净带宽高于内容被播放的数据速率，它就是适用的。</p>
+<p>一旦超过了可用带宽，TCP的流量控制将变为不利条件。</p>
+<p>在这种情况下，客户端将以较慢的速度接收数据（尽管仍然完整且按顺序），并且在不中断的情况下不再播放。为了减少这种问题，大部分播放器在开始播放前缓冲大量的数据，以弥补数据速率的下降。</p>
+<p>HTTP的最大优点是，所发送的内容不需要知道信道特性，因为<strong>HTTP保证没有任何丢失</strong>。所以HTTP仍然是后台传输和非实时敏感数据传输的首选传输协议。</p>
+<h4 id="RTSP/RTP"><a href="#RTSP/RTP" class="headerlink" title="RTSP/RTP"></a>RTSP/RTP</h4><p>相比之下，<strong>实时传输协议</strong>（<code>RTP</code>）和它的同伴协议<code>RTSP</code>和<code>RTCP</code>从底层向上都是为实时流媒体应用设计的。</p>
+<p>RTP是承载实际数据的协议，它是基于<code>UDP</code>的。UDP本身既不负责数据的排序，也不负责定时。RTP为每个数据包增加了<strong>序列号</strong>，用于保持数据包有序以及检测丢失情况。另外，每个包都包含一个时间戳作为第一有效字节，用于同步目的，以及有效载荷类型，用于确定数据的类型（例如：MPEG视频或PCM音频）。当然，应用程序必须通过纠错方案或鲁棒解码器将协议的有损性质考虑在内。因为它是基于UDP的，所以它也可以用在<strong>多播</strong>环境中，当多个客户机希望同时接收相同的内容时使用。</p>
+<p><code>RTSP</code>（<strong>实时流传输协议</strong>）用于会话管理，例如，确定内容的属性，并控制传输（设置，播放，暂停，停止，…）。它的语法被设计的与HTTP颇为相似，但不同之处在于它是有状态的，在同一个会话，连续的操作不需要在相同的TCP连接上发生。因此，它包括一个<strong>会话ID</strong>和一个<strong>序列号</strong>。</p>
+<p>一个典型的RTSP会话通常从客户端的<code>OPTIONS</code>请求开始，服务器使用它支持方法的列表进行响应。接下来，客户端会发出针对特定内容项的<code>DESCRIBE</code>请求，服务器用带有描述的响应让客户了解期望的流的类型。然后，客户端发送一个<code>SETUP</code>请求，只有此时，服务器才会为此次会话分配资源，并发送<em>会话ID</em>给客户端，客户端现在必须在本次会话的每个后续请求中加入会话ID。现在，客户端可发出<code>PLAY</code>或<code>PAUSE</code>请求来控制传输。最后，当客户想要结束会话，它发送一个<code>TEARDOWN</code>请求。</p>
+<p>而一个流会话正在播放（或记录）时，发送者和接收者可任选在<code>RTCP</code>（<strong>实时传输控制协议</strong>）交换连接信息。它主要用于发送或接收报告，例如通知另一方有关丢失的数据包，或给发送者一个缓冲区填充满的报告。</p>
+<p>RTP一个问题仍然存在，那就是一端丢失检测（DPD）。因为在一个正在运行的会话过程中没有持久连接，服务器不能被动的检测到客户端刚离开网络，并只会继续发送RTP流。一个可能性是使用RTCP定期接收报告，如果在一定的时间内没有报告被接收到就结束会话。很多用户现在使用的另一种“变通”是保持RTSP连接打开，并每隔几秒钟发出一个带会话ID的无操作请求（例如<code>OPTIONS</code>）。</p>
+<blockquote>
+<p>例如 VLC或者MPlyaer</p>
+</blockquote>
+<p><strong>会话描述协议（SDP）</strong><br>会话描述协议按格式呈现一个确定会话的属性。它是一个纯文本格式，包括一个<em>有序的</em>键值对列表。</p>
+<pre><code>v=0
+o=- 1224610665 1224610665 IN IP4 192.168.80.2
+s=Das Erste
+c=IN IP4 224.0.1.2
+t=0 0
+m=video 0 RTP/AVP 33
+a=control:rtsp://192.168.80.2:10554/video.mpg
+</code></pre><p>本示例演示了一个多播视频传输。会话ID是1224610665，发起地址IP为IPv4网络中的192.168.80.2。流的会话名称是“Das Erste”，它是在没有预定义的UDP端口（0）的多播信道224.0.1.2上传输。它包含一个MPEG传送流（RTP有效载荷类型为33），并通过RTSP在<code>rtsp://192.168.80.2:10554/video.mpg</code>被控制。</p>
+<p>DLNA定义了使用现有SDP头部的规则，以及一些新的SDP头，包括<code>a=contentFeatures.dlna.org</code>（又包含在内容项资源的第四个字段）和<code>a=scmsFlag.dlna.org</code>（指定版权和复制状态）。</p>
+<p><strong>纠错</strong><br>由于RTP的有损性质，内容应该更健壮以抵抗传送误差，尤其使用是不可靠的（无线局域网）或共享的（家庭网络）的网络。这里有两种方法，前期增加冗余（前向纠错，FEC）或让接收者可以重新请求丢失的包（自动重新请求，ARQ）。</p>
+<p><strong>FEC</strong> 通过在每个包中加入一定量的错误校正数据，当一个包丢失时，接收者仍然能够通过使用周围包的校正数据来重建它。显而易见的缺点是，传输总是需要更多的带宽，即使没有错误需要校正。但如果发生数据损坏，在客户端是能够迅速重建数据。这是有多余的带宽可用时的理想的有损通道。</p>
+<p><strong>ARQ</strong> 给客户端在一个短的时间内从服务器请求丢失的包的拷贝的可能性。它的主要缺点是，重新传输时，接收者需要花费至少两倍流传输时间在加上服务器延迟时间来缓存重发的流。如果通过有损共享介质（如无线LAN）进行多播时，当许多客户端请求重传不同块的时候，它也不能很好地扩展。</p>
+<p><strong>混合纠错模式</strong> 结合上面这两种方法，让FEC参数理想的适应当前信道特性。这个目标是为了使用FEC尽可能的避免许多重传，同时还具有重新请求不可校正的数据包的可能性。在这个项目中使用的<em>自适应混合纠错</em>（AHEC）属于这一类。</p>
+<p>在任何情况下，流媒体格式应该适合在有损信道传输，即如果一些数据已损坏（当然是可见或可听的损失），流仍然应该是可解码的。MPEG-2视频编解码器是一个很好的例子，如果发生数据损坏，小块乱码可能会出现在屏幕上，但仍保持播放。</p>
+<p>所有这些方案仅当信道带宽大于或等于内容所需的带宽时工作。如果不是这种情况，唯一的选择是降低内容的要求，例如，通过再量化MPEG视频（降低详细信息）或完全重新编码流（可能以较低的视频分辨率或更低的音频采样率）。</p>
+<p>一个相当新的方法是可伸缩的（视频）编码方案，这需要物理层额外的支持。这种情况下，内容的较低质量版本以更健壮的方式发送（例如，在无线LAN中以较低的比特率），而所需的额外的用于重新建立更高质量版本的信息，与基本信息一起使用更高的比特率传输。每当客户端未能接收到高质量的组件时，它仍然可以显示低质量的版本。</p>
+<h2 id="u7ED3_u6784"><a href="#u7ED3_u6784" class="headerlink" title="结构"></a>结构</h2><p>本项目的一个原理是利用现有的标准，最大化与市场上现有的和即将推出的设备的互操作性。DLNA媒体服务器架构提供一切必要的东西，包括设备发现，内容枚举和媒体传输。DLNA/UPnP AV体系结构使用现有的互联网标准，例如HTTP，SOAP和XML构建的。</p>
+<p style="text-align:center"><br>  <img src="/images/dlna/img-rtpserver.png"><br>  </p><p style="text-align:center"><code>rtpserver</code>使用的协议和标准概述。</p><br><p></p>
+
+<p>由此产生的媒体服务器样机，目前仅仅被命名为<code>rtpserver</code>，是与UPnP AV和DLNA兼容的，运行在<code>GNU/Linux</code>操作系统上。它通过作为DLNA内容项的调谐器后端接收广播频道，并将它们提供给UPnP AV或DLNA客户端。视频流可通过HTTP或者RTSP/RTP传送。如果有必要，流将被转化成所需要的格式（再复用或转码）。</p>
+<p style="text-align:center"><br>  <img src="/images/dlna/img-server-arch.png"><br>  </p><p style="text-align:center"><code>rtpserver</code>架构概述</p><br><p></p>
+
+<h3 id="u6D41_u5904_u7406"><a href="#u6D41_u5904_u7406" class="headerlink" title="流处理"></a>流处理</h3><p>由于<code>rtpserver</code>在未来可能会支持更多的流类型而不仅仅DVB MPEG传输流，其流处理采用模块化设计，借鉴了著名的Unix哲学：“<strong>做一件事，把它做好</strong>”。流在由源，多个转换器（同时作为源和接收器）和接收器组成的管道中被处理。管道元素可以从源中动态增加或删除（允许例如多客户端共享一个单独的DVB-S调谐器只要他们在相同的转发渠道观察信道）。</p>
+<p>每个源都在使用有效载荷类型和根据所述有效载荷类型的额外识别信息标记的离散块中向下发送数据。接收器在任何方式下都不延迟他们的源，因此大多数转换器可以在一个额外的线程中异步处理数据。</p>
+<p>每个源产生一个特定类型的输出，在离散块中发送下来，以适应任何细分负载要求。它通过负载类型、容器类型和可选的多用途ID标示。<em>容器类型</em>描述了数据所使用的容器格式（如AVI，MKV，MPEG-PS），<em>有效载荷类型</em>描述来源在每个块中发送了什么（例如，一个MPEG传输流数据包，一个MPEG PS数据包，或者原始的、未对齐数据）。</p>
+<h4 id="u6E90"><a href="#u6E90" class="headerlink" title="源"></a>源</h4><p>每个源类型包括一个内容项目类，它代表了这个源可以提供的内容项，一个<em>SourceProvider</em>，用于为一个给定内容项目创建源对象的类，以及源类本身，用于提供数据。</p>
+<p><strong>VDRSource</strong><br>如上所述，<code>rtpserver</code>可通过一个正在运行的带<code>streamdev</code>服务器的VDR访问DVB硬件。甚至即使VDR和<code>rtpserver</code>运行在两个不同的、联网的计算机上也是可行的，但不建议这样做。</p>
+<p>这种方法有几个优点：</p>
+<ul>
+<li>可用的DVB硬件可以在VDR本身和可能的多个<code>rtpserver</code>实例之间共享。</li>
+<li>直接调整DVB硬件和管理多个卡片的繁琐的任务就留给了VDR。</li>
+<li>VDR提供一个信道的列表，因此从<code>rtpserver</code>的信道扫描是没有必要的。</li>
+</ul>
+<p>一个小缺点是初始化和开始流媒体会话之间的延迟略有增加。</p>
+<p>在启动时，<code>VDRSourceProvider</code>将会从VDR获取频道列表。VDR提供了一个名为<code>SVDRP</code>的简单的、基于文本的网络协议。在连接到SVDRP端口并发送<code>LSTC</code>（LiST频道）命令后，VDR就会发送可用信道列表：</p>
+<pre><code>&gt; LSTC
+&lt; 220 sauron SVDRP VideoDiskRecorder 1.6.0-1; Fri Apr 24 19:30:39 2009
+&lt; 250-1 Das Erste;ARD:11837:hC34:S19.2E:27500:101:102=deu,103=2ch;106=dd:104:0:28106:1:1101:0
+&lt; 250-2 ZDF;ZDFvision:11954:hC34:S19.2E:27500:110:120=deu,121=2ch;125=dd:130:0:28006:1:1079:0
+&lt; 250-3 ProSieben;ProSiebenSat.1:12544:hC56:S19.2E:22000:511:512=deu;515=deu:33:0:17501:1:1107:0
+&lt; 221 sauron closing connetion
+</code></pre><p>这个列表包含频道号和名称、调谐参数（频率，码元速率，FEC比率，…）以及流的PID。每个频道线路都被翻译成用于内容目录的内容项。</p>
+<p>当一个通道被用于流传输时，<code>VDRSource</code>通过HTTP连接到配置的VDR实例，并开始将从VDR收到的数据推送到所有连接的接收器。如果多个客户端请求相同的内容，通常该内容的现有<code>VDRSource</code>对象会被重复使用，因此，对于相同内容的多个流会话仅使用一个到VDR的连接。一个<code>VDRSource</code>能够提供MPEG传输流、打包的基本流、或者针对音频源的基本流负载。</p>
+<p>对于电视数据流来说，将选择MPEG流传输。VDR通常会提供完整的SI流，包括PAT/PMI、视频、音频、图文电视和PCR PID。</p>
+<p><strong>DVBStreamSource</strong><br>这个源使用命令行工具<code>dvbstream</code>从DVB设备读取。再次说明，多个并发客户端对同一个频道的多个传输请求中，DVBStreamSource对象将被重复利用，而不是相同的频率下的不同的频道。</p>
+<p>频道列表从和VDR使用的格式相同的文件中解析，它类似于上面的例子。</p>
+<p><strong>FileSource</strong><br>该对象读取本地文件，并将其不变的发送到管道中。它存在的主要目的是将DLNA测试媒体流发送给<strong>兼容性测试工具</strong>（参见4.5.1节），但也可以用来播放音乐文件。</p>
+<blockquote>
+<p>因为内容目录常驻内存并且每次服务器启动时都会重新生成，因此这种方式也不适用于提供一个非常大的音乐列表。</p>
+</blockquote>
+<h4 id="u8F6C_u6362_u5668"><a href="#u8F6C_u6362_u5668" class="headerlink" title="转换器"></a>转换器</h4><p>因为并非每个接收器或客户端都可以支持源内容的格式，<code>rtpserver</code>提供了许多转换器用于按照一定的方式修改该数据流。每一个转换器通常只做一种特定的工作，因而它们可以被按一定顺序放置到更复杂的任务中。</p>
+<p><strong>MPEGTSPacketizer</strong><br>它MPEG传送流分组报文头上锁定自身，并向下发送单个MPEG TS报文。它不会对输入数据的排列或完整性做任何假设。如果同步丢失，所有数据都被丢弃，直到同步恢复。</p>
+<p><strong>MPEGTStoPESExtractor</strong><br>将传入的传输流数据包重组为单个打包的基本流。</p>
+<p><strong>MPEGPEStoESExtractor</strong><br>从一个打包的基本流中提取一个特定的基本流。</p>
+<p><strong>MPEGAudioDecoder</strong><br>将MP2/3音频基本流解码为立体声LPCM音频流。这主要是用于不直接支持MPEG2音频的客户端。</p>
+<blockquote>
+<p>这个转换器是为Terrater Noxon2Audio流媒体广播客户端所写的，该客户端只支持MP3音频，但不支持MP2。</p>
+</blockquote>
+<p><strong>MPEGTStoPSReplex</strong><br>复用MPEG传送流到MPEG程序流。它基本上是一个C++包装的<code>replex</code>工具，从传输流中提取一组给定的PID。</p>
+<p><code>replex</code>没有被设计于在一个实时流上工作，它需要一个大容量的缓冲（约6MB）来工作。它也不能在任何频道上工作。</p>
+<blockquote>
+<p>一个例子是它不能在德国Pro7频道上工作。</p>
+</blockquote>
+<p>不幸的是，这个转换器是使索尼的PS3进行电视直播的唯一途径，因为PS3不支持MPEG传输流。请注意，即使有这样的再复用器，PS3同步仍有问题，导致偶尔的丢帧和音频/视频不同步。有趣的是，当首先保存到磁盘，然后使用<code>FileSource</code>服务时，直播时候出现上述效果的相同流将表现完美。这说明上述问题是由PS3的缓冲器空运行造成的，到目前为止没有发现解决方案。</p>
+<p><strong>LiveBuffer</strong><br>许多HTTP流客户端在开始渲染之前，都会填充自己的本地缓冲区，直到缓冲区上溢。之后他们就暂停HTTP连接，读取数据一直到缓冲区下界，然后开始获取下一个数据块。由于这种非一致的行为，一个<code>LiveBuffer</code>元件被插入到所有涉及实时内容的HTTP会话管道中。它从传出接收器中分离输入流以消除短暂的HTTP连接暂停的情况。它也可以延迟传输，直到缓冲填充水平达到一个配置的值，以保持一定的缓冲储备，如果客户端需要快速读取数据，就把它作为输入源。</p>
+<h4 id="u63A5_u6536_u5668"><a href="#u63A5_u6536_u5668" class="headerlink" title="接收器"></a>接收器</h4><p>对于每一种传输协议，都有一个单独的接收器可用。要了解会话管理的细节请查看第3.2节。</p>
+<p><strong>RTPSink</strong><br>通过RTP或UDP发送传入数据到客户端或者多播频道。DVB-IPI建议，一个MPEG传输流，应使RTP时间戳适应于流的PCR，并将7个TS包放在一起成为一个RTP包。下图显示了一个例子。</p>
+<p style="text-align:center"><br>  <img src="/images/dlna/img-stream-flow.png"><br>  </p><p style="text-align:center">MPEG传输流从源到接收器之间的的流动</p><br><p></p>
+
+<p>尚未包含对DLNA定义的<code>vnd.dlna.mpeg-tts</code>有效载荷类型（它在每个188字节的TS包前面增加了一个32位的时间戳）的支持。</p>
+<blockquote>
+<p>没有渲染终端支持这种格式，相关文档只在短期可用。</p>
+</blockquote>
+<p><strong>HTTPStreamingSession</strong><br>HTTP会话对象的一部分是接收器部件。当客户端为内容项发送一个有效的HTTP请求时，它将自己附加到管道的端部，并将数据发送到客户端。</p>
+<h3 id="u4F1A_u8BDD_u7BA1_u7406"><a href="#u4F1A_u8BDD_u7BA1_u7406" class="headerlink" title="会话管理"></a>会话管理</h3><p>对于由客户端发起的每个流过程，都有一个会话对象保留所有与流相关的状态。虽然这对HTTP相当容易，但当信号和实际数据绑在一起，RTSP和/或组播流就更加复杂。</p>
+<h4 id="HTTP_u4F1A_u8BDD"><a href="#HTTP_u4F1A_u8BDD" class="headerlink" title="HTTP会话"></a>HTTP会话</h4><p>对于HTTP，会话开始于传入的<strong>HTTP GET</strong>请求，当连接由任一侧终止时结束。在解析传入的GET请求后，<code>HTTPServer</code>实例询问每个注册的<code>HttpHandler</code>来处理请求。如果这是一个有效的指向流媒体对象的URL，会话注册表将创建一个新的<code>HTTPStreamingSession</code>对象并在它上面处理连接。该<code>HTTPStreamingSession</code>解析报头、创建源对象和转换管道，并开始流传输。因次<code>HTTPStreamingSession</code>不仅是会话对象，还是管道接收器。</p>
+<h4 id="RTSP/RTP_u4F1A_u8BDD"><a href="#RTSP/RTP_u4F1A_u8BDD" class="headerlink" title="RTSP/RTP会话"></a>RTSP/RTP会话</h4><p>对于RTSP会话，一个<code>RTSPStreamingSession</code>对象在客户端的<code>SETUP</code>请求时创建。根据传输协商，一个<code>RTPUnicastSession</code>对象或<code>RTPMulticastSession</code>对象被创建，并产生一个会话ID。这个ID被发送回客户端，并从现在开始引用该会话。客户端现在可以关闭RTSP连接，并在新连接上就本次会话（播放，暂停，拆除，…）发送后续请求。只有当客户端为该会话发送<code>TEARDOWN</code>请求，该会话资源才会被释放，且会话ID不再有效。</p>
+<p>这里，会话对象（<code>RTSPStreamingSession</code>）从接收器对象（<code>RTPUnicastSession/RTPMulticastSession</code>）中分隔。这对于多播会话是必要的，在多播中，多个客户端可能同时请求非常相同的频道。<code>StreamingSessionRegistry</code>跟踪每个组播会话订阅用户的数量，只有当最后一个客户端断开连接时才销毁它。</p>
+<h2 id="u5B9E_u73B0"><a href="#u5B9E_u73B0" class="headerlink" title="实现"></a>实现</h2><p>本项目的核心是实现一个可以在不变的DLNA客户端上直播的媒体服务器工作原型，以及一个带RTP支持的媒体渲染器原型。在<code>rtpserver</code>开发之初，需要一个UPnP库。有几个免费的UPnP框架可供选择：</p>
+<ul>
+<li><p><code>libupnp</code>：基于原始的英特尔<code>Linux SDK</code>的C库。</p>
+<blockquote>
+<p><a href="http://pupnp.sourceforge.net" target="_blank" rel="external">http://pupnp.sourceforge.net</a></p>
+</blockquote>
+</li>
+<li><p><code>libgupnp</code>：面向对象的C库，基于<code>GObject</code>、<code>glib</code>。</p>
+<blockquote>
+<p><a href="http://www.gupnp.org" target="_blank" rel="external">http://www.gupnp.org</a></p>
+</blockquote>
+</li>
+<li><p><code>coherence</code>：用Python编写的UPnP框架。</p>
+<blockquote>
+<p><a href="http://www.coherence.beebits.net" target="_blank" rel="external">http://www.coherence.beebits.net</a></p>
+</blockquote>
+</li>
+<li><p><code>libdlna</code>：C库，提供了DLNA媒体配置文件的支持。依赖于<code>libupnp</code>。</p>
+<blockquote>
+<p><a href="http://libdlna.geekbox.org" target="_blank" rel="external">http://libdlna.geekbox.org</a></p>
+</blockquote>
+</li>
+</ul>
+<p>一开始使用<code>libupnp</code>，但很快可以发现一个原生C++库将有许多优点。<code>libupnp</code>自身对<strong>POSIX线程</strong>的使用经常与<code>rtpserver</code>冲突，所以UPnP框架中越来越多的部分用C++重写了。这就不可避免地导致了一个新的名为<code>libupnp++</code>的原生C++ UPnP库产生。</p>
+<h3 id="libupnp++"><a href="#libupnp++" class="headerlink" title="libupnp++"></a>libupnp++</h3><p>在为<code>rtpserver</code>重写的UPnP组件变得越来越大之后，他们被分装到一个独立的库中，名叫<code>libupnp++</code>。不久后，<code>libupnp++</code>包括了媒体服务器需要的所有必要功能，对<code>libupnp</code>的依赖被删除。</p>
+<p><code>libupnp++</code>包含一个HTTP Web服务器，为生成XML描述文档提供服务。它还处理传入的SOAP调用。开发人员可以实现<code>HttpHandler</code>接口来支持自己的网址（如流媒体或自己的文件），或者使用<code>UPNPServerVirtualDirs</code>对象来支持内存中的静态项目。</p>
+<p>内置的<strong>GENA</strong>服务器（和<code>UPNPService</code>基类一起）处理事件的订阅和通知。该SSDP服务器自动通告新的和消失的<em>设备</em>与<em>服务</em>。</p>
+<p>所有的服务都在后台线程启动，因此主应用程序既没有运行一个特殊的主循环也不做任何定期调用。</p>
+<p>它也包括所有媒体服务器必须的<em>服务</em>（内容目录和的连接管理），以及内容容器与项目的基类。计划支持<em>控制点</em>和<em>嵌入式设备</em>，但目前尚不可用。</p>
+<h4 id="u8981_u6C42"><a href="#u8981_u6C42" class="headerlink" title="要求"></a>要求</h4><p><code>libupnp++</code>依赖于：</p>
+<ul>
+<li>用于多线程的GNU通用C++。</li>
+<li>Apache Xerces-C 2.8，用于解析/生成XML。</li>
+<li><code>uuid</code>用于生成UUID。</li>
+<li><code>libdlna</code>（可选）对媒体文件进行分类。</li>
+<li><code>libmhash</code>使用MD5哈希表从任意的路径生成短网址。</li>
+</ul>
+<h3 id="rtpserver"><a href="#rtpserver" class="headerlink" title="rtpserver"></a>rtpserver</h3><p><code>rtpserver</code>是UPnP媒体服务器。虽然第一个目标是通过RTP在电视上看直播，它使用模块化方式构建，以在未来添加更多功能。</p>
+<h4 id="u8981_u6C42-1"><a href="#u8981_u6C42-1" class="headerlink" title="要求"></a>要求</h4><p><strong>硬件</strong><br>一个<code>rtpserver</code>安装需要约10MB硬盘空间，需要256MB RAM和500MHz处理器处理未转换的DVB流数据。如果客户端需要实时再复用MPEG程序流，推荐使用1GHz的CPU。</p>
+<p><strong>操作系统</strong><br>目前仅支持Linux。如果VDR实例（见下文）在网络上可用，移植<code>rtpserver</code>到BSD、MacOS X或Windows是可能的，但目前还没有计划这样做（反正目前机顶盒嵌入式系统大多数都运行Linux）。最优的Linux发行版是Ubuntu8.10，但如果下面的软件要求满足，其他系统也应该可以工作。</p>
+<p><strong>软件</strong><br><code>rtpserver</code>需要以下库：</p>
+<ul>
+<li><code>libupnp++</code>（参见4.1节）</li>
+<li><code>libccrtp-ahec</code>（提供高级混合纠错）或<code>libccrtp</code>，用于RTP支持</li>
+<li>GNU通用C++（<code>libcommoncpp2</code>）</li>
+<li><code>libconfig++</code>，用于配置文件</li>
+<li><code>libmad</code>（可选）用于解码MP2音频为LPCM</li>
+<li><code>libdlna</code>（可选）用于识别存储媒体文件的DLNA媒体配置。</li>
+<li><code>uuid</code></li>
+</ul>
+<h3 id="u793A_u4F8B_u8BBE_u7F6E"><a href="#u793A_u4F8B_u8BBE_u7F6E" class="headerlink" title="示例设置"></a>示例设置</h3><p>示例设置成功地在2009年的<strong>CeBIT博览会</strong>上展示，它由以下几部分组成：</p>
+<ul>
+<li><strong>媒体服务器</strong>：基于Atom的英特尔HTPC，运行Ubuntu 8.10和<code>rtpserver</code>。它可具有各种调谐器，包括一个DVB-S PCI卡或DVB-T USB加密狗。调谐后端则使用VDR。</li>
+<li><strong>媒体渲染器</strong>：基于Atom的英特尔HTPC，运行Ubuntu 8.10和Jochen Grun写的媒体渲染器。解码在一个全功能的DVB-S卡中完成。</li>
+<li><strong>媒体播放器</strong>：索尼的PlayStation III游戏机。虽然只支持HTTP传输，但它表现出了<code>rtpserver</code>和DLNA硬件设备之间的互通性，并引人注目。</li>
+<li><strong>控制点</strong>：苹果iPhone 3G，运行<code>PlugPlayer</code>，一个UPnP AV控制点应用。</li>
+<li><strong>网络</strong>：使用普通的用于家庭网络结点的无线路由器，包括一个小的以太网交换机和一个DHCP服务器。除了iPhone外的所有设备都通过802.3以太网连接。</li>
+</ul>
+<p>示例展示了使用RTP协议直播而不是HTTP协议的巨大优势：由于HTTP的缓存要求，PS3需要近10秒才开始播放，但基于RTP的媒体渲染器能够在频道之间几乎瞬间切换，就像它是来自一个传统DVB机顶盒一样。</p>
+<h3 id="u4F7F_u7528_u6848_u4F8B_uFF1A_u901A_u8FC7RTSP/RTP_u8FDB_u884C_u6D41_u5A92_u4F53_u7535_u89C6_u76F4_u64AD"><a href="#u4F7F_u7528_u6848_u4F8B_uFF1A_u901A_u8FC7RTSP/RTP_u8FDB_u884C_u6D41_u5A92_u4F53_u7535_u89C6_u76F4_u64AD" class="headerlink" title="使用案例：通过RTSP/RTP进行流媒体电视直播"></a>使用案例：通过RTSP/RTP进行流媒体电视直播</h3><p>这是当用户从媒体渲染器的控制点开始电视台播放时发生的情况。</p>
+<h4 id="u8BBE_u5907_u542F_u52A8_u548C_u53D1_u73B0"><a href="#u8BBE_u5907_u542F_u52A8_u548C_u53D1_u73B0" class="headerlink" title="设备启动和发现"></a>设备启动和发现</h4><p>在启动时，所有的设备都将从DHCP服务器获取IP地址。UPnP<em>设备</em>就会成为可被发现的并通过SSDP宣布它们自己。启动后，<code>rtpserver</code>将扫描配置的媒体文件夹中的媒体文件，并将它们映射到内容目录。在DVB源中查询可用频道，并将它们也插入到内容目录。<code>rtpserver</code>对电视和广播电台进行了区分，并把它们排序到两个单独的内容容器中。</p>
+<h4 id="u5185_u5BB9_u53D1_u73B0"><a href="#u5185_u5BB9_u53D1_u73B0" class="headerlink" title="内容发现"></a>内容发现</h4><p>控制点通过发出SOAP请求触发媒体服务器的<code>ContentDirectory::Browse()</code>操作，来检索媒体服务器的内容目录。这通常发生在点播，即无论何时用户在内容项目列表中滚动或进入子目录，就从媒体服务器的内容目录获取新的可见的内容对象。<code>rtpserver</code>的每个内容项代表一个有两个<em>资源</em>的广播频道，一个用于HTTP传输，另一个用于RTSP/RTP。</p>
+<h4 id="u4F1A_u8BDD_u521D_u59CB_u5316"><a href="#u4F1A_u8BDD_u521D_u59CB_u5316" class="headerlink" title="会话初始化"></a>会话初始化</h4><p>用户通常不仅选择要播放的内容，还选择要显示的内容的渲染器。控制点使用<code>ConnectionManager::GetProtocolInfo()</code>操作为一个可能的协议与格式列表查询所选择的媒体渲染器，以查看渲染器实际上是否能够显示所选择的内容。这里使用的媒体渲染器支持这些协议：</p>
+<pre><code>rtsp-rtp-udp:*:video/mpeg2:,rtsp-rtp-udp:*:video/mpeg:
+</code></pre><p>在这种情况下，这组支持的协议和给定电视台提供的资源之间的交点就只有一个资源。现在，控制点将通过媒体渲染器提供的<code>AVTransport::SetAVTransportURI()</code>操作发送资源，来初始化播放。然后调用<code>AVTransport::Play()</code>方法来启动播放。</p>
+<p>对于HTTP和RTSP/RTP，运输配置都在UPnP的SOAP框架之外完成。对于RTSP/RTP传输，媒体渲染器首先使用RTSP<code>OPTIONS</code>方法获取可用的方法（第一段为请求内容，第二段为响应内容，下同）：</p>
+<pre><code class="http">OPTIONS * RTSP/1.0
+CSeq: 0
+</code></pre>
+<pre><code class="http">RTSP/1.0 200 OK
+CSeq: 0
+public: DESCRIBE, OPTIONS, PLAY, SETUP, TEARDOWN
+server: rtpserver 0.0.2svn
+</code></pre>
+<p><code>rtpserver</code>目前仅支持播放所必需的最基本的方法。<br>当渲染器从控制点得到了RTSP URL，它将使用<code>DESCRIBE</code>方法从服务器获取有关它的附加信息：</p>
+<pre><code class="http">DESCRIBE /rtpserver/radio/S19.2E-1-1093-28422.mpa?apid=431&amp;audio=MP2&amp;container=MPEGES&amp;ppid=0 RTSP/1.0
+Host: 192.168.80.5:10554
+CSeq: 1
+</code></pre>
+<pre><code class="http">RTSP/1.0 200 OK
+CSeq: 1
+server: rtpserver 0.0.2svn
+Content-Type: application/sdp
+Content-Length: 238
+
+v=0
+o=- 1240165012 1240165012 IN IP4 192.168.80.5
+s=hr4
+c=IN IP4 239.35.129.11
+t=0 0
+m=audio 0 RTP/AVP 33
+a=control:rtsp://192.168.80.5:10554/rtpserver/radio/S19.2E-1-1093-28422.mpa?apid=431&amp;audio=MP2&amp;container=MPEGES&amp;ppid=0
+</code></pre>
+<p>服务器使用描述内容的SDP文件响应。需要注意的是到现在为止，<code>rtpserver</code>没有为流会话做任何准备。这只会发生在渲染器发送<code>SETUP</code>请求的时候：</p>
+<pre><code class="http">SETUP rtsp://192.168.80.5:10554/rtpserver/tv/S19.2E-1-1079-28006.mpg?apid=120&amp;audio=MP2&amp;container=MPEGTS&amp;ppid=110&amp;video=MPEG2&amp;vpid=110 RTSP/1.0
+CSeq: 3
+Transport: RTP/AVP;multicast;ttl=1
+user-agent: VLC media player (LIVE555 Streaming Media v2008.07.24)
+</code></pre>
+<pre><code class="http">RTSP/1.0 200 OK
+CSeq: 3
+Session: 1240167190
+server: rtpserver 0.0.2svn
+transport: RTP/AVP;multicast;mode=&quot;PLAY&quot;;destination=239.35.129.11;ttl=1;port=10004-10008
+</code></pre>
+<p>这里，客户端为电视频道请求设置会话。它使用<code>Transport</code>头表明支持组播。<code>rtpserver</code>现在将为请求的URL查找内容项。</p>
+<h4 id="u8BBE_u7F6E_u7BA1_u9053"><a href="#u8BBE_u7F6E_u7BA1_u9053" class="headerlink" title="设置管道"></a>设置管道</h4><p><code>rtpserver</code>现在将组装与所选内容项相关联的管道。为使多播传输实际可用，<code>rtpserver</code>跟踪所有运行的多播传输，如果给定的广播频道已正在传输，将返回现有实例。但是这里假设被配置的传输是唯一的。</p>
+<p>首先，源通过与内容项相关联的源提供者创建，这时提供者为<code>VDRSourceProvider</code>。为了节省带宽以及在现有的DVB调谐器的数量之下有效地工作，<code>VDRSourceProvider</code>跟踪所有VDR源，并且在相同频道的时候重复使用源。这里，一个新<code>VDRSource</code>将被创建，它将会连接到VDR以获取媒体流。</p>
+<p>接着，接收器被创建，在这种情况下为<code>RTPSink</code>。一个组播通道和一组RTP端口将分配给它。</p>
+<p>最后，在源和接收器之间的转换器链被组装，目前使用的是一套硬编码规则。因为<code>VDRSource</code>已经产生MPEG传输流，所以只有<code>MPEGTSPacketizer</code>是必要的，因此最终的管道将是<code>VDRSource</code> → <code>MPEGTSPacketizer</code> → <code>RTPSink</code>。</p>
+<p>现在，客户端被指定了一个唯一的会话ID，服务器正在启动以在指定的多播频道上传输流到电视。由于它是通过一个单向的UDP传输实时流，立即启动流传输而不等待客户端是没有问题的。然而，一个普通的客户端现在将仍发出<code>PLAY</code>请求以开始流：</p>
+<pre><code class="http">PLAY rtsp://192.168.80.5:10554/rtpserver/tv/S19.2E-1-1079-28006.mpg?apid=120&amp;audio=MP2&amp;container=MPEGTS&amp;ppid=110&amp;video=MPEG2&amp;vpid=110 RTSP/1.0
+CSeq: 4
+Session: 1240167190
+range: npt=0,000-
+user-agent: VLC media player (LIVE555 Streaming Media v2008.07.24)
+</code></pre>
+<pre><code class="http">RTSP/1.0 200 OK
+CSeq: 4
+Session: 1240167190
+server: rtpserver 0.0.2svn
+</code></pre>
+<p>客户端现在将监听协商的UDP多播信道，以获取媒体流并渲染。</p>
+<h4 id="u7ED3_u675F_u4F1A_u8BDD"><a href="#u7ED3_u675F_u4F1A_u8BDD" class="headerlink" title="结束会话"></a>结束会话</h4><p>当用户结束播放时，渲染器将使用<code>TEARDOWN</code>请求来结束RTSP会话：</p>
+<pre><code class="http">TEARDOWN rtsp://192.168.80.5:10554/rtpserver/tv/S19.2E-1-1079-28006.mpg?apid=120&amp;audio=MP2&amp;ocntainer=MPEGTS&amp;ppid=110&amp;video=MPEG2&amp;vpid=110 RTSP/1.0
+CSeq: 5
+Session: 1240167190
+user-agent: VLC media player (LIVE555 Streaming Media v2008.07.24)
+</code></pre>
+<pre><code class="http">RTSP/1.0 200 OK
+CSeq: 5
+Session: 1240167190
+server: rtpserver 0.0.2svn
+</code></pre>
+<p>现在，服务器将释放本次会话的所有资源，除非它们也被其他会话使用（如DVB共享信道或组播会话）。</p>
+<h3 id="DLNA_u517C_u5BB9_u6027_u6D4B_u8BD5"><a href="#DLNA_u517C_u5BB9_u6027_u6D4B_u8BD5" class="headerlink" title="DLNA兼容性测试"></a>DLNA兼容性测试</h3><h4 id="DLNA_u4E00_u81F4_u6027_u6D4B_u8BD5_u5DE5_u5177"><a href="#DLNA_u4E00_u81F4_u6027_u6D4B_u8BD5_u5DE5_u5177" class="headerlink" title="DLNA一致性测试工具"></a>DLNA一致性测试工具</h4><p>DLNA为他们的成员提供了测试应用程序套件，以验证“测试设备”（DUT）符合DLNA准则。该<strong>一致性测试工具</strong>（CTT）是一个Windows应用程序，为大多数准则针对DUT运行一个测试。该准则中被分类为<code>must</code>的规则是必须遵守的，<code>should</code>规则被是推荐遵守的，而<code>optional</code>则是DUT可以选择遵守也可选择不遵守的规则。几乎所有的<code>most</code>和大部分<code>should</code>规则都有一个测试用例，而大部分<code>optional</code>准则则没有。</p>
+<p>启动CTT后，用户必须通过提供DUT（例如数字媒体服务器的DMS）类来创建设备配置文件，并检查盒子的附加功能（如无线网络支持，多网络支持或媒体上传）。然后CTT将按照选择的功能编译测试。</p>
+<p>如果要测试的准则适用于该设备（即该准则适用于该设备的类，分类和功能），则测试要么通过，要么根据其类别，判定失败或得到一个警告状态。如果测试检测到设备声称不支持大纲描述的可选功能，它将返回<code>N/A</code>。有些测试还需要人工干预，如重新启动或循环DUT电源。</p>
+<h4 id="rtpserver_u7684_u6D4B_u8BD5_u72B6_u6001"><a href="#rtpserver_u7684_u6D4B_u8BD5_u72B6_u6001" class="headerlink" title="rtpserver的测试状态"></a>rtpserver的测试状态</h4><p>CTT有几个缺点，使得测试<code>rtpserver</code>有点难度。最大的问题是对许多媒体有限的支持，大多数测试都涉及从<code>rtpserver</code>获取广播媒体并等待流结束，测试正常时不会发生任何情况。因此<code>rtpserver</code>具有一个特殊选项，将广播流限制为30秒。此外，某些测试和它们对应的准则记录不够清楚，所以有几个测试可能不满足。有些测试被纳入选择集合中，即使他们是<code>rtpserver</code>既不支持也没有说明的功能。最后，因为完整的RTSP/RTP支持是可选的，所有CTT没有纳入这个协议的测试。</p>
+<p>尽管如此，<code>rtpserver</code>满足整个CTT测试，只有极少数的例外，其中失败的原因无法确定。CTT测试结果如下：</p>
+<ul>
+<li>568个准则/指导块与我们的设备配置文件（DMS）有关。</li>
+<li>其中的124个，CTT没有提供测试。无论怎样，如果指导方针适用于<code>rtpserver</code>，它将尽量满足规则。</li>
+<li>237个准则为可选功能，<code>rtpserver</code>（还）没有支持，例如媒体上传。CTT正确的标记它们为不适用。</li>
+<li>188个测试通过，没有问题。</li>
+<li>8个测试返回一个“警告”结果。他们或者是缺少内容项的图标（专辑封面，台标），或者是因为故意设置以加快测试的过小的SSDP<code>CACHE-CONTROL</code>值。</li>
+<li>11个测试失败。对于他们中的5个，CTT发现数据错误，实际上数据从来没有在网络上发送。4个测试声称<code>rtpserver</code>支持媒体上传（当然任何企图的上传都失败），尽管<code>rtpserver</code>和CTT配置文件都没有声称支持媒体上传。剩下的两个未满足，因为参考文件要么含糊要么不可用了。</li>
+</ul>
+<h2 id="u7ED3_u8BBA"><a href="#u7ED3_u8BBA" class="headerlink" title="结论"></a>结论</h2><p>上面已经显示了，在家庭网络中，使用现有标准，一个广播电视可以有类似于传统方式传输的广播电视的体验。尽管还存在一些AV同步问题和一些有限的限制，通过HTTP在一个直播电视上使用商用DLNA客户端播放还是可能的。仍然缺失的就是一个完整电视机那样的体验，可以快速的响应遥控器控制，并切换频道，就像使用普通电视机一样。</p>
+<h3 id="u672A_u6765_u5DE5_u4F5C"><a href="#u672A_u6765_u5DE5_u4F5C" class="headerlink" title="未来工作"></a>未来工作</h3><p>即使基本功能工作良好，也还有一些主题仍需要解决：</p>
+<h4 id="u76F4_u63A5_u8BBF_u95EEDVB_u8C03_u8C10_u5668"><a href="#u76F4_u63A5_u8BBF_u95EEDVB_u8C03_u8C10_u5668" class="headerlink" title="直接访问DVB调谐器"></a>直接访问DVB调谐器</h4><p>目前DVB后端（<code>VDRSource</code>和<code>DVBStreamSource</code>）都依赖于第三方软件来调整DVB硬件、访问接收到的数据流。未来的<code>rtpserver</code>版本肯定会使用Linux的<code>DVB API</code>来直接访问DVB调谐器硬件。</p>
+<h4 id="DVB-SI_u6620_u5C04_u548CEPG"><a href="#DVB-SI_u6620_u5C04_u548CEPG" class="headerlink" title="DVB-SI映射和EPG"></a>DVB-SI映射和EPG</h4><p><code>DVB-HN</code>指定服务信息如何嵌入到DVB流（<code>DVB-SI</code>）中，例如EPG（电子节目指南）数据，要被映射到内容目录。 当这完成时，每个单独的电视或广播节目被映射到一个单独的内容项。然后这些可以由记录客户端单独请求。</p>
+<h4 id="u4E13_u7528_u63A7_u5236_u70B9"><a href="#u4E13_u7528_u63A7_u5236_u70B9" class="headerlink" title="专用控制点"></a>专用控制点</h4><p>无论是索尼的PlayStation 3，还是iPhone上的<code>PlugPlayer</code>都不提供频道之间的“快速”切换，因为这些设备在设计时考虑到存储的内容。因此，将来的项目可能考虑包括一个有电视体验般的DLNA控制点。通过<code>rtpserver</code>提供的内容目录已经包括了<code>upnp:channelNr</code>属性来在一个顺序列表中排列可用广播频道，就像在一个传统电视机那样。</p>
+<h4 id="u5D4C_u5165_u5F0F_u5A92_u4F53_u670D_u52A1_u5668_u548C_u64AD_u653E_u5668"><a href="#u5D4C_u5165_u5F0F_u5A92_u4F53_u670D_u52A1_u5668_u548C_u64AD_u653E_u5668" class="headerlink" title="嵌入式媒体服务器和播放器"></a>嵌入式媒体服务器和播放器</h4><p>目前，媒体服务器和媒体渲染器都被安装到磁盘上，并运行在完整的Ubuntu中，这需要几分钟来启动，也需要手动操作来启动媒体服务器和渲染器。更人性化的设计可以包括一个小的、专用的Linux发行版，它可以快速的从一个闪存中直接启动应用程序。这样的设计可以提供比现有的一些商用IPTV平台更快的启动速度。基于连接状态（无论是显示器还是调谐器设备连接），无论是媒体服务器、媒体渲染器或这两者都可以被自动启动。</p>
+<h4 id="u5185_u5BB9_u76EE_u5F55_u641C_u7D22"><a href="#u5185_u5BB9_u76EE_u5F55_u641C_u7D22" class="headerlink" title="内容目录搜索"></a>内容目录搜索</h4><p>UPnP<em>内容目录</em>指定一个可选的，功能强大的<em>搜索</em>操作，它可以根据用户指定的搜索参数返回一个内容项列表，甚至不需要使用普通的<em>浏览</em>请求就可以访问。这提供了包括基于网络的媒体平台的可能性，如YouTube，谷歌视频或Last.fm，只要实现一个适当的源类。</p>
+<h4 id="u667A_u80FD_u8F6C_u7801_u5F15_u64CE"><a href="#u667A_u80FD_u8F6C_u7801_u5F15_u64CE" class="headerlink" title="智能转码引擎"></a>智能转码引擎</h4><p>转换器框架（第3.1.2节）中目前只有很少的转换器在开发<code>rtpserver</code>中是必要的。定义特定源/接收器组合管道的规则集也是硬编码的。使用外部库例如<code>ffmpeg</code>，有更多的转换器可以用来重新编码内容或改变容器。规则集可以使用图形算法替代，其可以自动确定最快或最优的路由路径。</p>
+<h4 id="u91CD_u5199_u5E26_u7EA0_u9519_u7684RTP_u5E93"><a href="#u91CD_u5199_u5E26_u7EA0_u9519_u7684RTP_u5E93" class="headerlink" title="重写带纠错的RTP库"></a>重写带纠错的RTP库</h4><p>目前使用的带AHEC的RTP库，<code>libccrtp-ahec</code>，是<code>GNU libccrtp</code>的一个旧分支。这个库最初设计时考虑到IP语音电话，不容易在较新的Linux发行版中集成。从头设计一个新的带AHEC的库可以增加稳定性，并为新技术，如<strong>可扩展视频编解码器</strong>，做准备。</p>
+<h2 id="u53C2_u8003_u6587_u732E"><a href="#u53C2_u8003_u6587_u732E" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>S. Cheshire, B. Aboba, and E. Guttman. Dynamic Configuration of IPv4 Link-Local Addresses. RFC 3927 (Proposed Standard), May 2005. <a href="http://www.ietf.org/rfc/rfc3927.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc3927.txt</a>.</li>
+<li>J. Cohen and S. Aggarwal. General Event Notification Architecture Base. IETF Draft (expired), July 1998. <a href="http://quimby.gnus.org/internet-drafts/draft-cohen-gena-p-base-01.txt" target="_blank" rel="external">http://quimby.gnus.org/internet-drafts/draft-cohen-gena-p-base-01.txt</a>.</li>
+<li>Contributing Members of the UPnP Forum. AVTransport:1 Service Template Version 1.01, June 2002.</li>
+<li>Contributing Members of the UPnP Forum. ConnectionManager:1 Service Template Version 1.01, June 2002.</li>
+<li>Contributing Members of the UPnP Forum. ContentDirectory:1 Service Template Version 1.01, June 2002.</li>
+<li>Contributing Members of the UPnP Forum. UPnP AV Architecture:0.83 v1.0, 2002.</li>
+<li>Contributing Members of the UPnP Forum. UPnP Device Architecture v1.0, July 2006.</li>
+<li>Digital Living Network Alliance. Digital Living Network Alliance: official web site. <a href="http://www.dlna.org" target="_blank" rel="external">http://www.dlna.org</a>.</li>
+<li>Digital Living Network Alliance. DLNA Networked Device Interoperability Guidelines, October 2006.</li>
+<li>Digital Living Network Alliance. DLNA Overview and Vision Whitepaper 2007, 2007.</li>
+<li>European Telecommunications Standards Institute. ETSI TS 102 034 V1.3.1: Digital Video Broadcasting (DVB); Transport of MPEG-2 TS Based DVB Services over IP Based Networks, 2007.</li>
+<li>Yaron Y. Goland, Ting Cai, Paul Leach, Ye Gu, and Shivaun Albright. Simple Service Discovery Protocol/1.0 Operating without an Arbiter. IETF Draft (expired), October 1999. ftp://ftp.pwg.org/pub/pwg/ipp/new_SSDP/draft-cai-ssdp-v1-03.txt.</li>
+<li>Jochen Grün. Study Thesis: Implementierung eines DVB Digital Media Renderers, November 2008.</li>
+<li>M. Handley and V. Jacobson. SDP: Session Description Protocol, April 1998. <a href="http://www.ietf.org/rfc/rfc2327.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc2327.txt</a>.</li>
+<li>Intel Corporation. Designing a UPnP AV MediaServer, 2003.</li>
+<li>ISO/IEC. ISO/IEC 13818-1: Information technology — Generic coding of moving pic- tures and associated audio information: Systems, December 2000.</li>
+<li>Michael Jeronimo and Jack Weast. UPnP Design by Example. Intel Press, April 2003.</li>
+<li>Klaus Schmidinger. Video Disk Recorder. <a href="http://www.cadsoft.de/vdr" target="_blank" rel="external">http://www.cadsoft.de/vdr</a>.</li>
+<li>H. Schulzrinne, S. Casner, R. Frederick, and V. Jacobson. RTP: A Transport Protocol for Real-Time Applications, July 2003. <a href="http://www.ietf.org/rfc/rfc3550.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc3550.txt</a>.</li>
+<li>H. Schulzrinne, A. Rao, and R. Lanphier. Real Time Streaming Protocol, April 1998. <a href="http://www.ietf.org/rfc/rfc2326.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc2326.txt</a>.</li>
+<li>Guoping Tan and Thorsten Herfet. Optimization of an RTP Level Hybrid Error Correction Scheme for DVB Systems Over Wireless Home Networks Under Restrict Delay Constraint. In IEEE Transactions on Broadcasting, Vol 53, Issue 1, Part 2, pages 297–307. IEEE, March 2007.</li>
+<li>The DVB Project. DVB-HN (Home Network) Reference Model Phase 1. <a href="http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN\_ref\_model.pdf" target="_blank" rel="external">http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN\_ref\_model.pdf</a>, February 2007.</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DLNA/">DLNA</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/DLNA/">DLNA</a><a href="/tags/RTSP-RTP/">RTSP/RTP</a><a href="/tags/UPnP/">UPnP</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/" data-title="【译】实现一个DLNA兼容的UPnP AV媒体服务器 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/02/24/Treap-tree/"  title="Treap树">
+ <strong>下一篇：</strong><br/> 
+ <span>Treap树
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/" data-title="【译】实现一个DLNA兼容的UPnP AV媒体服务器" data-url="http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="javascript:void(0)" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#u5F15_u8A00"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u52A8_u673A"><span class="toc-number">1.1.</span> <span class="toc-text">动机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u76EE_u6807"><span class="toc-number">1.2.</span> <span class="toc-text">目标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6"><span class="toc-number">2.</span> <span class="toc-text">已存在的框架和标准</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DVB-IP"><span class="toc-number">2.1.</span> <span class="toc-text">DVB-IP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DVB-HN"><span class="toc-number">2.2.</span> <span class="toc-text">DVB-HN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4E13_u7528_u89E3_u51B3_u65B9_u6848"><span class="toc-number">2.3.</span> <span class="toc-text">专用解决方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VDR"><span class="toc-number">2.4.</span> <span class="toc-text">VDR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UPnP"><span class="toc-number">2.5.</span> <span class="toc-text">UPnP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u548C_u670D_u52A1"><span class="toc-number">2.5.1.</span> <span class="toc-text">设备和服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u83B7_u53D6IP_u5730_u5740"><span class="toc-number">2.5.2.</span> <span class="toc-text">获取IP地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u53D1_u73B0"><span class="toc-number">2.5.3.</span> <span class="toc-text">设备发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63CF_u8FF0"><span class="toc-number">2.5.4.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A7_u5236"><span class="toc-number">2.5.5.</span> <span class="toc-text">控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4E8B_u4EF6"><span class="toc-number">2.5.6.</span> <span class="toc-text">事件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UPnP_AV"><span class="toc-number">2.6.</span> <span class="toc-text">UPnP AV</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u5A92_u4F53_u670D_u52A1_u5668"><span class="toc-number">2.6.1.</span> <span class="toc-text">媒体服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5A92_u4F53_u6E32_u67D3_u5668"><span class="toc-number">2.6.2.</span> <span class="toc-text">媒体渲染器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A7_u5236_u70B9"><span class="toc-number">2.6.3.</span> <span class="toc-text">控制点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u76EE_u5F55"><span class="toc-number">2.6.4.</span> <span class="toc-text">内容目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u8D44_u6E90"><span class="toc-number">2.6.5.</span> <span class="toc-text">内容资源</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLNA"><span class="toc-number">2.7.</span> <span class="toc-text">DLNA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u6570_u636E_u53EF_u7528_u6027_u6A21_u578B"><span class="toc-number">2.7.1.</span> <span class="toc-text">数据可用性模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#protocolInfo_u5B57_u6BB5"><span class="toc-number">2.7.2.</span> <span class="toc-text">protocolInfo字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP_u5934"><span class="toc-number">2.7.3.</span> <span class="toc-text">HTTP头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP_u5934"><span class="toc-number">2.7.4.</span> <span class="toc-text">RTSP头</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F20_u8F93_u534F_u8BAE"><span class="toc-number">2.8.</span> <span class="toc-text">传输协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP"><span class="toc-number">2.8.1.</span> <span class="toc-text">HTTP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP/RTP"><span class="toc-number">2.8.2.</span> <span class="toc-text">RTSP/RTP</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u6784"><span class="toc-number">3.</span> <span class="toc-text">结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u6D41_u5904_u7406"><span class="toc-number">3.1.</span> <span class="toc-text">流处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u6E90"><span class="toc-number">3.1.1.</span> <span class="toc-text">源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8F6C_u6362_u5668"><span class="toc-number">3.1.2.</span> <span class="toc-text">转换器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u63A5_u6536_u5668"><span class="toc-number">3.1.3.</span> <span class="toc-text">接收器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F1A_u8BDD_u7BA1_u7406"><span class="toc-number">3.2.</span> <span class="toc-text">会话管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP_u4F1A_u8BDD"><span class="toc-number">3.2.1.</span> <span class="toc-text">HTTP会话</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RTSP/RTP_u4F1A_u8BDD"><span class="toc-number">3.2.2.</span> <span class="toc-text">RTSP/RTP会话</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u5B9E_u73B0"><span class="toc-number">4.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#libupnp++"><span class="toc-number">4.1.</span> <span class="toc-text">libupnp++</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8981_u6C42"><span class="toc-number">4.1.1.</span> <span class="toc-text">要求</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rtpserver"><span class="toc-number">4.2.</span> <span class="toc-text">rtpserver</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8981_u6C42-1"><span class="toc-number">4.2.1.</span> <span class="toc-text">要求</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u793A_u4F8B_u8BBE_u7F6E"><span class="toc-number">4.3.</span> <span class="toc-text">示例设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#u4F7F_u7528_u6848_u4F8B_uFF1A_u901A_u8FC7RTSP/RTP_u8FDB_u884C_u6D41_u5A92_u4F53_u7535_u89C6_u76F4_u64AD"><span class="toc-number">4.4.</span> <span class="toc-text">使用案例：通过RTSP/RTP进行流媒体电视直播</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u5907_u542F_u52A8_u548C_u53D1_u73B0"><span class="toc-number">4.4.1.</span> <span class="toc-text">设备启动和发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u53D1_u73B0"><span class="toc-number">4.4.2.</span> <span class="toc-text">内容发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4F1A_u8BDD_u521D_u59CB_u5316"><span class="toc-number">4.4.3.</span> <span class="toc-text">会话初始化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u8BBE_u7F6E_u7BA1_u9053"><span class="toc-number">4.4.4.</span> <span class="toc-text">设置管道</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u7ED3_u675F_u4F1A_u8BDD"><span class="toc-number">4.4.5.</span> <span class="toc-text">结束会话</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLNA_u517C_u5BB9_u6027_u6D4B_u8BD5"><span class="toc-number">4.5.</span> <span class="toc-text">DLNA兼容性测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DLNA_u4E00_u81F4_u6027_u6D4B_u8BD5_u5DE5_u5177"><span class="toc-number">4.5.1.</span> <span class="toc-text">DLNA一致性测试工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rtpserver_u7684_u6D4B_u8BD5_u72B6_u6001"><span class="toc-number">4.5.2.</span> <span class="toc-text">rtpserver的测试状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u7ED3_u8BBA"><span class="toc-number">5.</span> <span class="toc-text">结论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#u672A_u6765_u5DE5_u4F5C"><span class="toc-number">5.1.</span> <span class="toc-text">未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#u76F4_u63A5_u8BBF_u95EEDVB_u8C03_u8C10_u5668"><span class="toc-number">5.1.1.</span> <span class="toc-text">直接访问DVB调谐器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DVB-SI_u6620_u5C04_u548CEPG"><span class="toc-number">5.1.2.</span> <span class="toc-text">DVB-SI映射和EPG</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u4E13_u7528_u63A7_u5236_u70B9"><span class="toc-number">5.1.3.</span> <span class="toc-text">专用控制点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5D4C_u5165_u5F0F_u5A92_u4F53_u670D_u52A1_u5668_u548C_u64AD_u653E_u5668"><span class="toc-number">5.1.4.</span> <span class="toc-text">嵌入式媒体服务器和播放器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u5185_u5BB9_u76EE_u5F55_u641C_u7D22"><span class="toc-number">5.1.5.</span> <span class="toc-text">内容目录搜索</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u667A_u80FD_u8F6C_u7801_u5F15_u64CE"><span class="toc-number">5.1.6.</span> <span class="toc-text">智能转码引擎</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#u91CD_u5199_u5E26_u7EA0_u9519_u7684RTP_u5E93"><span class="toc-number">5.1.7.</span> <span class="toc-text">重写带纠错的RTP库</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#u53C2_u8003_u6587_u732E"><span class="toc-number">6.</span> <span class="toc-text">参考文献</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="javascript:void(0)" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle"><a href="/categories">分类</a></p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/UWP/" title="UWP">UWP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/随笔/" title="随笔">随笔<sup>5</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle"><a href="/tags">标签</a></p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/VisualStateManager/" title="VisualStateManager">VisualStateManager<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Transitions/" title="Transitions">Transitions<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Storyboard/" title="Storyboard">Storyboard<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Jacman/" title="Jacman">Jacman<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数据恢复/" title="数据恢复">数据恢复<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLite/" title="SQLite">SQLite<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/继承映射/" title="继承映射">继承映射<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C#">C#<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/UPnP/" title="UPnP">UPnP<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/RTSP-RTP/" title="RTSP/RTP">RTSP/RTP<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XAML/" title="XAML">XAML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Binding/" title="Binding">Binding<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Maximum-SubArray/" title="Maximum SubArray">Maximum SubArray<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 记那场清风明月的传说。 <br/>
+			清风闻仙醉，明月唤梦回。</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="http://3meng.github.io/about" target="_blank" title="一粒尘埃">一粒尘埃</a>
+		
+		. Hosted on <a href="https://github.com/" target="_blank" title="GitHub">GitHub</a>
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  var $article = $(".article-content");
+  var count = [0, 0, 0, 0, 0, 0];
+  var mark = [0, 0, 0, 0, 0, 0];
+  
+  (function setMark(){
+    var hTag = ["h1", "h2", "h3", "h4", "h5", "h6"];
+    var index = 0;
+    for (var i = 0; i < 6; ++i) {
+      if ($article.children(hTag[i]).length > 0) {
+        ++index;
+        mark[i] = index;
+      }
+    }
+  })();
+  
+  $article.children(":header").each(function(){
+    var t = $(this);
+    var pos = 0;
+    switch (t[0].tagName) {
+      case "H1": pos = 0; break;
+      case "H2": pos = 1; break;
+      case "H3": pos = 2; break;
+      case "H4": pos = 3; break;
+      case "H5": pos = 4; break;
+      case "H6": pos = 5; break;
+    }
+    
+    var len = mark[pos];
+    if (len < 6) { count[len] = 0; }
+    count[len - 1]++;
+    
+    var listStr = count[0] + "";
+    for (var i = 1; i < len; ++i) { listStr += "." + count[i]; }
+    listStr += " ";
+    t.html(listStr + t.html());
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  var is_open = true;
+  function closeAside(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+    is_open = false;
+  };
+  function openAside(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+    is_open = true;
+  }
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+      if (is_open) {
+        openAside();
+      } else {
+        closeAside();
+      }
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    closeAside();
+  });
+  o.click(function(){
+    openAside();
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  closeAside();
+  $('#toc.toc-aside').css('display', 'block').addClass('fadeIn');
+  
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"3menggithub"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-60919501-1', 'auto');  
+ga('require', 'linkid', 'linkid.js');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Highlight.js Begin -->
+<script src="//cdn.bootcss.com/highlight.js/9.1.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- Highlight.js End -->
+
+  </body>
+</html>
