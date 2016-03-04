@@ -4,7 +4,7 @@
   <subtitle><![CDATA[历劫由来谁一笑，仙踪尽飞羽衣飘。]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://3meng.github.io/"/>
-  <updated>2016-02-28T13:28:16.000Z</updated>
+  <updated>2016-03-04T07:05:59.000Z</updated>
   <id>http://3meng.github.io/</id>
   
   <author>
@@ -19,8 +19,8 @@
     <link href="http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/"/>
     <id>http://3meng.github.io/2016/02/28/Implementing-a-DLNA-compliant-UPnP-AV-MediaServer/</id>
     <published>2016-02-27T17:25:38.000Z</published>
-    <updated>2016-02-28T13:28:16.000Z</updated>
-    <content type="html"><![CDATA[<p>首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
+    <updated>2016-03-04T07:05:59.000Z</updated>
+    <content type="html"><![CDATA[<p>首先声明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
 <ul>
 <li>题目：<strong>Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support</strong>.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）</li>
 <li>作者：<strong>Martin Emrich</strong></li>
@@ -41,7 +41,7 @@
 <blockquote>
 <p>到2008年为止，只有三个德国英特网服务提供商提供免费可用的公共电台IPTV流到他们的客户住所，所有的都只适用于他们自己的专用IPTV订阅。</p>
 </blockquote>
-<p>同时，家庭多媒体网络正变的更加现实。新的标准，比如<strong>UPnP AV</strong>和<strong>DLNA</strong>，允许家用多媒体设备发现彼此而无需终端用户的任何配置。这样一来，很多人已经在使用家庭网络，使他们的照片，视频和音乐集合始终在家庭媒体客户端设备可用。类似DLNA CERTIFIED™徽标计划的新举措将保证不同厂商的设备在协议和内容格式条款之间的<strong>兼容性</strong>。</p>
+<p>同时，家庭多媒体网络正变的更加现实。新的标准，比如<strong>UPnP AV</strong>和<strong>DLNA</strong>，允许家用多媒体设备发现彼此而无需终端用户的任何配置。这样一来，很多人已经在使用家庭网络，使他们的照片，视频和音乐集合始终在家庭媒体客户端设备可用。类似<strong>DLNA CERTIFIED™</strong>徽标计划的新举措将保证不同厂商的设备在协议和内容格式条款之间的<strong>兼容性</strong>。</p>
 <h3 id="u76EE_u6807"><a href="#u76EE_u6807" class="headerlink" title="目标"></a>目标</h3><p>目前，这两个世界几乎独立存在。典型的家庭网络用户有一个网络媒体播放器设备，旁边放着一个DVB接收盒（即使DLNA承认这些“小岛”）。我们的目标是通过提供一个媒体服务器来联合这两个应用程序，媒体服务器<strong>使用现有的标准构建</strong>，并可通过DVB调谐器硬件以及音乐，视频和照片等内容存储提供现场直播。当然，对于每一种类型的内容，适当的传输协议（<code>HTTP</code>，<code>RTSP/RTP</code>单播或多播）将被选择。服务器将是<strong>符合DLNA设备指南</strong>，因此与市场上的许多设备兼容。未来的工作可以包括相应的媒体客户端的设计，包括硬件，操作系统配置和软件。</p>
 <p>一个使用<code>RTP</code>协议直播电视和电台的DLNA兼容的媒体服务器的原型将在本文进行开发。由于目前没有UPnP或DLNA兼容的接收设备可用于接收RTP传输信号，一个合适的媒体渲染器由Jochen Crun同时开发。为了证明DLNA兼容性，最后的媒体服务器使用<strong>DLNA一致性测试工具</strong>（<code>CTT</code>）测试，当然它应该通过所有相关测试。</p>
 <h2 id="u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6"><a href="#u5DF2_u5B58_u5728_u7684_u6846_u67B6_u548C_u6807_u51C6" class="headerlink" title="已存在的框架和标准"></a>已存在的框架和标准</h2><p>有几个标准组织以及个别公司正在开发各种框架，使广播和/或媒体可以共享到家庭网络。</p>
@@ -53,8 +53,8 @@
 <p>在发现服务后，终端设备可以通过SD&amp;S获取XML文档的<code>DVB-SI</code>（服务信息）。</p>
 <p>媒体流的唯一容器为<strong>MPEG传输流</strong>（TS），无论是通过<code>RTP</code>还是<code>UDP</code>（<strong>ITU H.610</strong>）传输。会话通过<code>IGMP</code>（组播）或<code>RTSP</code>（同样有限，没有特技播放操作）管理。</p>
 <p>目前，仅有少数的最终用户设备明确兼容<code>DVB-IPTV</code>，尽管有可能一些专有的IPTV产品至少在德国市场上提供了部分<code>DVB-IPI</code>兼容。要确认这些，更多的逆向工程工作可能是必需的。</p>
-<p><code>DVB-IPI</code>的主要缺点是其对于MPEG流之外的媒体类型缺少支持，使得它不适合用于家庭网络中分布式的本地内容存储（照片，音乐）。一些机制，例如<code>多协议封装</code>（MPE，它允许在MPEG数据流中嵌入任意数据发送），理论上可以用于扩展功能，但它们不是DVB-IPI规范的一部分。其更关注提供在现有DVB传输中提供的相同的特性（通过加入视频点播）。</p>
-<p>不过，一个通用设备除了其他框架外还可以实现DVB-IP以获得与现有的DVB-IP服务的兼容性。</p>
+<p><code>DVB-IPI</code>的主要缺点是其对于MPEG流之外的媒体类型缺少支持，使得它不适合用于家庭网络中分布式的本地内容存储（照片，音乐）。一些机制，例如<code>多协议封装</code>（MPE，它允许在MPEG数据流中嵌入任意数据发送），理论上可以用于扩展功能，但它们不是<code>DVB-IPI</code>规范的一部分。其更关注提供在现有DVB传输中提供的相同的特性（通过加入视频点播）。</p>
+<p>不过，一个通用设备除了其他框架外还可以实现<code>DVB-IP</code>以获得与现有的<strong>DVB-IP</strong>服务的兼容性。</p>
 <h3 id="DVB-HN"><a href="#DVB-HN" class="headerlink" title="DVB-HN"></a>DVB-HN</h3><p>DVB项目似乎已经了解了DVB-IPI的局限性，它们现在将DVB-IPI和DLNA的特性组合成一个称为<code>DVB-HN</code>（<strong>DVB家庭网络</strong>）的新框架。本质上，DVB-HN根据DLNA准则，使在广播内容中需要的所有可选部分为必须的。他们还引进新的设备类：</p>
 <ul>
 <li><strong>HNED</strong>（家庭网络终端设备）：这些重用现有的DLNA设备类（DMS，DMP，DMC），分别扩展为<code>DVB-DMS</code>，<code>DVB-DMP</code>和<code>DVB-DMC</code>。</li>
@@ -203,7 +203,7 @@ ST: unpn:rootdevice
 <h4 id="u63A7_u5236"><a href="#u63A7_u5236" class="headerlink" title="控制"></a>控制</h4><p>当<em>控制点</em>已经发现<em>设备</em>并且读取其描述之后，它就可以调用由该<em>设备</em>提供的操作了。动作调用使用SOAP远程过程调用完成。调用方使用<code>HTTP POST</code>方式发送<code>SOAP</code>请求到服务的<strong>controlURL</strong>。如果该请求是有效的，<em>设备</em>执行相应的动作，并返回响应。如果执行时间需要超过30秒，该服务要求即刻返回，并在执行完成时发送一个事件。</p>
 <p>UPnP标准曾经纳入一个机制来直接查询状态变量，但现在该方式已经<strong>过时</strong>。</p>
 <p>一个<em>服务</em>提供的操作通常使用形如<strong>&lt;服务&gt;:&lt;操作&gt;</strong>或<strong>&lt;服务缩写&gt;:&lt;操作&gt;</strong>的方式引用，如<code>CMS:GetProtocolInfo</code>表示连接管理(<code>ConnectionManager</code>)的<code>GetProtocolInfo</code>操作。</p>
-<h4 id="u4E8B_u4EF6"><a href="#u4E8B_u4EF6" class="headerlink" title="事件"></a>事件</h4><p>作为不断轮询查看<em>服务</em>状态的代替方式，一个<em>控制点</em>可以订阅由<em>服务</em>发出的事件。UPnP使用<em>*通用事件通知结构</em>（<code>GENA</code>）来发出通知。 该协议基于HTTP，但为不同的消息类型引入了新方法。</p>
+<h4 id="u4E8B_u4EF6"><a href="#u4E8B_u4EF6" class="headerlink" title="事件"></a>事件</h4><p>作为不断轮询查看<em>服务</em>状态的代替方式，一个<em>控制点</em>可以订阅由<em>服务</em>发出的事件。UPnP使用<em>通用事件通知结构</em>（<code>GENA</code>）来发出通知。 该协议基于HTTP，但为不同的消息类型引入了新方法。</p>
 <p>对事件感兴趣的客户端可以发送订阅请求到<em>服务</em>的<code>eventSubURL</code>。订阅包括一个回调URL和订阅时间。注意，没有办法将订阅限制到<em>服务状态变量</em>的特定子集。该<em>服务</em>使用一个唯一标识的订阅ID进行相应，并发送第一个、包括所有事件状态变量的<em>初始化</em>事件。之后（直到订阅到期或客户取消订阅），每当一个变量发生变化时，该<em>服务</em>发送相应事件通知给每一个订阅用户。</p>
 <h3 id="UPnP_AV"><a href="#UPnP_AV" class="headerlink" title="UPnP AV"></a>UPnP AV</h3><p>UPnP AV基础设施说明了一组UPnP设备的配置文件和它们之间的相互作用，以帮助在设备之间传输媒体内容（音频，视频，图像，…）。这些设备配置文件是：</p>
 <ul>
@@ -273,7 +273,7 @@ ST: unpn:rootdevice
 <li><strong>内容格式</strong>：通常情况是内容的MIME类型，如<code>video/mpeg</code>或者<code>image/jpeg</code>。</li>
 <li><strong>附加信息</strong>：可能包含有关该资源的详细信息。如果不需要，它被设置为<code>*</code>。</li>
 </ul>
-<h3 id="DLNA"><a href="#DLNA" class="headerlink" title="DLNA"></a>DLNA</h3><p>数字生活网络联盟（<code>DLNA</code>）是全球领先的消费娱乐厂商联盟。它的目标是让用户可以联网家庭娱乐设备并提供无缝的合作工作，只要设备带有DLNA CERTIFIED™标志，即使这些设备是来自不同的厂商。</p>
+<h3 id="DLNA"><a href="#DLNA" class="headerlink" title="DLNA"></a>DLNA</h3><p>数字生活网络联盟（<code>DLNA</code>）是全球领先的消费娱乐厂商联盟。它的目标是让用户可以联网家庭娱乐设备并提供无缝的合作工作，只要设备带有<strong>DLNA CERTIFIED™</strong>标志，即使这些设备是来自不同的厂商。</p>
 <p>DLNA实际上是UPnP AV组的继承人，基本上DLNA架构就是UPnP AV加上许多额外的规范和说明，所有设计都用于避免不同设备之间的兼容性问题。有一些较为明显的增加内容：</p>
 <ul>
 <li>更多的设备配置文件：DLNA不仅区分<strong>媒体服务器</strong>，<strong>媒体渲染器</strong>和<strong>控制点</strong>，还区分不同的设备类别，比如家庭网络设备（HND）或移动手持设备（MHD），以及不同的媒体类别（例如数字媒体播放器（DMP）或移动数字媒体服务器（M-DMS））。还有一种打印体系结构（建立在UPnP打印定义的上层）。通过这，单个设备的功能可以更彻底地指定。</li>
@@ -281,7 +281,7 @@ ST: unpn:rootdevice
 <li>强制传输、容器和编解码器：一个设备要被认证，必须至少支持HTTP传输和一组最小的媒体格式集合（包括MPEG 2视频，MP3音频，JPEG和LPCM）。DLNA甚至指定了媒体互操作单元（<code>MIU</code>），其本质上是一个转码器设备，用于使内容与其他设备兼容。</li>
 <li>详细媒体传输规格：DLNA设备准则还规定了如何访问和传输的不能随机访问的内容，例如直播或者硬盘录像机上一个增长的记录。</li>
 </ul>
-<p>一个DLNA CERTIFIED™的设备，必须符合数百项要求，需要使用由DLNA向其成员提供的一种<strong>一致性测试工具</strong>（<code>CTT</code>）测试。DLNA的主页列出了超过1000种认证的设备，包括电视机，笔记本电脑（通常是指经过认证的DLNA软件），当然还有索尼的PlayStation 3视频游戏机。</p>
+<p>一个<strong>DLNA CERTIFIED™</strong>的设备，必须符合数百项要求，需要使用由DLNA向其成员提供的一种<strong>一致性测试工具</strong>（<code>CTT</code>）测试。DLNA的主页列出了超过1000种认证的设备，包括电视机，笔记本电脑（通常是指经过认证的DLNA软件），当然还有索尼的PlayStation 3视频游戏机。</p>
 <p>尽管DLNA规定了需要在家庭网络直播（RTSP/RTP传输或调谐器管理）的所有内容，截至2008年年底，没有任何实现这些指导方针的设备投放市场。这可能是由于在认证过程这些功能是可选的，因而没有被CTT测试（它测试的大多只是强制性要求），另一个原因可能是RTP传输增加了开发难度。</p>
 <p>除了约束或澄清现有的UPnP AV架构，DLNA准则主要在现有的协议和格式中添加了新的头部和字段。其座右铭是“<strong>分析并解释，或分析而忽视</strong>”，这意味着任何在交流中遇到的无法理解（例如：一个厂商特定的XML元素出现在DIDL-Lite文档中）或看起来畸形的信息，另一方应始终宽容地对待，并当做该元素从没有出现过。通过这种方式，可以扩充更多信息而不会干扰传统客户端。</p>
 <h4 id="u6570_u636E_u53EF_u7528_u6027_u6A21_u578B"><a href="#u6570_u636E_u53EF_u7528_u6027_u6A21_u578B" class="headerlink" title="数据可用性模型"></a>数据可用性模型</h4><p>DLNA知道存储和直播内容之间不同的可用性属性，因而定义了统一的<strong>客户端数据可用性模型</strong>（<code>UCDAM</code>）来描述流边界和有效范围：</p>
@@ -327,7 +327,7 @@ ST: unpn:rootdevice
 <li><p><code>realTimeInfo.dlna.org</code>：对于实时传输字符的内容（如直播），客户端和服务器可以在键值对中通信附加信息。当前唯一使用的键是<code>DLNA.ORG_TLAG</code>。如果它是一个有限数（正实数），它指定在当前时间（例如：当从调谐器硬件接收内容片段时）和它必须被发送到客户端的时间之间的用秒表示的时间差。如果超过此时间（因为客户端在此时间不接受它），服务器被允许删除数据以保持传输的实时特性。如果它是无限的，该标记被设置为<code>*</code>。</p>
 </li>
 </ul>
-<h4 id="RTSP_u5934"><a href="#RTSP_u5934" class="headerlink" title="RTSP头"></a>RTSP头</h4><p>支持(<code>dlna.annouce</code>, …)功能列表可以通过客户端或服务器发出。它包含一个逗号分割的发送端点的功能列表，例如，<code>dlna annouce</code>表示服务器可以发送RTSP ANNOUNCE消息。</p>
+<h4 id="RTSP_u5934"><a href="#RTSP_u5934" class="headerlink" title="RTSP头"></a>RTSP头</h4><p>支持(<code>dlna.annouce</code>, …)功能列表可以通过客户端或服务器发出。它包含一个逗号分割的发送端点的功能列表，例如，<code>dlna annouce</code>表示服务器可以发送<code>RTSP ANNOUNCE</code>消息。</p>
 <ul>
 <li><p><code>Buffer-Info.dlna.org</code>：当服务器支持RTCP缓冲器充满报告时，这将在客户端的RTSP SETUP请求中发送，指示客户端缓冲字符。它包括去抖动缓冲器字节大小、编码数据缓冲器字节大小、接收缓冲器传送机构（去抖动缓冲区是立即将数据推送到编码数据缓冲器，还是基于数据包的时间标记）、以毫秒计算的接收机缓冲区大小。</p>
 </li>
@@ -364,7 +364,7 @@ Hello World!
 <p><code>RTSP</code>（<strong>实时流传输协议</strong>）用于会话管理，例如，确定内容的属性，并控制传输（设置，播放，暂停，停止，…）。它的语法被设计的与HTTP颇为相似，但不同之处在于它是有状态的，在同一个会话，连续的操作不需要在相同的TCP连接上发生。因此，它包括一个<strong>会话ID</strong>和一个<strong>序列号</strong>。</p>
 <p>一个典型的RTSP会话通常从客户端的<code>OPTIONS</code>请求开始，服务器使用它支持方法的列表进行响应。接下来，客户端会发出针对特定内容项的<code>DESCRIBE</code>请求，服务器用带有描述的响应让客户了解期望的流的类型。然后，客户端发送一个<code>SETUP</code>请求，只有此时，服务器才会为此次会话分配资源，并发送<em>会话ID</em>给客户端，客户端现在必须在本次会话的每个后续请求中加入会话ID。现在，客户端可发出<code>PLAY</code>或<code>PAUSE</code>请求来控制传输。最后，当客户想要结束会话，它发送一个<code>TEARDOWN</code>请求。</p>
 <p>而一个流会话正在播放（或记录）时，发送者和接收者可任选在<code>RTCP</code>（<strong>实时传输控制协议</strong>）交换连接信息。它主要用于发送或接收报告，例如通知另一方有关丢失的数据包，或给发送者一个缓冲区填充满的报告。</p>
-<p>RTP一个问题仍然存在，那就是一端丢失检测（DPD）。因为在一个正在运行的会话过程中没有持久连接，服务器不能被动的检测到客户端刚离开网络，并只会继续发送RTP流。一个可能性是使用RTCP定期接收报告，如果在一定的时间内没有报告被接收到就结束会话。很多用户现在使用的另一种“变通”是保持RTSP连接打开，并每隔几秒钟发出一个带会话ID的无操作请求（例如<code>OPTIONS</code>）。</p>
+<p>RTP的一个问题仍然存在，那就是对等方丢失检测（DPD）。因为在一个正在运行的会话过程中没有持久连接，服务器不能被动的检测到客户端刚离开网络，并只会继续发送RTP流。一个可能性是使用RTCP定期接收报告，如果在一定的时间内没有报告被接收到就结束会话。很多用户现在使用的另一种“变通”是保持RTSP连接打开，并每隔几秒钟发出一个带会话ID的无操作请求（例如<code>OPTIONS</code>）。</p>
 <blockquote>
 <p>例如 VLC或者MPlyaer</p>
 </blockquote>
@@ -377,7 +377,7 @@ t=0 0
 m=video 0 RTP/AVP 33
 a=control:rtsp://192.168.80.2:10554/video.mpg
 </code></pre><p>本示例演示了一个多播视频传输。会话ID是1224610665，发起地址IP为IPv4网络中的192.168.80.2。流的会话名称是“Das Erste”，它是在没有预定义的UDP端口（0）的多播信道224.0.1.2上传输。它包含一个MPEG传送流（RTP有效载荷类型为33），并通过RTSP在<code>rtsp://192.168.80.2:10554/video.mpg</code>被控制。</p>
-<p>DLNA定义了使用现有SDP头部的规则，以及一些新的SDP头，包括<code>a=contentFeatures.dlna.org</code>（又包含在内容项资源的第四个字段）和<code>a=scmsFlag.dlna.org</code>（指定版权和复制状态）。</p>
+<p>DLNA定义了使用现有<code>SDP</code>头部的规则，以及一些新的<code>SDP</code>头，包括<code>a=contentFeatures.dlna.org</code>（又包含在内容项资源的第四个字段）和<code>a=scmsFlag.dlna.org</code>（指定版权和复制状态）。</p>
 <p><strong>纠错</strong><br>由于RTP的有损性质，内容应该更健壮以抵抗传送误差，尤其使用是不可靠的（无线局域网）或共享的（家庭网络）的网络。这里有两种方法，前期增加冗余（前向纠错，FEC）或让接收者可以重新请求丢失的包（自动重新请求，ARQ）。</p>
 <p><strong>FEC</strong> 通过在每个包中加入一定量的错误校正数据，当一个包丢失时，接收者仍然能够通过使用周围包的校正数据来重建它。显而易见的缺点是，传输总是需要更多的带宽，即使没有错误需要校正。但如果发生数据损坏，在客户端是能够迅速重建数据。这是有多余的带宽可用时的理想的有损通道。</p>
 <p><strong>ARQ</strong> 给客户端在一个短的时间内从服务器请求丢失的包的拷贝的可能性。它的主要缺点是，重新传输时，接收者需要花费至少两倍流传输时间在加上服务器延迟时间来缓存重发的流。如果通过有损共享介质（如无线LAN）进行多播时，当许多客户端请求重传不同块的时候，它也不能很好地扩展。</p>
@@ -626,11 +626,11 @@ server: rtpserver 0.0.2svn
 <li>H. Schulzrinne, S. Casner, R. Frederick, and V. Jacobson. RTP: A Transport Protocol for Real-Time Applications, July 2003. <a href="http://www.ietf.org/rfc/rfc3550.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc3550.txt</a>.</li>
 <li>H. Schulzrinne, A. Rao, and R. Lanphier. Real Time Streaming Protocol, April 1998. <a href="http://www.ietf.org/rfc/rfc2326.txt" target="_blank" rel="external">http://www.ietf.org/rfc/rfc2326.txt</a>.</li>
 <li>Guoping Tan and Thorsten Herfet. Optimization of an RTP Level Hybrid Error Correction Scheme for DVB Systems Over Wireless Home Networks Under Restrict Delay Constraint. In IEEE Transactions on Broadcasting, Vol 53, Issue 1, Part 2, pages 297–307. IEEE, March 2007.</li>
-<li>The DVB Project. DVB-HN (Home Network) Reference Model Phase 1. <a href="http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN\_ref\_model.pdf" target="_blank" rel="external">http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN\_ref\_model.pdf</a>, February 2007.</li>
+<li>The DVB Project. DVB-HN (Home Network) Reference Model Phase 1. <a href="http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN_ref_model.pdf" target="_blank" rel="external">http://www.dvb.org/technology/standards/a109.tm3690r2.DVB-HN_ref_model.pdf</a>, February 2007.</li>
 </ol>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p>首先说明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
+    <![CDATA[<p>首先声明，这是毕设中要求翻译的一篇论文，原文相关信息如下：</p>
 <ul>
 <li>题目：<strong>Implementing a DLNA-compliant UPnP AV MediaServer with DVB and RTSP/RTP support</strong>.（实现一个DLNA兼容且支持DVB和RTSP/RTP的UPnP AV媒体服务器）</li>
 <li>作者：<strong>Martin Emrich</strong></li>
