@@ -84,6 +84,137 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/07/21/New-Language-Features-in-CSharp6/" title="C# 6 新特性" itemprop="url">C# 6 新特性</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://3meng.github.io/about" title="一粒尘埃" target="_blank" itemprop="author">一粒尘埃</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-21T06:52:31.000Z" itemprop="datePublished"> 发表于 2015-07-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>微软新一代开发工具<code>Visual Studio 2015</code>正式版已经于北京时间 2015年7月20日 23:30 发布了，而作为<code>.Net</code>开发中的主力开发语言<code>C#</code>，也已经走到了<code>C# 6</code>。</p>
+<p>那么作为<code>C#</code>开发语言的最新版本，微软又给它添加或改进了哪些特性呢？</p>
+<p><code>C# 6</code>的新特性是和微软的 .Net 开源编译器<a href="https://github.com/dotnet/roslyn">Roslyn</a>紧密相连的，在其 GitHub 页面中，也给出了<code>C# 6</code>新特性：<a href="https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6">New Language Features in C# 6</a>。下面内容一部分为简单的翻译，以及在查看时的一些理解和疑问，由于目前我还没发下载最新版 Win10 和 VS 2015，因此有些地方暂时还没发验证猜想。等待后续更新。</p>
+<p>下面先列出<code>C# 6</code>中的新特性：</p>
+<ul>
+<li><p>自动属性初始值表达式</p>
+<blockquote>
+<p><code>public int X { get; set; } = x;</code></p>
+</blockquote>
+</li>
+<li><p>只读自动属性</p>
+<blockquote>
+<p><code>public int Y { get; } = y;</code></p>
+</blockquote>
+</li>
+<li><p>静态导入<code>using static</code></p>
+<blockquote>
+<pre><code class="csharp">using static System.Console;
+// ...
+Write(4);
+</code></pre>
+</blockquote>
+</li>
+<li><p>索引器对象初始化</p>
+<blockquote>
+<p><code>new JObject { [&quot;x&quot;] = 3 }</code></p>
+</blockquote>
+</li>
+<li><p>在<code>catch</code>和<code>finally</code>块中使用<code>await</code></p>
+<blockquote>
+<p><code>try { ... } catch { await ... } finally { await ... }</code></p>
+</blockquote>
+</li>
+<li><p>异常筛选器</p>
+<blockquote>
+<p><code>catch(Exception e) when (e.Count &gt; 5) { ... }</code></p>
+</blockquote>
+</li>
+<li><p>函数/属性表达式</p>
+<blockquote>
+<p><code>public double Dist =&gt; Sqrt(X * X + Y * Y);</code></p>
+</blockquote>
+</li>
+<li><p>Null条件运算符</p>
+<blockquote>
+<p><code>customer?.Orders?[5]</code></p>
+</blockquote>
+</li>
+<li><p>字符串插值</p>
+<blockquote>
+<p><code>$&quot;{p.Name} is {p.Age} years old.&quot;</code></p>
+</blockquote>
+</li>
+<li><p><code>nameof</code>运算符</p>
+<blockquote>
+<p><code>string s = nameof(Console.Write);</code></p>
+</blockquote>
+</li>
+<li><p>其它改进</p>
+<blockquote>
+<ul>
+<li>#pragma</li>
+<li>集合初始化支持扩展方法<code>Add</code></li>
+<li>重载方法解析改进</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2015/07/21/New-Language-Features-in-CSharp6/#more">Read More</a>
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/随笔/">随笔</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C#</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/07/21/New-Language-Features-in-CSharp6/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/07/21/New-Language-Features-in-CSharp6/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/07/16/SQLite-and-inheritance-mapping/" title="SQLite与“继承映射”" itemprop="url">SQLite与“继承映射”</a>
   </h1>
   <p class="article-author">By
@@ -218,7 +349,7 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/10/Windows-Sockets/" title="Windows Sockets：多线程WEB服务器" itemprop="url">Windows Sockets：多线程WEB服务器</a>
+      <a href="/2015/06/10/Windows-Sockets/" title="Windows Socket：多线程WEB服务器" itemprop="url">Windows Socket：多线程WEB服务器</a>
   </h1>
   <p class="article-author">By
        
@@ -232,7 +363,7 @@
     <div class="article-content">
         
         <p>平时如果一个项目需要网络连接，一般都是直接用如<code>C#</code>、<code>Java</code>等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用<code>C#</code>中的Socket相关类做过一点有关长连接的事情。</p>
-<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Sockets API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
+<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Socket API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
 <h2 id="u5B9E_u9A8C_u8981_u6C42"><a href="#u5B9E_u9A8C_u8981_u6C42" class="headerlink" title="实验要求"></a>实验要求</h2><ol>
 <li>可配置IP地址、监听端口和主目录</li>
 <li>能够在监听端口上进行监听</li>
@@ -264,7 +395,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Windows-Sockets/">Windows Sockets</a>
+  <span></span> <a href="/tags/Winsock/">Winsock</a>
   </div>
 
 </div>
@@ -371,15 +502,11 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
-		  
-		
-		  
 			<li><a href="/categories/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>2</sup></a></li>
 		  
 		
 		  
@@ -392,6 +519,10 @@
 		
 		  
 			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>3</sup></a></li>
 		  
 		
 		  
@@ -408,23 +539,19 @@
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
+				<li><a href="/tags/Winsock/" title="Winsock">Winsock<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Unixsock/" title="Unixsock">Unixsock<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
 			
 		
 			
@@ -444,7 +571,11 @@
 			
 		
 			
-				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
 			
 		
 			
@@ -494,7 +625,7 @@
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 

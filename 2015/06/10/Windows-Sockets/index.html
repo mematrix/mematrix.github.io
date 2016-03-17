@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Windows Sockets：多线程WEB服务器 | 一千二百年的清风明月</title>
+    <title>Windows Socket：多线程WEB服务器 | 一千二百年的清风明月</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="一粒尘埃">
@@ -12,18 +12,18 @@
 
     
     <meta name="description" content="平时如果一个项目需要网络连接，一般都是直接用如C#、Java等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用C#中的Socket相关类做过一点有关长连接的事情。
-而最近，恰好由于网络课程实验要求，使用Windows Sockets API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是">
+而最近，恰好由于网络课程实验要求，使用Windows Socket API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Windows Sockets：多线程WEB服务器">
+<meta property="og:title" content="Windows Socket：多线程WEB服务器">
 <meta property="og:url" content="http://3meng.github.io/2015/06/10/Windows-Sockets/index.html">
 <meta property="og:site_name" content="一千二百年的清风明月">
 <meta property="og:description" content="平时如果一个项目需要网络连接，一般都是直接用如C#、Java等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用C#中的Socket相关类做过一点有关长连接的事情。
-而最近，恰好由于网络课程实验要求，使用Windows Sockets API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是">
-<meta property="og:updated_time" content="2016-02-22T14:24:35.000Z">
+而最近，恰好由于网络课程实验要求，使用Windows Socket API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简">
+<meta property="og:updated_time" content="2016-03-06T14:06:05.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Windows Sockets：多线程WEB服务器">
+<meta name="twitter:title" content="Windows Socket：多线程WEB服务器">
 <meta name="twitter:description" content="平时如果一个项目需要网络连接，一般都是直接用如C#、Java等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用C#中的Socket相关类做过一点有关长连接的事情。
-而最近，恰好由于网络课程实验要求，使用Windows Sockets API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是">
+而最近，恰好由于网络课程实验要求，使用Windows Socket API + C/C++来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简">
 
     
     <link rel="alternative" href="/atom.xml" title="一千二百年的清风明月" type="application/atom+xml">
@@ -86,7 +86,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/10/Windows-Sockets/" title="Windows Sockets：多线程WEB服务器" itemprop="url">Windows Sockets：多线程WEB服务器</a>
+      <a href="/2015/06/10/Windows-Sockets/" title="Windows Socket：多线程WEB服务器" itemprop="url">Windows Socket：多线程WEB服务器</a>
   </h1>
   <p class="article-author">By
        
@@ -107,7 +107,7 @@
 		</div>
 		
 		<p>平时如果一个项目需要网络连接，一般都是直接用如<code>C#</code>、<code>Java</code>等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用<code>C#</code>中的Socket相关类做过一点有关长连接的事情。</p>
-<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Sockets API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
+<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Socket API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
 <h2 id="u5B9E_u9A8C_u8981_u6C42"><a href="#u5B9E_u9A8C_u8981_u6C42" class="headerlink" title="实验要求"></a>实验要求</h2><ol>
 <li>可配置IP地址、监听端口和主目录</li>
 <li>能够在监听端口上进行监听</li>
@@ -683,7 +683,7 @@ finish:
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Windows-Sockets/">Windows Sockets</a>
+  <span></span> <a href="/tags/Winsock/">Winsock</a>
   </div>
 
 </div>
@@ -692,7 +692,7 @@ finish:
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://3meng.github.io/2015/06/10/Windows-Sockets/" data-title="Windows Sockets：多线程WEB服务器 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
+	  <div data-url="http://3meng.github.io/2015/06/10/Windows-Sockets/" data-title="Windows Socket：多线程WEB服务器 | 一千二百年的清风明月" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -726,7 +726,7 @@ finish:
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/06/10/Windows-Sockets/" data-title="Windows Sockets：多线程WEB服务器" data-url="http://3meng.github.io/2015/06/10/Windows-Sockets/"></div>
+	<div class="ds-thread" data-thread-key="2015/06/10/Windows-Sockets/" data-title="Windows Socket：多线程WEB服务器" data-url="http://3meng.github.io/2015/06/10/Windows-Sockets/"></div>
 </section>
 
 
@@ -750,15 +750,11 @@ finish:
 		<ul>
 		
 		  
-			<li><a href="/categories/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
-		  
-		
-		  
 			<li><a href="/categories/DLNA/" title="DLNA">DLNA<sup>1</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/Socket/" title="Socket">Socket<sup>1</sup></a></li>
+			<li><a href="/categories/Socket/" title="Socket">Socket<sup>2</sup></a></li>
 		  
 		
 		  
@@ -771,6 +767,10 @@ finish:
 		
 		  
 			<li><a href="/categories/笔记/" title="笔记">笔记<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>3</sup></a></li>
 		  
 		
 		  
@@ -787,23 +787,19 @@ finish:
 		<ul class="clearfix">
 		
 			
-				<li><a href="/tags/Algorithm/" title="Algorithm">Algorithm<sup>3</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/Hexo/" title="Hexo">Hexo<sup>3</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
+				<li><a href="/tags/Winsock/" title="Winsock">Winsock<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Unixsock/" title="Unixsock">Unixsock<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/CHK文件/" title="CHK文件">CHK文件<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
 			
 		
 			
@@ -823,7 +819,11 @@ finish:
 			
 		
 			
-				<li><a href="/tags/Windows-Sockets/" title="Windows Sockets">Windows Sockets<sup>1</sup></a></li>
+				<li><a href="/tags/Binary-Tree/" title="Binary Tree">Binary Tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Treap/" title="Treap">Treap<sup>1</sup></a></li>
 			
 		
 			
@@ -873,7 +873,7 @@ finish:
   
   <div class="archiveslist">
     <p class="asidetitle"><a href="/archives">归档</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a><span class="archive-list-count">1</span></li></ul>
   </div>
 
 

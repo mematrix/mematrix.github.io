@@ -4,7 +4,7 @@
   <subtitle><![CDATA[历劫由来谁一笑，仙踪尽飞羽衣飘。]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://3meng.github.io/"/>
-  <updated>2016-03-04T07:05:59.000Z</updated>
+  <updated>2016-03-17T16:14:30.000Z</updated>
   <id>http://3meng.github.io/</id>
   
   <author>
@@ -13,6 +13,171 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Windows和Unix-like系统中socket的一些区别和用法]]></title>
+    <link href="http://3meng.github.io/2016/03/16/Some-usages-of-socket-in-Windows-and-Unix-like-system/"/>
+    <id>http://3meng.github.io/2016/03/16/Some-usages-of-socket-in-Windows-and-Unix-like-system/</id>
+    <published>2016-03-16T13:23:17.000Z</published>
+    <updated>2016-03-17T16:14:30.000Z</updated>
+    <content type="html"><![CDATA[<p>最近因为要处理<code>UPnP</code>库所涉及的<code>socket</code>层次抽象，于是专门查看和测试了部分Windows和Unix-like系统中socket用法。总体来说，两者之间相似度很高（毕竟最初Windows上的socket方法就是从Unix系统中移植过去的），但是细节之间的差异也不小。当从Windows向Unix（Linux）系统移植或者从Unix（Linux）系统向Windows移植一个使用了socket的应用时，有些差异可以使用<code>typedef</code>、<code>#define</code>等方式来消除，但是有些不同用法却需要对主要代码进行改动。</p>
+<p>这里只会记录部分我查看的或测试过的结果。下面是我用于测试的三台主机所用的系统：</p>
+<ul>
+<li>Microsoft Windows 10 专业版（10586.36）</li>
+<li>Apple OS X Yosemite（10.10.5）</li>
+<li>Microsoft Windows 10 专业版（10586.122）</li>
+</ul>
+<p>其中两个Windows系统的主机连接到了同一台交换机上；而OS X系统的主机则使用无线网络连接到其中一个Windows系统创建的热点。</p>
+<a id="more"></a>
+<p>由于一般资料中对socket的讲解主要分为Windows和Linux，而看起来在Linux和Unix系统中关于socket的用法基本差别应该不大，比如我查看的有关Linux下socket的用法，都可以用于OS X中，而OS X是Unix系统的一个变种。所以在下面为了叙述方便，对于Unix（Linux）等统一称呼为Linux。</p>
+<h2 id="u90E8_u5206_u533A_u522B"><a href="#u90E8_u5206_u533A_u522B" class="headerlink" title="部分区别"></a>部分区别</h2><h3 id="u5934_u6587_u4EF6"><a href="#u5934_u6587_u4EF6" class="headerlink" title="头文件"></a>头文件</h3><p>在Windows下使用socket主要需要包含<code>winsock.h</code>或<code>winsock2.h</code>头文件，进行组播时可能还需要包含<code>ws2tcpip.h</code>头文件（这个头文件中包含了<code>winsock2.h</code>头文件）。</p>
+<blockquote>
+<p>此外，Windows中链接时还需要添加<code>ws2_32.lib</code>的引用。</p>
+</blockquote>
+<p>而在Linux系统中，则主要需要包含<code>sys/socket.h</code>头文件（通常当需要使用<code>inet_*</code>方法时，还需要包含<code>arpa/inet.h</code>头文件）。至于组播时需要的类型定义在<code>netinet/in.h</code>中，而它也被<code>arpa/inet.h</code>所包含。</p>
+<h3 id="u7C7B_u578B_u5B9A_u4E49"><a href="#u7C7B_u578B_u5B9A_u4E49" class="headerlink" title="类型定义"></a>类型定义</h3><h4 id="socket_u4E0E_u5730_u5740_u7C7B_u578B"><a href="#socket_u4E0E_u5730_u5740_u7C7B_u578B" class="headerlink" title="socket与地址类型"></a>socket与地址类型</h4><p>在Windows中一个socket类型被定义为<code>SOCKET</code>，而在Linux中则是<code>int</code>类型，这两者其实是类似的，因为在Windows下有如下定义（此处列出的是Win64下面定义）：</p>
+<pre><code class="c++">typedef unsigned long long int UINT_PTR;
+typedef UINT_PTR SOCKET;
+</code></pre>
+<p>对于用于表示一个socket地址的类型定义，在Windows下和Linux下基本是一样的，但是在Windows中又对部分类型进行了进一步的重新定义：</p>
+<pre><code class="c++">typedef in_addr IN_ADDR;
+typedef sockaddr SOCKADDR;
+typedef sockaddr_in SOCKADDR_IN;
+</code></pre>
+<p>至于组播时使用到的<code>struct ip_mreq</code>类型则没有被重定义，因此两者中是一致的。</p>
+<p><strong>注意：</strong>在Windows下的<code>struct in_addr</code>类型中包含了一个<code>S_un</code>的联合体，定义如下：</p>
+<pre><code class="c++">union
+{
+    struct { unsigned char s_b1, s_b2, s_b3, s_b4; } S_un_b;
+    struct { unsigned short s_w1, s_w2; } S_un_w;
+    unsigned long S_addr;
+}
+</code></pre>
+<p>而在Linux下则是直接定义<code>unsigned long s_addr;</code>，并没有这个联合体。但是两者最终含义都是一样的，只是Windows下需要多一层访问路径写法，但是同时也可以直接获取到地址的对应字节值（比如用于转换成点分十进制方式）。</p>
+<blockquote>
+<p>不过在Windows中，同时也定义了如下的宏，因此可以无缝的切换到Linux。</p>
+<pre><code class="c++">#define s_addr  S_un.S_addr
+#define s_host  S_un.S_un_b.s_b2
+#define s_net   S_un.S_un_b.s_b1
+#define s_imp   S_un.S_un_w.s_w2
+#define s_impno S_un.S_un_b.s_b4
+#define s_lh    S_un.S_un_b.s_b3
+</code></pre>
+</blockquote>
+<h4 id="u51FD_u6570_u51FA_u9519_u8FD4_u56DE_u503C"><a href="#u51FD_u6570_u51FA_u9519_u8FD4_u56DE_u503C" class="headerlink" title="函数出错返回值"></a>函数出错返回值</h4><p>通常在Linux下如果socket方法运行时出错了，会返回<code>-1</code>来表示调用出错，而在Windows中一般将socket方法返回值与<code>SOCKET_ERROR</code>进行比较，但是有一个不算例外的例外，那就是<code>socket</code>方法，当它出错时，将会返回<code>INVALID_SOCKET</code>。<code>SOCKET_ERROR</code>和<code>INVALID_SOCKET</code>与Linux之下的使用其实是一致的，因为它们的定义如下：</p>
+<pre><code class="c++">#define INVALID_SOCKET (SOCKET)(~0)
+#define SOCKET_ERROR (-1)
+</code></pre>
+<p>可以很容易看出，<code>INVALID_SOCKET</code>和<code>SOCKET_ERROR</code>的值都是-1。</p>
+<h4 id="error_code_u548C_u5B8F_u5B9A_u4E49"><a href="#error_code_u548C_u5B8F_u5B9A_u4E49" class="headerlink" title="error code和宏定义"></a>error code和宏定义</h4><p>关于各种出错状态码的定义，不同系统之间各有规定，包括名称、具体数值以及含义等，这个就需要参考具体的系统开发文档了。在通常情况下，Windows和Linux中关于错误状态码定义的名称（<code>#define</code>）和含义是一样的，但是具体的数值却可能不一样，因此，在实际使用中，我们应尽量使用定义好的宏名称来表示错误码，而不是直接写数值。</p>
+<p>至于一些常用的宏定义，和上面的错误状态码很类似，基本都是每个系统独自定义的一套符号和值，用于socket方法的各种调用和比较。这里，在Windows和Linux中很多宏定义基本就是一样的，特别是在几个主要的socket方法中使用的宏定义，名称基本一样，比如<code>INADDR_ANY</code>、<code>AF_INET</code>、<code>IP_MULTICAST_LOOP</code>等。</p>
+<p>而在<code>shutdown</code>方法中则需要注意一点，这个方法的参数是一个<code>int</code>类型参数，调用它的时候，所传整数值和代表含义在Windows和Linux下都是一致的，都是使用0表示关闭读通道、1表示关闭写通道、2表示全部关闭；但是如果使用宏定义的话，在Windows下分别用<code>SD_RECEIVE</code>、<code>SD_SEND</code>、<code>SD_BOTH</code>，而Linux下则是<code>SHUT_RD</code>、<code>SHUT_WR</code>、<code>SHUT_RDWR</code>。</p>
+<h4 id="u5176_u5B83"><a href="#u5176_u5B83" class="headerlink" title="其它"></a>其它</h4><p>有一点需要注意，在OS X中，涉及到传数据并同时给出数据长度的socket方法（比如<code>recvfrom</code>、<code>bind</code>、<code>setsockopt</code>等）中，数据长度的参数类型为<code>socklen_t</code>，其经过展开的定义类似下面的形式：</p>
+<pre><code class="c++">typedef unsigned int socklen_t;
+</code></pre>
+<h4 id="u53C2_u8003"><a href="#u53C2_u8003" class="headerlink" title="参考"></a>参考</h4><ol>
+<li><a href="http://blog.csdn.net/wxqian25/article/details/8252661" target="_blank" rel="external">http://blog.csdn.net/wxqian25/article/details/8252661</a></li>
+</ol>
+<h3 id="u65B9_u6CD5_u5B9A_u4E49"><a href="#u65B9_u6CD5_u5B9A_u4E49" class="headerlink" title="方法定义"></a>方法定义</h3><p>在Windows中使用socket的时候，首先需要调用<code>WSAStartup</code>方法初始化，之后的各种操作则类似Linux，而在结束之后还需要调用<code>WSACleanup</code>方法释放资源。除此之外，在Windows中则还定义了一组符合Windows消息驱动的socket方法，均以<code>WSA</code>开头，功能和对应的方法（比如<code>WSASend</code>对应<code>send</code>）类似。他们主要用于IOCP模型中。</p>
+<h4 id="u83B7_u53D6_u9519_u8BEF_u72B6_u6001_u7801"><a href="#u83B7_u53D6_u9519_u8BEF_u72B6_u6001_u7801" class="headerlink" title="获取错误状态码"></a>获取错误状态码</h4><p>在Linux下，是使用一个全局变量<code>errno</code>来指示错误的，即使是socket方法也不例外。但是在Windows中，则需要区分对待，对于第一个API<code>WSAStartup</code>来说，如果出错，我们使用普通的<code>GetLastError</code>方法获取错误信息，而其它的socket方法，则都必须使用专门的方法来获取：<code>WSAGetLastError</code>。返回的错误ID也随不同系统而有所区别。</p>
+<h4 id="u5173_u95ED_u5957_u63A5_u5B57"><a href="#u5173_u95ED_u5957_u63A5_u5B57" class="headerlink" title="关闭套接字"></a>关闭套接字</h4><p>在Windows和Linux中，我们都使用<code>shutdown</code>方法来关闭一个套接字的指定方向的数据流向，其参数的异同已经在上面叙说过。但是二者之间也可能有潜在的不同之处，将在下文对比说明。</p>
+<p>至于关闭套接字的方法，在Windows中是<code>closesocket</code>方法，而在Linux下则是<code>close</code>方法，它们都需要传递一个socket描述符。</p>
+<p>那么这两个关闭方法之间又有什么区别？在Linux下，这里有两篇文章可以参考：</p>
+<ul>
+<li><a href="http://blog.csdn.net/lgp88/article/details/7176509" target="_blank" rel="external">http://blog.csdn.net/lgp88/article/details/7176509</a></li>
+<li><a href="http://blog.csdn.net/pingnanlee/article/details/8426712" target="_blank" rel="external">http://blog.csdn.net/pingnanlee/article/details/8426712</a></li>
+</ul>
+<p>这里也间接说了一点Windows下与Linux下socket编程的一点区别。因为Linux下有<code>fork</code>方法，因此可以很容易创建一个子进程，来处理不同的socket连接，也就是Linux下可以采用多进程实现并发；但是Windows中则没有这个<code>fork</code>方法，因此通常在Windows下，采用的是多线程Web服务器，因此对于Windows下和Linux下的<code>shutdown</code>与<code>close/closesocket</code>方法实现，应该还是有些区别。</p>
+<p>在上面两篇文章中所说，如果是多进程共享一个套接字，那么<code>close</code>操作只会讲套接字描述符的引用计数减一，一直到其引用计数等于0的时候，才会真正关闭这个套接字（对于TCP协议将引发四次挥手过程）；而<code>shutdown</code>却不理会套接字共享，调用之后，将会直接破坏socket的指定方向的连接（由参数决定），此时所有共享此套接字的进程对套接字进行对应操作时，都将会收到错误信息。但是与Windows下一样，<code>shutdown</code>并不会关闭套接字，也不会释放资源，因此最后还是需要调用<code>close</code>方法。</p>
+<p>而对于Windows下来说，这两个方法并没有被设计成上面的工作方式，而是采用了一种更符合Windows编程的习惯。比如对于<code>closesocket</code>方法来说，调用之后，不管你是在哪个进程调用的，参数所传递的套接字都会被关闭并释放其占用的所有资源，并不存在引用计数一说；而<code>shutdown</code>方法也略有不同，调用该方法之后，如果参数为<code>SD_RECEIVE</code>，那么所有<strong>随后的</strong><code>recv</code>方法调用都不被允许，这个方法对更底层的协议层没有任何影响，对于一个TCP连接的socket，如果在数据队列中还有等待接收的数据或者又接收到新的数据，那么连接将被重置，因此用户是无法接收到这些数据的，而如果是一个UDP连接，没有任何影响。无论如何，都不会产生一个ICMP错误包。类似的情况也发生在参数为<code>SD_SEND</code>和<code>SD_BOTH</code>的时候，对于一个TCP连接来说，一个<strong>FIN</strong>报文将会被发送。</p>
+<p>有关Windows下套接字的信息，可以从MSDN上找到说明。这里有一篇关闭socket连接的说明：<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms738547(v=vs.85).aspx" target="_black" rel="external">Graceful Shutdown, Linger Options, and Socket Closure</a>。</p>
+<h4 id="u901A_u7528_u8F85_u52A9_u65B9_u6CD5"><a href="#u901A_u7528_u8F85_u52A9_u65B9_u6CD5" class="headerlink" title="通用辅助方法"></a>通用辅助方法</h4><p>无论实在Windows下还是Linux中，系统都提供了一些常用的辅助方法，用于处理一些常用的操作，比如在网络字节序和本机字节序之间转换、在IP地址的点分十进制字符串表示和Struct/整数表示之间转换等。</p>
+<p>字节序的转换方面，两者都提供了类似的方法，例如<code>htonl</code>与<code>ntohl</code>方法转换一个<code>unsigned long int</code>类型，而<code>htons</code>与<code>ntohs</code>方法转换一个<code>unsigned short int</code>类型。</p>
+<p>而在IP地址表示的转换方面，就略有区别了，比如从点分十进制到整数的转换，Linux下提供了<code>inet_addr</code>和<code>inet_aton</code>方法，而从整数转回到字符串，则提供了<code>inet_ntoa</code>。但是在Windows下，则没有提供<code>inet_aton</code>这个方法，因此对于<code>255.255.255.255</code>这个IP地址无法正确识别。不过从Windows Vista之后，在Windows下可以使用<code>inet_pton</code>来讲IP地址从点分十进制转换为整数或IPV6地址结构。</p>
+<blockquote>
+<p>在Linux中还提供了<code>inet_network</code>方法，它和<code>inet_addr</code>很类似，都是从字符串接卸出一个整数IP地址，但是有一点区别是前者返回的是本机序，而后者则是返回网络序。至于Windows下还没有验证是否存在这个方法。</p>
+<p>在Windows和Linux中都有<code>inet_ntop</code>和<code>inet_pton</code>方法，他们不仅支持IPV4地址的转换，还支持IPV6地址的转换。</p>
+</blockquote>
+<h4 id="u5176_u5B83-1"><a href="#u5176_u5B83-1" class="headerlink" title="其它"></a>其它</h4><p>在<a href="http://blog.csdn.net/wxqian25/article/details/8252661" target="_blank" rel="external">这里</a>还提到了一些其它的不同地方，比如socket控制方法，在Windows下为<code>ioctlsocket</code>，而在Linux下则是<code>fcntl</code>；而对于<code>send</code>方法，虽然在Windows下和Linux下两者签名一致，但是对于最后一个参数，Windows下一般传0即可，但是Linux下却最好设置为<code>MSG_NOSIGNAL</code>，否则如果发送出错则有可能导致程序退出；等等。如果你有兴趣，可以自行验证这些行为。</p>
+<h2 id="u7528_u6CD5_26amp_3B_u7EC6_u8282"><a href="#u7528_u6CD5_26amp_3B_u7EC6_u8282" class="headerlink" title="用法&amp;细节"></a>用法&amp;细节</h2><p>在Windows和Linux中socket的区别也不仅仅限于类型之间的差异，由这些类型差异当然也会导出一些细节用法的不同，在此就不在赘述了，毕竟上文也大概提到了。下面主要陈述一些其它的细节用法和说明，而未必是平台之间的差异。</p>
+<h3 id="u5524_u9192_u963B_u585E_u8C03_u7528"><a href="#u5524_u9192_u963B_u585E_u8C03_u7528" class="headerlink" title="唤醒阻塞调用"></a>唤醒阻塞调用</h3><p>这个也许是我曾搜索时间最长的一个问题了，当然，问题也并不是如何简单的关闭一个套接字，更详细的说，是如何（<strong>安全的</strong>）唤醒一个阻塞的socket方法调用，主要是读写方法。</p>
+<p>socket可以工作在两种模式下：阻塞模式（<strong>默认</strong>）和非阻塞模式。这两种方式各有优劣，这里就不做说明了，通常的任务，使用默认的阻塞的阻塞模式就可以很完美的工作了，而且控制也简单，无需像非阻塞模式下那样添加额外的处理判断以及线程调度等。但是现在问题就来了，如果一个程序中使用了阻塞的socket调用，但我们希望可以随时退出程序，该怎么办？很不幸，在网络上搜索的大部分答案都是：使用非阻塞调用方式……就不讨论对于一般小型的任务，使用非阻塞模式的不便利以及浪费资源了，这里都已经提出期望了，如何退出一个阻塞的socket调用，为什么还总是要回答非阻塞。而也有一两个答案提出使用<code>shutdown</code>方法，只有几乎很少的回答提到了使用<code>close</code>（<code>closesocket</code>）方法。</p>
+<blockquote>
+<p>有关socket的一些用法在后文提到，这里不重复了。</p>
+</blockquote>
+<p>对于一个阻塞的socket调用，其实我们这里要做的就是想办法让其从调用中返回，从而让线程继续执行，然后正常终结。（这里你也可以试试粗暴的关闭阻塞的socket调用所在线程，但是不提这样的方式是否优美，这种粗暴的做法，也不保证可以回收所有资源。）而如何让socket调用返回？正常情况是方法完成了任务，比如收到了数据，而大部分情况下，我们也是阻塞在这个接收数据的方法上，因此也有人提出了这样的解决方案：自己定义一种协议，然后在要关闭套接字的时候，新开一个socket，像原来的在等候的套接字发送一个指定格式的数据，从而达到唤醒的目的。不过这种方式对于UDP连接还可以，对于一个TCP会话就不好做到了，毕竟TCP连接是完备的五元组标示的一个连接，非目的地发出的数据，操作系统也不会把数据投递到另一端。</p>
+<p>而再回过头来看socket提供的主要方法，能够让一个阻塞的调用返回到其调用者的，也许就只有<code>shutdown</code>或<code>close/colsesocket</code>方法了。按照网上的说法，可以调用<code>shutdown</code>并传递合适的参数就可以唤醒阻塞的调用，比如如果是一个<code>read</code>方法阻塞，那么可以通过传递<code>SD_RECEIVE</code>或<code>SHUT_RD</code>来“<strong>破坏</strong>”socket读通道，从而导致读方法返回，类似的也可用于写操作上，至于读写通道同时关闭的<code>SD_BOTH</code>和<code>SHUT_RDWR</code>当然同样合适。这个说法看起来很有理，然后，我在测试过程中发现，如果仅仅调用这个方法，无论是在Windows下还是OS X中，都无法让被阻塞的方法返回。没办法，只有再试试<code>close</code>方法了，而这时，根据打印的log来看，就可以直接看到阻塞调用返回了，然后子线程正常终止，最后就是主线程等待子线程都结束之后才返回，根据log时间来看，被阻塞的方法都是立即返回的，自然携带了一个错误信息：<code>SOCKET_ERROR</code>。</p>
+<p>至于这样做有没有什么副作用，目前还没有发现，虽然在MSDN上有过一句话，就是提示<code>closesocket</code>方法不要与其它Winsock方法同时调用，但是同时也可以在MSDN上看到，<code>closesocket</code>也保证回收socket所占用的资源，并且还说到，当调用<code>closesocket</code>时，任何未运行的重叠发送和接收方法都会取消，相应事件、完成端口动作等都会被执行，同时，该方法将会在其它的I/O操作上初始化一个取消标记。有关具体的行为和配置，可以从上面的“<strong>关闭套接字</strong>”一节中附加的MSDN链接中找到详细说明。而对于Linux下来说，系统应该也会进行类似的保证。</p>
+<p>因此，目前我就是通过调用<code>close/closesocket</code>方法来实现唤醒其它线程中的阻塞调用的，当然具体用法还需要在根据系统给出的API文档决定细节调用，比如在MSDN中提到，<code>close</code>一个socket时，将会自动发送<code>FIN</code>报文，也就是对于<code>TCP</code>连接来说，就会步入四次挥手过程，而这个时候，就可以配置<code>closesocket</code>方法是立即返回还是等待这个关闭过程完成，默认配置是立即返回，然后剩下的由操作系统完成。</p>
+<h3 id="TCP_u662F_u5168_u53CC_u5DE5_u7684"><a href="#TCP_u662F_u5168_u53CC_u5DE5_u7684" class="headerlink" title="TCP是全双工的"></a>TCP是全双工的</h3><p>正因为TCP是全双工的，因此我们可以在一个TCP连接上同时执行读写操作，也就是同时进行发送和接收行为，而实际上，对于一个UDP连接的socket对象来说，我们也可以在上面同时进行收发操作，这点在有些时候就可以给我们的程序设计提供很大的便利，比如说我们可以在一个socket因为接收数据被阻塞的时候，从其它线程继续使用这个socket连接发送数据，这在有些读写操作不串行的时候很有用，比如在一个组播中，就需要一边监听组播消息，而又可能同时需要使用当前地址向组播会议中发送消息。</p>
+<blockquote>
+<p>至于为什么我们可以同时在一个socket对象上进行读写操作，这是因为socket对象的读写缓冲区是分开的，因此两个操作完全互不干扰，也就不存在多线程访问时候的竞争问题了。</p>
+</blockquote>
+<p>当我们记住这点，并且明白在<strong>两个</strong>线程中同时操作一个socket对象（当然，同一时刻一个只负责读，另一个只负责写）是不会发生意外的，也不需要额外的线程同步工作，在很多时候，可以方便我们的程序设计，比如下文中的组播示例。</p>
+<h3 id="u5355_u64AD_26amp_3B_u7EC4_u64AD"><a href="#u5355_u64AD_26amp_3B_u7EC4_u64AD" class="headerlink" title="单播&amp;组播"></a>单播&amp;组播</h3><p>简单来说，单播就是一对一传输信息，而组播就是一对（特定的）多传输信息。而多扯一句，广播则是完全的一对多，也就是对网络上所有设备。</p>
+<p>也许你认为需要两个socket对象才能同时完成对单播信息和组播信息的接收与发送，一个socket用来作为单播接收服务器，另一个作为组播监听服务器；但实际上，只需要一个就够了。</p>
+<blockquote>
+<p>当然，由于涉及到了组播，因此我们这里提到的单播也是使用UDP协议。</p>
+</blockquote>
+<p>我们可以在一个socket对象上完成单播和组播。首先说单播，其配置就和普通的用法一模一样，因为我们在这里还需要同时在这个socket对象上完成监听任务，也就是允许它像一个服务器那样工作，因此我们必须要在这个socket对象上调用<code>bind</code>操作，以将其绑定到一个地址上，通常我们使用下面的方式，使得socket对象可以接受来自任意地址的消息：</p>
+<pre><code class="c++">sockaddr_in local;
+local.sin_family = AF_INET;
+local.sin_addr.s_addr = htonl(INADDR_ANY);
+local.sin_port = htons(/* 端口号 */);
+if (-1 == bind(socket, (sockaddr *)&amp;local, sizeof(local)))
+{
+    // 处理错误
+}
+</code></pre>
+<blockquote>
+<p>这里有一个小问题需要注意，如果你在上述代码所位于的编译单元中添加了对命名空间<code>std</code>的引用并且使用<code>-std=c++11</code>编译，那么在编译时候可能会出点问题，编译器可能会报错，提示无法将<code>int</code>类型与<code>__Bind(xxx)</code>类型进行比较 这样的类似信息，而原因很简单，因为在<strong>C++11</strong>之后，命名空间<code>std</code>中也有一个<code>bind</code>方法，而有些编译器可能将这里解析成对<code>std::bind</code>方法的调用了，因此就出现了错误，解决方法也很简单，将你所有的<code>bind</code>调用都改成<code>::bind</code>，也就是提示编译器，我们使用的是全局命名空间的<code>bind</code>方法（这是一个C方法，而来自C语言的方法都位于当前编译单元的全局命名空间中）。并不是所有编译器都会报这样的错误，比如同样的方式，我在Windows中使用<code>MinGW-gcc</code>就没有问题，而在OS X下面使用XCode所带的编译器（名为<code>gcc</code>，实际应该是<code>clang</code>了吧）就会出现这样的错误。</p>
+</blockquote>
+<p>当我们绑定地址之后，就可以按照传统方式，在一个新的线程开始监听socket信息了，这一切，都和你之前所做的一样，而在这之后，你就创建了一个支持单播的socket连接了，可以在其上发送消息（如上一节所述），也可以接收消息。</p>
+<p>那么接下来，就是再为这个socket对象启用组播属性了，启用方式很简单，在上面的socket对象上调用<code>setsockopt</code>配置相关属性就可以了，单纯的向系统申明支持接收组播消息可以按照如下方式：</p>
+<pre><code class="c++">ip_mreq imMreq;
+ipMreq.imr_interface.s_addr = htonl(INADDR_ANY);
+ipMreq.imr_multiaddr.s_addr = htonl(/* 组播地址 */);
+if (-1 == setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&amp;ipMreq, sizeof(ipMreq)))
+{
+    // 处理错误
+}
+</code></pre>
+<p>我们设置<code>imr_interface.s_addr</code>来向系统说明我们希望使用哪个网卡来发送消息，而<code>imr_multiaddr.s_addr</code>则是希望加入的组播会议室（只有加入之后才能接收该组播上的消息）。这样我们就可以接收组播消息了，至于接收方法？当然是和单播一样了，对于UDP而言就是使用更常用的<code>recvfrom</code>了，因此你只需要在原来的代码中添加类似上面的代码就可以了，其它的地方不需要改动。</p>
+<p>在加入组播之后，我们也还可以使用<code>setsockopt</code>来设定一些其它的组播设置，比如是否接收自己发送出去的消息（<code>IP_MULTICAST_LOOP</code>）、组播数据报文的TTL值（<code>IP_MULTICAST_TTL</code>，默认为1，也就是当到达第一个路由器之后就会被丢弃，因此限制了组播报文只能在一个局域网内部传送，如果<strong>你的数据报必须要跨过路由器继续传送的话，你必须修改这个值为一个合适的值</strong>）……等等。</p>
+<blockquote>
+<p>这里也有一个奇怪的问题，在设置时候<code>IP_MULTICAST_LOOP</code>的时候，我使用了一个<code>unsigned int</code>类型变量作为<code>setsockopt</code>方法的第四个参数，但是结果在Windows下运行正常，而到了OS X中却没有作用，目前尚未深究原因，想来应该不会是大小端的原因，因为这个变量的值为0。</p>
+</blockquote>
+<p>而最后就是向组播会议室中发送消息了，这个依然和单播时一样，使用<code>sendto</code>方法，不同的是，此刻你需要将<code>sendto</code>的接收地址设置为一个组播地址，而你的操作系统自然会识别出来，并自动将这个消息作为组播消息发送出去。</p>
+<h3 id="u5176_u5B83-2"><a href="#u5176_u5B83-2" class="headerlink" title="其它"></a>其它</h3><p>一个TCP连接可以使用一个四元组来唯一标示：<strong>&lt;发送地址, 发送端口号, 接收地址, 接收端口号&gt;</strong>，而对于一个socket连接来说，应该是使用一个五元组来唯一标示一个连接：<strong>&lt;发送地址, 发送端口号, 接收地址, 接收端口号, 协议&gt;</strong>，而在操作系统内核中，要求每个socket连接都是唯一的，在<code>bind</code>方法中，将会设置一个socket对象的<strong>发送地址</strong>以及<strong>发送端口号</strong>（当然，这个方法也同样会导致操作系统设置这个socket对象可接收数据的范围，也就是只有数据包的目的地址为你绑定的地址时，才会将该数据包发送到这个socket），在<code>connect</code>方法中，将会设置<strong>接收地址</strong>和<strong>接收端口号</strong>，这样，一个socket就可以被唯一确定了。</p>
+<blockquote>
+<p>注意一个UDP协议的socket连接，也可以使用<code>connect</code>方法，与TCP中不同的是，该方法在UDP协议下仅仅设置socket的目的地址，而不会进行三次握手操作。当你在一个UDP连接中调用了<code>connect</code>方法后，你也可以像在TCP连接中那样使用<code>send</code>方法和<code>recv</code>方法，这个时候目的地址就是你<code>connect</code>的地址，这在某些情况下可以优化性能。</p>
+</blockquote>
+<p>我们可以使用<code>SO_REUSEADDR</code>选项或者<code>SO_REUSEPORT</code>选项来指定某一个socket上的地址可以被“重用”，当然这里并不是说操作系统允许同时存在两个相同的socket连接，这个重用一般用于监听服务器上，可以使得一个位于<code>TIME_WAITE</code>状态的socket绑定地址立即可用于新的绑定。此外，<code>SO_REUSEADDR</code>还会影响到系统对通配地址的解析规则，有关这两个选项的更多信息以及操作系统之间的实施区别，可以从网上搜索到更详细的资料，比如这篇文章：<a href="http://blog.chinaunix.net/uid-28587158-id-4006500.html" target="_blank" rel="external">http://blog.chinaunix.net/uid-28587158-id-4006500.html</a>。</p>
+<blockquote>
+<p>当你对一个UDP连接使用<code>SO_REUSEADDR</code>或者<code>SO_REUSEPORT</code>时，不同于TCP的情形，这时候操作系统将会允许多个socket“完全的”重用一个地址（包括端口号），当然为了防止“端口窃听”，操作系统也会对这种情况有所限制或者应对措施。这个时候，你就可以在一个进程或多个进程中将socket绑定到同一个地址了，当消息来临的时候，这些socket都会收到。这种情况我已经在Windows下验证过了，一个App的多实例都可以接收到发来的消息。</p>
+</blockquote>
+<h2 id="u5199_u5728_u6700_u540E"><a href="#u5199_u5728_u6700_u540E" class="headerlink" title="写在最后"></a>写在最后</h2><p>在这里所记录的远远没有穷举完有关socket的知识，以及它们在不同平台下的差异，如果你确实需要编写跨平台的socket相关程序，那么你需要亲自去对比平台差异，并亲自去试验了解不同的平台提供的API，甚至也不妨对有些API自己去造一把轮子。</p>
+<p>而更多时候，我们还是会针对某一个平台或一系列相关的平台进行开发，这样的话，也许相关平台的操作系统会在基本的BSD形式的API之外添加更多适用于平台特性的API，这些API也许无法跨平台，但是却是可以针对特定平台优化使用以及性能，比如Windows下的<code>WSA*</code>方法，可以用于IOCP模型，而在OS X中，也在上述通用API之外提供了更多的易用的socket方法。使用这些特定于平台的方法，也许可以给开发带来更多的方便。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>最近因为要处理<code>UPnP</code>库所涉及的<code>socket</code>层次抽象，于是专门查看和测试了部分Windows和Unix-like系统中socket用法。总体来说，两者之间相似度很高（毕竟最初Windows上的socket方法就是从Unix系统中移植过去的），但是细节之间的差异也不小。当从Windows向Unix（Linux）系统移植或者从Unix（Linux）系统向Windows移植一个使用了socket的应用时，有些差异可以使用<code>typedef</code>、<code>#define</code>等方式来消除，但是有些不同用法却需要对主要代码进行改动。</p>
+<p>这里只会记录部分我查看的或测试过的结果。下面是我用于测试的三台主机所用的系统：</p>
+<ul>
+<li>Microsoft Windows 10 专业版（10586.36）</li>
+<li>Apple OS X Yosemite（10.10.5）</li>
+<li>Microsoft Windows 10 专业版（10586.122）</li>
+</ul>
+<p>其中两个Windows系统的主机连接到了同一台交换机上；而OS X系统的主机则使用无线网络连接到其中一个Windows系统创建的热点。</p>]]>
+    
+    </summary>
+    
+      <category term="Unixsock" scheme="http://3meng.github.io/tags/Unixsock/"/>
+    
+      <category term="Winsock" scheme="http://3meng.github.io/tags/Winsock/"/>
+    
+      <category term="Socket" scheme="http://3meng.github.io/categories/Socket/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[【译】实现一个DLNA兼容的UPnP AV媒体服务器]]></title>
@@ -663,7 +828,7 @@ server: rtpserver 0.0.2svn
     <link href="http://3meng.github.io/2016/02/24/Treap-tree/"/>
     <id>http://3meng.github.io/2016/02/24/Treap-tree/</id>
     <published>2016-02-24T13:25:47.000Z</published>
-    <updated>2016-02-25T08:18:44.000Z</updated>
+    <updated>2016-03-06T14:11:54.000Z</updated>
     <content type="html"><![CDATA[<p>下面的题目是<strong>《算法导论（第三版）》</strong>中红黑树一章的思考题13-4，主要介绍与分析了<code>Treap树</code>的一些知识和性质。本文也将以原题内容作为线索，通过证明和解答其中的问题，来说明<code>Treap树</code>的主要特点。</p>
 <p>有些问题也是比较棘手的，受限于个人能力，因此并无法保证所有证明过程的正确性，而在合适的时机，我将会给出社区讨论链接。</p>
 <blockquote>
@@ -804,11 +969,9 @@ server: rtpserver 0.0.2svn
     
     </summary>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/tags/Algorithm/"/>
-    
       <category term="Treap" scheme="http://3meng.github.io/tags/Treap/"/>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/categories/Algorithm/"/>
+      <category term="算法" scheme="http://3meng.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
@@ -1143,7 +1306,7 @@ server: rtpserver 0.0.2svn
     <link href="http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/"/>
     <id>http://3meng.github.io/2016/02/17/non-recursive-traversal-of-binary-tree/</id>
     <published>2016-02-17T11:45:09.000Z</published>
-    <updated>2016-02-24T13:31:35.000Z</updated>
+    <updated>2016-03-06T14:11:29.000Z</updated>
     <content type="html"><![CDATA[<p>今天看到了<strong>《算法导论（第三版）》</strong>第三部分中第十章内容，在<code>10.4节</code>遇到了一个题目，要求在<code>O(n)</code>（即上限渐进时间为线性）时间内非递归遍历二叉树，并且只能使用固定量的额外存储空间。</p>
 <blockquote>
 <p><strong>10.4-5</strong> 给定一个<em>n</em>结点的二叉树，写出一个<code>O(n)</code>时间的非递归过程，将该树每个节点的关键字输出。要求除该树本身的存储空间外只能使用固定量的额外存储空间，且在过程中不得修改该树，即使是暂时的修改也不允许。</p>
@@ -1272,11 +1435,9 @@ server: rtpserver 0.0.2svn
     
     </summary>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/tags/Algorithm/"/>
-    
       <category term="Binary Tree" scheme="http://3meng.github.io/tags/Binary-Tree/"/>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/categories/Algorithm/"/>
+      <category term="算法" scheme="http://3meng.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
@@ -1285,7 +1446,7 @@ server: rtpserver 0.0.2svn
     <link href="http://3meng.github.io/2016/02/08/Algorithm-of-Finding-Maximum-SubArray/"/>
     <id>http://3meng.github.io/2016/02/08/Algorithm-of-Finding-Maximum-SubArray/</id>
     <published>2016-02-08T06:10:07.000Z</published>
-    <updated>2016-02-22T14:16:01.000Z</updated>
+    <updated>2016-03-06T14:11:02.000Z</updated>
     <content type="html"><![CDATA[<p>最近开始看<strong>《算法导论（第三版）》</strong>这本书，在第4章讲解<em>分治策略</em>的时候，举了一个例子：<strong>最大子数组</strong>问题（<code>4.1节</code>），简单来说，就是在一个给定的数组中，找出一个非空<strong>连续</strong>子数组，使这个数组中元素的<strong>总和最大</strong>，我们称这样的子数组为<strong>最大子数组</strong>。</p>
 <p>在书中讲解分析了两种解决方法，一种就是最容易想到的暴力求解方法，另一种自然就是主题相关的分治法；然后在结束的时候，提到了可以实现一种更快速的线性时间的算法，这里将给出我的思路（原书这里描述有误，不知道是作者/译者笔误还是印刷错误）。</p>
 <a id="more"></a>
@@ -1539,11 +1700,9 @@ max_subarray find_maximum_subarray(int A[], unsigned low, unsigned high)
     
     </summary>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/tags/Algorithm/"/>
-    
       <category term="Maximum SubArray" scheme="http://3meng.github.io/tags/Maximum-SubArray/"/>
     
-      <category term="Algorithm" scheme="http://3meng.github.io/categories/Algorithm/"/>
+      <category term="算法" scheme="http://3meng.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
@@ -2822,13 +2981,13 @@ RD [/S] [/Q] [drive:]path
   </entry>
   
   <entry>
-    <title><![CDATA[Windows Sockets：多线程WEB服务器]]></title>
+    <title><![CDATA[Windows Socket：多线程WEB服务器]]></title>
     <link href="http://3meng.github.io/2015/06/10/Windows-Sockets/"/>
     <id>http://3meng.github.io/2015/06/10/Windows-Sockets/</id>
     <published>2015-06-09T16:32:10.000Z</published>
-    <updated>2016-02-22T14:24:35.000Z</updated>
+    <updated>2016-03-06T14:06:05.000Z</updated>
     <content type="html"><![CDATA[<p>平时如果一个项目需要网络连接，一般都是直接用如<code>C#</code>、<code>Java</code>等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用<code>C#</code>中的Socket相关类做过一点有关长连接的事情。</p>
-<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Sockets API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
+<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Socket API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
 <h2 id="u5B9E_u9A8C_u8981_u6C42"><a href="#u5B9E_u9A8C_u8981_u6C42" class="headerlink" title="实验要求"></a>实验要求</h2><ol>
 <li>可配置IP地址、监听端口和主目录</li>
 <li>能够在监听端口上进行监听</li>
@@ -3394,7 +3553,7 @@ finish:
 ]]></content>
     <summary type="html">
     <![CDATA[<p>平时如果一个项目需要网络连接，一般都是直接用如<code>C#</code>、<code>Java</code>等高级语言直接调用相关的函数去实现功能，甚至从未关注过在底层这些函数是怎么运作的；而截至不久前，也只是用<code>C#</code>中的Socket相关类做过一点有关长连接的事情。</p>
-<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Sockets API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
+<p>而最近，恰好由于网络课程实验要求，使用<code>Windows Socket API</code> + <code>C/C++</code>来实现一个简单的多线程Web服务器，于是开始一边摸索，一边实现功能。在这个实验中，不仅仅是简单的<code>Windows Socket</code>函数调用，其实主要的工作还在于多线程（包括GUI线程）之间的通信，对于HTTP请求，也只是简单的实现了<code>GET</code>方法。</p>
 <h2 id="u5B9E_u9A8C_u8981_u6C42"><a href="#u5B9E_u9A8C_u8981_u6C42" class="headerlink" title="实验要求"></a>实验要求</h2><ol>
 <li>可配置IP地址、监听端口和主目录</li>
 <li>能够在监听端口上进行监听</li>
@@ -3410,7 +3569,7 @@ finish:
     
     </summary>
     
-      <category term="Windows Sockets" scheme="http://3meng.github.io/tags/Windows-Sockets/"/>
+      <category term="Winsock" scheme="http://3meng.github.io/tags/Winsock/"/>
     
       <category term="Socket" scheme="http://3meng.github.io/categories/Socket/"/>
     
